@@ -71,7 +71,7 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <ErrorBoundary>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
           <Toaster />
           <Sonner />
