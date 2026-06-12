@@ -29,7 +29,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 const playSound = () => {
-  const soundPref = localStorage.getItem('padma_sound') as any || 'pop';
+  const soundPref = localStorage.getItem('sadma_sound') as any || 'pop';
   playNotificationSound(soundPref);
 };
 

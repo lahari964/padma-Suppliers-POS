@@ -110,7 +110,7 @@ export default function Bills() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `PadmaPOS_${activeTab}_bills_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+      link.setAttribute('download', `SadmaPOS_${activeTab}_bills_${format(new Date(), 'yyyy-MM-dd')}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -127,7 +127,7 @@ export default function Bills() {
     const paid = bill.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
     const balance = Math.max(0, bill.totalCost - paid - (bill.discount || 0));
     
-    const text = `Hello ${bill.customerName},\n\nThis is a friendly update regarding your rental order (${bill.id}) with Padma Suppliers.\n\nTotal Amount: ₹${bill.totalCost}\nAdvance Paid: ₹${bill.advance}\nTotal Paid so far: ₹${paid}\n*Remaining Balance: ₹${balance}*\n\nPlease let us know if you have any questions. Thank you!`;
+    const text = `Hello ${bill.customerName},\n\nThis is a friendly update regarding your rental order (${bill.id}) with Sadma Suppliers.\n\nTotal Amount: ₹${bill.totalCost}\nAdvance Paid: ₹${bill.advance}\nTotal Paid so far: ₹${paid}\n*Remaining Balance: ₹${balance}*\n\nPlease let us know if you have any questions. Thank you!`;
     
     const encodedText = encodeURIComponent(text);
     // Remove all non-numeric characters from mobile just in case

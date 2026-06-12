@@ -8,7 +8,7 @@ import { getBillDisplayInfo } from '../hooks/useBillCalculations';
 export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const { preferences } = useStore();
   const biz = preferences.businessDetails || {
-    name: 'Padma POS',
+    name: 'Sadma POS',
     tagline: '',
     address: '',
     phone: '',
@@ -25,7 +25,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
     return createPortal(
       <div id="print-section" className="hidden print:block font-mono text-black mx-auto text-[12px] leading-tight p-2" style={{ width: thermalSize, maxWidth: thermalSize }}>
         <div className="text-center mb-4 flex flex-col items-center">
-          <img src="/logo.png" alt="Padma Suppliers Logo" className="w-12 h-12 mb-2 object-contain filter grayscale" />
+          <img src="/logo.png" alt="Sadma Suppliers Logo" className="w-12 h-12 mb-2 object-contain filter grayscale" />
           <h1 className="text-lg font-bold uppercase">{biz.name}</h1>
           {biz.tagline && <p className="text-xs">{biz.tagline}</p>}
           {biz.address && <p className="text-xs mt-1">{biz.address}</p>}
@@ -127,7 +127,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
       <div className="flex justify-between items-start mb-8">
         <div className="flex gap-4">
           <div className="w-12 h-12 shrink-0">
-            <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Sadma Suppliers Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className="text-4xl font-serif font-bold uppercase tracking-tight leading-none mb-2">{biz.name || 'PADMA\nSUPPLIERS'}</h1>
@@ -241,9 +241,9 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
       {/* Footer Message */}
       <div className="text-center mt-8 text-sm">
         {isReturnedStatus ? (
-          <p>All items returned. Thank you for choosing {biz.name || 'Padma Suppliers'}!</p>
+          <p>All items returned. Thank you for choosing {biz.name || 'Sadma Suppliers'}!</p>
         ) : (
-          <p>Thank you for choosing {biz.name || 'Padma Suppliers'}!</p>
+          <p>Thank you for choosing {biz.name || 'Sadma Suppliers'}!</p>
         )}
       </div>
 

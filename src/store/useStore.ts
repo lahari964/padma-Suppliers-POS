@@ -60,19 +60,19 @@ interface StoreState {
 
 export const useStore = create<StoreState>((set) => ({
   bills: (() => {
-    const saved = localStorage.getItem('padma_bills');
+    const saved = localStorage.getItem('sadma_bills');
     return saved ? JSON.parse(saved) : [];
   })(),
   inventory: (() => {
-    const saved = localStorage.getItem('padma_inventory');
+    const saved = localStorage.getItem('sadma_inventory');
     return saved ? JSON.parse(saved) : DEFAULT_INVENTORY;
   })(),
   employees: (() => {
-    const saved = localStorage.getItem('padma_employees');
+    const saved = localStorage.getItem('sadma_employees');
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
   })(),
   currentUser: (() => {
-    const saved = sessionStorage.getItem('padma_current_user');
+    const saved = sessionStorage.getItem('sadma_current_user');
     return saved ? JSON.parse(saved) : null;
   })(),
   isDatabaseConnected: false,
@@ -80,15 +80,15 @@ export const useStore = create<StoreState>((set) => ({
   visualTheme: 'minimal',
   colorTheme: 'purple',
   preferences: (() => {
-    const saved = localStorage.getItem('padma_preferences');
+    const saved = localStorage.getItem('sadma_preferences');
     return saved ? JSON.parse(saved) : {
       businessDetails: {
-        name: 'Padma Suppliers',
+        name: 'Sadma Suppliers',
         tagline: 'Premium Quality (since 1977)',
         address: 'ganugapalem, ongole, Andhra Pradesh -523001',
         phone: '+91 9000000000, +91 8000000000, +91 7000000000, 08592-238543',
         terms: '1. Transportation and delivery charges are extra.\n2. Customers are fully liable for any damage or loss of rented items and must cover repair/replacement costs.\n3. All payments must be settled strictly according to the prior agreed terms.\n4. Late returns will incur additional daily rental fees.',
-        signatureLabel: 'For Padma Suppliers'
+        signatureLabel: 'For Sadma Suppliers'
       },
       receiptTemplate: 'Standard A4',
       thermalSize: '80mm',
@@ -109,14 +109,14 @@ export const useStore = create<StoreState>((set) => ({
 
   setBills: (bills) => set({ bills }),
   setInventory: (inventory) => {
-    localStorage.setItem('padma_inventory', JSON.stringify(inventory));
+    localStorage.setItem('sadma_inventory', JSON.stringify(inventory));
     set({ inventory });
   },
   updateInventoryQty: (id, delta) => set((state) => {
     const newInventory = state.inventory.map(item => 
       item.id === id ? { ...item, qtyAvailable: Math.max(0, (item.qtyAvailable || 0) + delta) } : item
     );
-    localStorage.setItem('padma_inventory', JSON.stringify(newInventory));
+    localStorage.setItem('sadma_inventory', JSON.stringify(newInventory));
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { inventory: newInventory };
   }),
@@ -129,18 +129,18 @@ export const useStore = create<StoreState>((set) => ({
         qtyAvailable: Math.max(0, (item.qtyAvailable || 0) - delta)
       } : item
     );
-    localStorage.setItem('padma_inventory', JSON.stringify(newInventory));
+    localStorage.setItem('sadma_inventory', JSON.stringify(newInventory));
     return { inventory: newInventory };
   }),
   setEmployees: (employees) => {
-    localStorage.setItem('padma_employees', JSON.stringify(employees));
+    localStorage.setItem('sadma_employees', JSON.stringify(employees));
     set({ employees });
   },
   setCurrentUser: (user) => {
     if (user) {
-      sessionStorage.setItem('padma_current_user', JSON.stringify(user));
+      sessionStorage.setItem('sadma_current_user', JSON.stringify(user));
     } else {
-      sessionStorage.removeItem('padma_current_user');
+      sessionStorage.removeItem('sadma_current_user');
     }
     set({ currentUser: user });
   },
@@ -151,34 +151,34 @@ export const useStore = create<StoreState>((set) => ({
 
   addBill: (bill) => set((state) => {
     const newBills = [...state.bills, bill];
-    localStorage.setItem('padma_bills', JSON.stringify(newBills));
+    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
     return { bills: newBills };
   }),
   updateBill: (id, updated) => set((state) => {
     const newBills = state.bills.map(b => b.id === id ? { ...b, ...updated } : b);
-    localStorage.setItem('padma_bills', JSON.stringify(newBills));
+    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { bills: newBills };
   }),
   deleteBill: (id) => set((state) => {
     const newBills = state.bills.filter(b => b.id !== id);
-    localStorage.setItem('padma_bills', JSON.stringify(newBills));
+    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
     return { bills: newBills };
   }),
   setPreferences: (prefs) => set((state) => {
     const newPrefs = { ...state.preferences, ...prefs, alerts: { ...state.preferences.alerts, ...(prefs.alerts || {}) }, businessDetails: { ...state.preferences.businessDetails, ...(prefs.businessDetails || {}) } };
-    localStorage.setItem('padma_preferences', JSON.stringify(newPrefs));
+    localStorage.setItem('sadma_preferences', JSON.stringify(newPrefs));
     return { preferences: newPrefs };
   }),
   addEmployee: (employee) => set((state) => {
     const newEmployees = [...state.employees, employee];
-    localStorage.setItem('padma_employees', JSON.stringify(newEmployees));
+    localStorage.setItem('sadma_employees', JSON.stringify(newEmployees));
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { employees: newEmployees };
   }),
   updateEmployee: (id, updated) => set((state) => {
     const newEmployees = state.employees.map(e => e.id === id ? { ...e, ...updated } : e);
-    localStorage.setItem('padma_employees', JSON.stringify(newEmployees));
+    localStorage.setItem('sadma_employees', JSON.stringify(newEmployees));
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { employees: newEmployees };
   }),

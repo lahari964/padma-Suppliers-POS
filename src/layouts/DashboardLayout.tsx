@@ -137,7 +137,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 {!logoError ? (
                   <img 
                     src="/logo.png" 
-                    alt="Padma Suppliers Logo" 
+                    alt="Sadma Suppliers Logo" 
                     className="h-8 w-auto object-contain"
                     onError={() => setLogoError(true)}
                   />
@@ -146,7 +146,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <span className="text-primary font-bold text-lg">P</span>
                   </div>
                 )}
-                <h1 className="font-bold text-xl tracking-tight hidden sm:block">Padma Suppliers</h1>
+                <h1 className="font-bold text-xl tracking-tight hidden sm:block">Sadma Suppliers</h1>
               </div>
             </div>
 

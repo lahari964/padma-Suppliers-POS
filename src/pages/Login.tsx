@@ -17,7 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const setCurrentUser = useStore(state => state.setCurrentUser);
   const [employees, setEmployees] = useState(() => {
-    const saved = localStorage.getItem('padma_employees');
+    const saved = localStorage.getItem('sadma_employees');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.length === 3 && parsed[0].name === 'Owner' && parsed[1].name === 'Manager') {
@@ -32,7 +32,7 @@ export default function Login() {
   const [loginPin, setLoginPin] = useState('');
 
   useEffect(() => {
-    const saved = sessionStorage.getItem('padma_current_user');
+    const saved = sessionStorage.getItem('sadma_current_user');
     if (saved) {
       navigate('/');
     }
@@ -43,7 +43,7 @@ export default function Login() {
       const { syncDownFromCloud } = await import('../lib/supabase');
       const { success } = await syncDownFromCloud();
       if (success) {
-        const updated = localStorage.getItem('padma_employees');
+        const updated = localStorage.getItem('sadma_employees');
         if (updated) {
           setEmployees(JSON.parse(updated));
         }
@@ -73,7 +73,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-sm shadow-lg border-border">
         <CardHeader className="text-center space-y-4">
-          <img src="https://assets.cdn.filesafe.space/9YKSM9vJJwAmtxbBkIyB/media/6a136179fe2210f89e688b6d.png" alt="Padma Suppliers" className="h-16 mx-auto object-contain" />
+          <img src="https://assets.cdn.filesafe.space/9YKSM9vJJwAmtxbBkIyB/media/6a136179fe2210f89e688b6d.png" alt="Sadma Suppliers" className="h-16 mx-auto object-contain" />
           <CardTitle className="text-xl">Staff Login</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">

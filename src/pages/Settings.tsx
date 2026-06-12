@@ -242,7 +242,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `padmapos-backup.json`;
+      a.download = `sadmapos-backup.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -298,7 +298,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
     const link = document.createElement('a');
     link.setAttribute('href', url);
     const dateRangeStr = (exportStartDate && exportEndDate) ? `${exportStartDate}_to_${exportEndDate}` : 'All';
-    link.setAttribute('download', `PadmaPOS_Bills_${dateRangeStr}.csv`);
+    link.setAttribute('download', `SadmaPOS_Bills_${dateRangeStr}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -716,7 +716,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                       }
                       if (Notification.permission === "granted") {
                         setPreferences({ pushEnabled: true });
-                        new Notification("Notifications Enabled", { body: "You will now receive padmaPOS alerts!" });
+                        new Notification("Notifications Enabled", { body: "You will now receive sadmaPOS alerts!" });
                       } else if (Notification.permission !== "denied") {
                         Notification.requestPermission().then((permission) => {
                           if (permission === "granted") {

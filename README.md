@@ -1,4 +1,4 @@
-# Padma POS - Tenthouse & Event Rentals
+# Sadma POS - Tenthouse & Event Rentals
 
 A comprehensive Point of Sale (POS) and inventory management system designed specifically for tenthouse and event rental businesses. Built with React, TypeScript, Tailwind CSS, and powered by an offline-first architecture with real-time Supabase background syncing.
 
