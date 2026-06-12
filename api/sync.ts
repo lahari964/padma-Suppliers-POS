@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   // 2. Initialize Supabase
   const url = process.env.VITE_SUPABASE_URL; // Can still use VITE_ prefix here since it exists in Vercel
-  const key = process.env.SUPABASE_SERVICE_KEY;
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_SERVICE_KEY;
 
   if (!url || !key) {
     return res.status(500).json({ success: false, error: 'Server misconfiguration: Missing Supabase credentials.' });
