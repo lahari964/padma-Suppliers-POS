@@ -15,8 +15,8 @@ const FAQ_DATA = [
       { q: "How do I log out manually?", a: "Click on your profile name/avatar at the top right corner of the screen to open the 'My Account' menu. Then, click the red 'Logout' button at the bottom of the menu. This will securely log you out of the system." },
       { q: "What happens if I click the 'Padma Suppliers' logo at the top left?", a: "Clicking the logo acts as a 'Home' button and will instantly return you to the Dashboard from anywhere in the app." },
       { q: "What happens if I enter the wrong PIN?", a: "The system will show an 'Invalid PIN' error. If you forget your PIN, you must ask an Admin to reset it for you from the Settings page." },
-      { q: "How do I switch between Light and Dark mode?", a: "Go to the Settings page and select the 'General' tab. You will find a toggle switch for 'Dark Mode'. Click it to instantly switch between light and dark themes." },
-      { q: "What does the 'Offline' red dot at the top right mean?", a: "It means your app is not connected to the cloud database. You can still use the app normally (create bills, add inventory), and all data is saved locally on your computer." }
+      { q: "How do I switch between Light and Dark mode?", a: "Go to the Settings page and select the 'General' tab. You will find a toggle switch for 'Dark Mode'. By default, the app automatically matches your phone or computer's system settings (Light/Dark), but you can manually override it here and it will remember your choice permanently." },
+      { q: "What does the 'Offline' red dot at the top right mean?", a: "It means your device lost internet connection. Because padmaPOS is an Offline-First app, you can still use it completely normally (create bills, manage inventory, take payments). All data is saved safely to your browser's memory. When your internet returns, it will automatically sync up to the secure cloud." }
     ]
   },
   {
@@ -133,15 +133,15 @@ const FAQ_DATA = [
     ]
   },
   {
-    category: "10. Troubleshooting, Optimizations & Database",
+    category: "10. Troubleshooting, Security & Database",
     icon: <Database className="w-5 h-5 text-cyan-500" />,
     items: [
-      { q: "Why is the app loading so much faster now?", a: "We recently heavily optimized the software by permanently removing clunky PDF-generation libraries. By removing these, the app's bundle size was reduced by nearly 2 Megabytes, resulting in lightning-fast load times even on slow mobile data connections! We now use the browser's ultra-fast native print function instead." },
+      { q: "Why is the app loading so much faster now?", a: "We heavily optimized the software by implementing 'Code Splitting'. The app now only downloads the specific page you are looking at (around 300kb) instead of downloading the entire application at once, resulting in lightning-fast load times even on slow mobile data connections!" },
+      { q: "Where do I enter my Database Keys?", a: "For maximum security, you NO LONGER enter database keys into the app itself! The master keys are securely locked inside your Vercel Environment Variables. The app communicates with Supabase through a secure Serverless Proxy, making it impossible for hackers to steal your keys." },
       { q: "What does 'Please fill all required fields' mean?", a: "This error pops up if you try to save something but left a mandatory box empty (like a Customer Name on a bill, or a PIN when adding staff)." },
-      { q: "What is the 'Database Repair Tool'?", a: "If you connect to a cloud database (Supabase) and the tables are missing, you click 'Generate Repair SQL'. You copy the code and paste it into your cloud provider to fix the tables." },
-      { q: "What does 'Danger Zone: Wipe Database' do?", a: "It permanently deletes absolutely everything: all bills, all inventory, all staff. It resets the software to Day 1." },
-      { q: "How do I actually wipe the database?", a: "You must click 'Wipe Database', then manually type the exact words 'DELETE EVERYTHING' in all capital letters, and then confirm." },
-      { q: "What if the screen freezes or bugs out?", a: "Simply refresh the webpage. Because data is saved locally, you will not lose anything." }
+      { q: "What is the 'Database Repair Tool'?", a: "If your cloud database tables are missing or corrupted, you can click 'Generate Repair SQL' in the Database tab (Admin only). You copy this code and paste it into Supabase's SQL Editor to instantly recreate all necessary tables." },
+      { q: "What does 'Danger Zone: Wipe Database' do?", a: "It permanently deletes absolutely everything: all bills, all inventory, all staff. It resets the software to Day 1. You must explicitly type 'DELETE EVERYTHING' to confirm." },
+      { q: "What if the screen freezes or bugs out?", a: "Simply refresh the webpage. Because data is saved locally first, you will not lose anything." }
     ]
   },
   {
