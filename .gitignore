@@ -7,3 +7,4 @@ dist/
 test-results/
 .last-run.json
 *.log
+padmaSuppliersPOS.numbers
