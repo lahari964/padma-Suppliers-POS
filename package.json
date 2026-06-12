@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "padma-pos",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -67,7 +67,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@leadconnector/vibe-tagger": "^0.3.1",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
