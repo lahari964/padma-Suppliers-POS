@@ -6,18 +6,27 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { useStore } from "./store/useStore";
 
-import Login from "./pages/Login";
-import DashboardLayout from "./layouts/DashboardLayout";
-import Dashboard from "./pages/Dashboard";
-import Bills from "./pages/Bills";
-import NewBill from "./pages/NewBill";
-import Inventory from "./pages/Inventory";
-import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import Previews from "./pages/Previews";
-import CalendarView from "./pages/CalendarView";
-import HelpCenter from "./pages/HelpCenter";
+import { Suspense, lazy } from 'react';
+import { Loader2 } from 'lucide-react';
+
+const Login = lazy(() => import("./pages/Login"));
+const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Bills = lazy(() => import("./pages/Bills"));
+const NewBill = lazy(() => import("./pages/NewBill"));
+const Inventory = lazy(() => import("./pages/Inventory"));
+const Settings = lazy(() => import("./pages/Settings"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Previews = lazy(() => import("./pages/Previews"));
+const CalendarView = lazy(() => import("./pages/CalendarView"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 import { ErrorBoundary } from "./components/ErrorBoundary";
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Loader2 className="w-8 h-8 animate-spin text-primary opacity-50" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -67,20 +76,22 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
-              <Route path="/new-bill" element={<ProtectedRoute><NewBill /></ProtectedRoute>} />
-              <Route path="/inventory" element={<ProtectedRoute allowedRoles={['Admin', 'Manager']}><Inventory /></ProtectedRoute>} />
-              <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/manual" element={<ProtectedRoute><HelpCenter /></ProtectedRoute>} />
-              
-              <Route path="/404-previews" element={<Previews />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                
+                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
+                <Route path="/new-bill" element={<ProtectedRoute><NewBill /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute allowedRoles={['Admin', 'Manager']}><Inventory /></ProtectedRoute>} />
+                <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/manual" element={<ProtectedRoute><HelpCenter /></ProtectedRoute>} />
+                
+                <Route path="/404-previews" element={<Previews />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
