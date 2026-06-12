@@ -17,7 +17,6 @@ const NewBill = lazy(() => import("./pages/NewBill"));
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Previews = lazy(() => import("./pages/Previews"));
 const CalendarView = lazy(() => import("./pages/CalendarView"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -87,8 +86,6 @@ const App = () => {
                 <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/manual" element={<ProtectedRoute><HelpCenter /></ProtectedRoute>} />
-                
-                <Route path="/404-previews" element={<Previews />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
