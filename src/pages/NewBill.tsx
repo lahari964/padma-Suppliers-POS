@@ -315,8 +315,8 @@ export default function NewBill() {
       </div>
 
       {/* Right Column: Inventory */}
-      <div className="w-full md:w-[400px] flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="w-full md:w-[400px] flex flex-col h-full max-h-[calc(100vh-6rem)] overflow-hidden space-y-4">
+        <div className="flex items-center justify-between shrink-0">
           <h2 className="text-2xl font-bold">Inventory</h2>
           <div className="relative w-48">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
