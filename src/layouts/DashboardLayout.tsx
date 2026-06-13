@@ -203,6 +203,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </DropdownMenu>
             </div>
           </header>
+          
+          {!isDatabaseConnected && (
+            <div className="bg-destructive/10 border-b border-destructive/20 p-2.5 px-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
+                </span>
+                <p className="text-sm font-medium text-destructive text-center sm:text-left">
+                  Website is offline now. Once connected, click the health check in Settings → Database.
+                </p>
+              </div>
+              <Button size="sm" variant="outline" className="h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 whitespace-nowrap" onClick={() => navigate('/settings')}>
+                Go to Settings
+              </Button>
+            </div>
+          )}
+
           <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative">
             {children}
           </main>
