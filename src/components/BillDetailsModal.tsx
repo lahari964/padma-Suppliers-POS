@@ -373,6 +373,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         qtyReturned: 0,
         days: 1,
         isDispatched: false,
+        isAddedPostBilling: displayStatus !== 'Upcoming',
         handledBy: currentUser?.name
       };
       
@@ -454,7 +455,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
   const handleStartBilling = () => {
     let updatedItems = [...bill.items];
-    updatedItems = updatedItems.map(i => ({ ...i, issueDate: billingStartDate, issueTime: billingStartTime }));
+    updatedItems = updatedItems.map(i => ({ ...i, issueDate: billingStartDate, issueTime: billingStartTime, isDispatched: true, dispatchDate: billingStartDate, dispatchTime: billingStartTime }));
     
     const newAuditLog = {
       timestamp: Date.now(),

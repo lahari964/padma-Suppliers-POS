@@ -61,7 +61,21 @@ interface StoreState {
 export const useStore = create<StoreState>((set) => ({
   bills: (() => {
     const saved = localStorage.getItem('sadma_bills');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed.map((b: any) => {
+        if (b.billingStarted) {
+          b.items = b.items.map((i: any) => {
+             if (i.isDispatched === false && !i.isAddedPostBilling) {
+                 return { ...i, isDispatched: true, dispatchDate: i.issueDate, dispatchTime: i.issueTime };
+             }
+             return i;
+          });
+        }
+        return b;
+      });
+    } catch { return []; }
   })(),
   inventory: (() => {
     const saved = localStorage.getItem('sadma_inventory');
