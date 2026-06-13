@@ -45,6 +45,15 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [isEditingTransport, setIsEditingTransport] = useState(false);
   const [transportTemp, setTransportTemp] = useState('');
 
+  const [isEditingPromiseDate, setIsEditingPromiseDate] = useState(false);
+  const [promiseDateTemp, setPromiseDateTemp] = useState('');
+
+  const handleSavePromiseDate = () => {
+    updateBill(bill.id, { paymentPromiseDate: promiseDateTemp || undefined });
+    setIsEditingPromiseDate(false);
+    toast.success('Payment promise date updated');
+  };
+
   const handleSaveTransport = () => {
     const newTransport = Number(transportTemp) || 0;
     const oldTransport = bill.transportationCharges || 0;
@@ -674,6 +683,41 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Event Date</p>
               <p className="font-semibold text-foreground">{bill.eventDate}</p>
+            </div>
+            
+            {/* Payment Promise Date */}
+            <div className="space-y-1 group relative rounded-xl p-2 -m-2 hover:bg-muted/30 transition-all">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                  <div className="w-4 h-4 rounded-full bg-orange-500/10 flex items-center justify-center">
+                    <Calendar className="w-2.5 h-2.5 text-orange-500" />
+                  </div>
+                  Promise Date
+                </p>
+                {!isEditingPromiseDate && displayStatus === 'Pending' && (
+                  <button onClick={() => { setPromiseDateTemp(bill.paymentPromiseDate || ''); setIsEditingPromiseDate(true); }} className="bg-background border border-border/60 shadow-sm p-1.5 text-muted-foreground hover:text-primary hover:border-primary/30 rounded-md absolute right-2 top-2">
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              
+              {isEditingPromiseDate ? (
+                <div className="flex items-center gap-1.5 mt-2 animate-in fade-in slide-in-from-top-1">
+                  <Input 
+                    type="date" 
+                    value={promiseDateTemp} 
+                    onChange={e => setPromiseDateTemp(e.target.value)} 
+                    className="h-8 text-sm font-medium border-primary/40 focus-visible:ring-primary/20 bg-background" 
+                    autoFocus
+                  />
+                  <Button size="sm" onClick={handleSavePromiseDate} className="h-8 w-8 p-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm shrink-0"><CheckCircle2 className="w-4 h-4" /></Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingPromiseDate(false)} className="h-8 w-8 p-0 rounded-md text-muted-foreground hover:text-destructive shrink-0"><X className="w-4 h-4" /></Button>
+                </div>
+              ) : (
+                <p className="font-semibold text-foreground text-lg tracking-tight mt-1">
+                  {bill.paymentPromiseDate ? format(parseISO(bill.paymentPromiseDate), 'dd MMM yyyy') : <span className="text-muted-foreground italic text-sm">Not set</span>}
+                </p>
+              )}
             </div>
             
             {/* Transportation with inline edit */}

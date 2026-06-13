@@ -71,7 +71,7 @@ export default function Dashboard() {
     const status = getBillDisplayInfo(b).status;
     const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
     const balance = b.totalCost - paid - (b.discount || 0);
-    return balance > 0 && (status === 'Pending' || (b.paymentPromiseDate && b.paymentPromiseDate < todayStr));
+    return balance > 0 && status === 'Pending' && b.paymentPromiseDate && b.paymentPromiseDate <= todayStr;
   });
 
   const overdueReturns = bills.filter(b => {
