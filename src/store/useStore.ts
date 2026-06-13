@@ -121,7 +121,19 @@ export const useStore = create<StoreState>((set) => ({
     };
   })(),
 
-  setBills: (bills) => set({ bills }),
+  setBills: (bills) => set({ 
+    bills: bills.map((b: any) => {
+      if (b.billingStarted) {
+        b.items = b.items.map((i: any) => {
+           if (i.isDispatched === false && !i.isAddedPostBilling) {
+               return { ...i, isDispatched: true, dispatchDate: i.issueDate, dispatchTime: i.issueTime };
+           }
+           return i;
+        });
+      }
+      return b;
+    }) 
+  }),
   setInventory: (inventory) => {
     localStorage.setItem('sadma_inventory', JSON.stringify(inventory));
     set({ inventory });
