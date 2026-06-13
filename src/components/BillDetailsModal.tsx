@@ -124,6 +124,16 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
   const totalPaid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
   const remainingBalance = bill.totalCost - totalPaid - (bill.discount || 0);
+
+  // Define clear rules for when an item should appear in the "To Dispatch" vs "Active" tables
+  const isItemPendingDispatch = (i: any) => {
+    return i.isDispatched === false && (!bill.billingStarted || i.isAddedPostBilling);
+  };
+
+  const isItemConsideredDispatched = (i: any) => {
+    return i.isDispatched !== false || (bill.billingStarted && !i.isAddedPostBilling);
+  };
+
   const displayStatus = getBillDisplayInfo(bill).status;
 
   const handleDownloadPDF = () => {
@@ -792,7 +802,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           </div>
 
           {/* Items To Be Dispatched (Upcoming) */}
-          {bill.items.some(i => !i.isDispatched) && displayStatus !== 'Settled' && (
+          {bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
@@ -818,8 +828,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bill.items.filter(i => !i.isDispatched).map(item => {
-                      const dispatchedQty = bill.items.filter(i => i.inventoryId === item.inventoryId && i.isDispatched).reduce((acc, curr) => acc + curr.qtyIssued, 0);
+                    {bill.items.filter(isItemPendingDispatch).map(item => {
+                      const dispatchedQty = bill.items.filter(i => i.inventoryId === item.inventoryId && isItemConsideredDispatched(i)).reduce((acc, curr) => acc + curr.qtyIssued, 0);
                       const totalBooked = item.qtyIssued + dispatchedQty;
                       return (
                       <TableRow key={item.id} className="group">
@@ -851,7 +861,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           )}
 
           {/* Current Items Status (Active / Partially Active) */}
-          {bill.items.some(i => i.isDispatched !== false) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
+          {bill.items.some(isItemConsideredDispatched) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
@@ -885,7 +895,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bill.items.filter(i => i.isDispatched !== false).map(item => {
+                    {bill.items.filter(isItemConsideredDispatched).map(item => {
                       const pendingReturn = item.qtyIssued - (item.qtyReturned || 0);
                       return (
                         <TableRow key={item.id} className="group">
@@ -944,7 +954,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bill.items.filter(i => i.isDispatched !== false).map(item => (
+                    {bill.items.filter(isItemConsideredDispatched).map(item => (
                       <TableRow key={item.id} className="group">
                         <TableCell>
                           <p className="font-semibold text-foreground">{item.name}</p>
