@@ -12,7 +12,8 @@ export const getBillDisplayInfo = (bill: Bill) => {
   let upcomingCount = 0;
   
   bill.items.forEach(i => {
-    if (i.issueDate <= todayStr) dispatchedCount += i.qtyIssued;
+    const isDispatched = i.isDispatched === true || (!('isDispatched' in i) && i.issueDate <= todayStr) || (bill.billingStarted && !i.isAddedPostBilling);
+    if (isDispatched) dispatchedCount += i.qtyIssued;
     else upcomingCount += i.qtyIssued;
   });
   
