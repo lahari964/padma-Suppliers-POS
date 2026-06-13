@@ -215,9 +215,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     const sTime = modalTime;
 
     if (qty >= item.qtyIssued) {
-      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime } : i);
+      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: sDate, issueTime: sTime } : i);
     } else {
-      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime };
+      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: sDate, issueTime: sTime };
       const remainingItem = { ...item, qtyIssued: item.qtyIssued - qty };
       updatedItems = updatedItems.map(i => i.id === item.id ? remainingItem : i);
       updatedItems.push(sentItem);
@@ -791,7 +791,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           </div>
 
           {/* Items To Be Dispatched (Upcoming) */}
-          {bill.items.some(i => !i.isDispatched) && displayStatus === 'Upcoming' && (
+          {bill.items.some(i => !i.isDispatched) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
@@ -853,7 +853,14 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {bill.items.some(i => i.isDispatched !== false) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
-                <h3 className="text-xl font-bold font-serif text-foreground">Active / Dispatched Items Status</h3>
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xl font-bold font-serif text-foreground">Active / Dispatched Items Status</h3>
+                  {displayStatus !== 'Settled' && (
+                    <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
+                      + Add New Items to Order
+                    </Button>
+                  )}
+                </div>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
                     <input type="checkbox" checked={hasDamages} onChange={e => setHasDamages(e.target.checked)} className="accent-red-500 w-4 h-4" />
