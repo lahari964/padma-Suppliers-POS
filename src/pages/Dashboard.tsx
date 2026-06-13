@@ -68,9 +68,10 @@ export default function Dashboard() {
   ).sort((a, b) => a.paymentPromiseDate!.localeCompare(b.paymentPromiseDate!));
 
   const overduePayments = bills.filter(b => {
+    const status = getBillDisplayInfo(b).status;
     const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
     const balance = b.totalCost - paid - (b.discount || 0);
-    return balance > 0 && b.eventDate && b.eventDate <= todayStr;
+    return balance > 0 && (status === 'Pending' || (b.paymentPromiseDate && b.paymentPromiseDate < todayStr));
   });
 
   const overdueReturns = bills.filter(b => {
