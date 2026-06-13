@@ -39,21 +39,15 @@ export default function Settings() {
   const handleHealthCheck = async () => {
     toast.loading('Pinging database cluster...', { id: 'db-ping' });
     try {
-      const { getSupabaseClient } = await import('../lib/supabase');
-      const supabase = getSupabaseClient();
-      if (!supabase) {
-        toast.dismiss('db-ping');
-        toast.error('Missing or invalid credentials.');
-        setIsDatabaseConnected(false);
-        return;
-      }
-      const { error } = await supabase.from('bills').select('id').limit(1);
+      const { syncDownFromCloud } = await import('../lib/supabase');
+      const { success, error } = await syncDownFromCloud();
+      
       toast.dismiss('db-ping');
-      if (error) {
-        toast.error('Connection failed: ' + error.message);
+      if (!success) {
+        toast.error('Connection failed: ' + (error || 'Unknown error'));
         setIsDatabaseConnected(false);
       } else {
-        toast.success('Database connected successfully!');
+        toast.success('Database connected and synced successfully!');
         setIsDatabaseConnected(true);
       }
     } catch (err: any) {

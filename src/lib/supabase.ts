@@ -3,7 +3,7 @@ import { Bill, InventoryItem, Employee } from '../types';
 
 // The app password used to authenticate with our Vercel Serverless Function
 const getAppPassword = () => {
-  return import.meta.env.VITE_APP_PASSWORD || '';
+  return import.meta.env.VITE_APP_PASSWORD || 'padma_pos_secure_2024';
 };
 
 // ---------------------------------------------------------

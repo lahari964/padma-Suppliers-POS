@@ -42,6 +42,44 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notesTemp, setNotesTemp] = useState('');
   
+  const [isEditingTransport, setIsEditingTransport] = useState(false);
+  const [transportTemp, setTransportTemp] = useState('');
+
+  const handleSaveTransport = () => {
+    const newTransport = Number(transportTemp) || 0;
+    const oldTransport = bill.transportationCharges || 0;
+    const diff = newTransport - oldTransport;
+    
+    if (diff !== 0) {
+      const newTotalCost = bill.totalCost + diff;
+      
+      let newStatus = bill.status;
+      const newRemaining = newTotalCost - totalPaid - (bill.discount || 0);
+      const allReturned = bill.items.every(i => (i.qtyReturned || 0) >= i.qtyIssued);
+      if (newRemaining <= 0 && allReturned) {
+         newStatus = 'Settled';
+      } else if (newRemaining > 0 && allReturned && bill.status === 'Settled') {
+         newStatus = 'Pending';
+      }
+
+      const newAuditLog = {
+        timestamp: Date.now(),
+        action: 'Updated Transport',
+        employeeName: currentUser?.name || 'System',
+        details: `Changed from ₹${oldTransport} to ₹${newTransport}`
+      };
+
+      updateBill(bill.id, { 
+        transportationCharges: newTransport,
+        totalCost: newTotalCost,
+        status: newStatus,
+        auditTrail: [...(bill.auditTrail || []), newAuditLog]
+      });
+      toast.success('Transportation charges updated');
+    }
+    setIsEditingTransport(false);
+  };
+  
   const [showAddItems, setShowAddItems] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [addQty, setAddQty] = useState<Record<string, number>>({});
@@ -637,13 +675,54 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <p className="text-sm font-medium text-muted-foreground">Event Date</p>
               <p className="font-semibold text-foreground">{bill.eventDate}</p>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Total Cost</p>
-              <p className="font-semibold text-foreground">₹{bill.totalCost.toLocaleString('en-IN')}</p>
+            
+            {/* Transportation with inline edit */}
+            <div className="space-y-1 group relative rounded-xl p-2 -m-2 hover:bg-muted/30 transition-all">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                  <div className="w-4 h-4 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <MapPin className="w-2.5 h-2.5 text-blue-500" />
+                  </div>
+                  Transport
+                </p>
+                {!isEditingTransport && (
+                  <button onClick={() => { setTransportTemp(String(bill.transportationCharges || 0)); setIsEditingTransport(true); }} className="opacity-0 group-hover:opacity-100 transition-opacity bg-background border shadow-sm p-1 text-muted-foreground hover:text-primary hover:border-primary/30 rounded-md absolute right-2 top-2">
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              
+              {isEditingTransport ? (
+                <div className="flex items-center gap-1.5 mt-2 animate-in fade-in slide-in-from-top-1">
+                  <div className="relative w-full">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">₹</span>
+                    <Input 
+                      type="number" 
+                      value={transportTemp} 
+                      onChange={e => setTransportTemp(e.target.value)} 
+                      onFocus={e => e.target.select()}
+                      className="h-8 pl-6 pr-2 text-sm font-medium border-primary/40 focus-visible:ring-primary/20 bg-background" 
+                      autoFocus
+                      onKeyDown={e => e.key === 'Enter' && handleSaveTransport()}
+                    />
+                  </div>
+                  <Button size="sm" onClick={handleSaveTransport} className="h-8 w-8 p-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm shrink-0"><CheckCircle2 className="w-4 h-4" /></Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingTransport(false)} className="h-8 w-8 p-0 rounded-md text-muted-foreground hover:text-destructive shrink-0"><X className="w-4 h-4" /></Button>
+                </div>
+              ) : (
+                <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{(bill.transportationCharges || 0).toLocaleString('en-IN')}</p>
+              )}
             </div>
-            <div className="space-y-1">
+
+            <div className="space-y-1 p-2 -m-2">
+              <p className="text-sm font-medium text-muted-foreground">Total Cost</p>
+              <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{bill.totalCost.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="space-y-1 p-2 -m-2">
               <p className="text-sm font-medium text-muted-foreground">Balance</p>
-              <p className="font-semibold text-foreground">₹{Math.max(0, remainingBalance).toLocaleString('en-IN')}</p>
+              <p className={`font-semibold text-lg tracking-tight mt-1 ${remainingBalance > 0 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                ₹{Math.max(0, remainingBalance).toLocaleString('en-IN')}
+              </p>
             </div>
             <div className="space-y-1 col-span-2">
               <div className="flex justify-between items-center">

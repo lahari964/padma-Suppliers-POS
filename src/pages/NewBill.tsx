@@ -40,7 +40,7 @@ export default function NewBill() {
   
   const [stagedItems, setStagedItems] = useState<StagedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [inventoryQty, setInventoryQty] = useState<Record<string, number>>({});
+  const [inventoryQty, setInventoryQty] = useState<Record<string, number | string>>({});
 
   const groupedInventory = useMemo(() => {
     const filtered = inventory.filter(item => 
@@ -287,6 +287,7 @@ export default function NewBill() {
                           min="1" 
                           className="w-16 h-8 text-center mx-auto" 
                           value={item.qty} 
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}
                         />
                       </td>
@@ -356,15 +357,17 @@ export default function NewBill() {
                         <Input 
                           type="number" 
                           min="1" 
-                          className="w-12 h-8 text-center" 
-                          value={inventoryQty[item.id] || 1}
-                          onChange={(e) => setInventoryQty(prev => ({ ...prev, [item.id]: parseInt(e.target.value) || 1 }))}
+                          className="w-20 h-8 text-center" 
+                          value={inventoryQty[item.id] !== undefined ? inventoryQty[item.id] : 1}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => setInventoryQty(prev => ({ ...prev, [item.id]: e.target.value }))}
                         />
                         <Button 
                           size="icon" 
                           className="w-8 h-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-none"
                           onClick={() => {
-                            const qty = inventoryQty[item.id] || 1;
+                            const val = inventoryQty[item.id];
+                            const qty = val === "" || val === undefined ? 1 : Number(val);
                             handleAddItem(item, qty);
                             setInventoryQty(prev => ({ ...prev, [item.id]: 1 }));
                           }}
