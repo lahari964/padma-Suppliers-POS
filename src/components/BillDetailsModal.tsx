@@ -969,11 +969,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         <div className="bg-card border-t border-border p-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
           
           <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
-            {displayStatus === 'Upcoming' && (
-              <Button variant="outline" onClick={handleSendReminder} className="h-12 px-4 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 transition-all gap-2 shrink-0" title="Send WhatsApp Reminder">
-                <MessageCircle className="w-5 h-5" /> Reminder
-              </Button>
-            )}
+
             <Button onClick={() => setShowPaymentModal(true)} className="h-12 px-6 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-base transition-all gap-2 shadow-sm shrink-0">
               <Wallet className="w-4 h-4" /> Record Payment
             </Button>
