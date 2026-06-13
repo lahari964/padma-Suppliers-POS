@@ -83,12 +83,12 @@ export const useStore = create<StoreState>((set) => ({
     const saved = localStorage.getItem('sadma_preferences');
     return saved ? JSON.parse(saved) : {
       businessDetails: {
-        name: 'Sadma Suppliers',
+        name: 'Padma Suppliers',
         tagline: 'Premium Quality (since 1977)',
         address: 'ganugapalem, ongole, Andhra Pradesh -523001',
         phone: '+91 9000000000, +91 8000000000, +91 7000000000, 08592-238543',
         terms: '1. Transportation and delivery charges are extra.\n2. Customers are fully liable for any damage or loss of rented items and must cover repair/replacement costs.\n3. All payments must be settled strictly according to the prior agreed terms.\n4. Late returns will incur additional daily rental fees.',
-        signatureLabel: 'For Sadma Suppliers'
+        signatureLabel: 'For Padma Suppliers'
       },
       receiptTemplate: 'Standard A4',
       thermalSize: '80mm',

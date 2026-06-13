@@ -13,10 +13,10 @@ const FAQ_DATA = [
       { q: "How do I log into the system?", a: "When you open the app, you will see a Login screen. Click on your role (Admin, Manager, or Staff), select your name, and enter your 4-digit PIN to access the system." },
       { q: "What happens if I close the browser or close the application?", a: "For security reasons, your session is temporary (saved in 'sessionStorage'). If you completely close your browser or the application tab, you will be automatically logged out. When you open the link again, you will be redirected back to the Login page." },
       { q: "How do I log out manually?", a: "Click on your profile name/avatar at the top right corner of the screen to open the 'My Account' menu. Then, click the red 'Logout' button at the bottom of the menu. This will securely log you out of the system." },
-      { q: "What happens if I click the 'Sadma Suppliers' logo at the top left?", a: "Clicking the logo acts as a 'Home' button and will instantly return you to the Dashboard from anywhere in the app." },
+      { q: "What happens if I click the 'Padma Suppliers' logo at the top left?", a: "Clicking the logo acts as a 'Home' button and will instantly return you to the Dashboard from anywhere in the app." },
       { q: "What happens if I enter the wrong PIN?", a: "The system will show an 'Invalid PIN' error. If you forget your PIN, you must ask an Admin to reset it for you from the Settings page." },
       { q: "How do I switch between Light and Dark mode?", a: "Go to the Settings page and select the 'General' tab. You will find a toggle switch for 'Dark Mode'. By default, the app automatically matches your phone or computer's system settings (Light/Dark), but you can manually override it here and it will remember your choice permanently." },
-      { q: "What does the 'Offline' red dot at the top right mean?", a: "It means your device lost internet connection. Because sadmaPOS is an Offline-First app, you can still use it completely normally (create bills, manage inventory, take payments). All data is saved safely to your browser's memory. When your internet returns, it will automatically sync up to the secure cloud." }
+      { q: "What does the 'Offline' red dot at the top right mean?", a: "It means your device lost internet connection. Because padmaPOS is an Offline-First app, you can still use it completely normally (create bills, manage inventory, take payments). All data is saved safely to your browser's memory. When your internet returns, it will automatically sync up to the secure cloud." }
     ]
   },
   {
@@ -127,7 +127,7 @@ const FAQ_DATA = [
     items: [
       { q: "How do I open Export Settings?", a: "Click 'Settings' -> 'Export / Download' tab." },
       { q: "How do I download my data to Excel/CSV?", a: "Under 'Custom Date Range Report', select a Start Date and an End Date. Click the blue 'Download CSV' button." },
-      { q: "How do I make a full backup of my entire software?", a: "Click the large 'Download Full JSON Backup' button. It will save a file called 'sadmapos-backup.json' to your computer. Keep this file safe!" },
+      { q: "How do I make a full backup of my entire software?", a: "Click the large 'Download Full JSON Backup' button. It will save a file called 'padmapos-backup.json' to your computer. Keep this file safe!" },
       { q: "How do I turn on Desktop Notifications?", a: "Go to Settings -> Notifications. Click the switch next to 'Browser Push Notifications'. Your web browser will ask 'Allow notifications?'. Click 'Allow'." },
       { q: "How do I change the notification sound?", a: "In the Notifications tab, click the 'Notification Sound' dropdown and pick a sound like 'Chime' or 'Ping'. It will play a test sound immediately." }
     ]
@@ -148,7 +148,7 @@ const FAQ_DATA = [
     category: "11. Miscellaneous & UI Navigation",
     icon: <Search className="w-5 h-5 text-fuchsia-500" />,
     items: [
-      { q: "What happens if I click the 'Sadma Suppliers' logo at the top left?", a: "Clicking the logo acts as a 'Home' button. It will instantly return you to the Dashboard from anywhere in the app, saving you clicks." },
+      { q: "What happens if I click the 'Padma Suppliers' logo at the top left?", a: "Clicking the logo acts as a 'Home' button. It will instantly return you to the Dashboard from anywhere in the app, saving you clicks." },
       { q: "What happens if my internet connection goes down while I'm billing?", a: "Do not panic! The app is designed to work completely offline. You can continue creating bills, taking advances, and processing returns. The red 'Offline' dot will appear. When internet returns, it will sync." },
       { q: "Can I use the app on my mobile phone?", a: "Yes. The layout is responsive. On small screens, the sidebar becomes a hamburger menu icon at the top left. Tap it to open the navigation menu." },
       { q: "Why do some buttons look faded or disabled?", a: "If a button is grayed out, it means you do not have the required Role access (e.g., Staff trying to edit inventory), or you need to fill out a required field first." },

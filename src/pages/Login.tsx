@@ -73,7 +73,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-sm shadow-lg border-border">
         <CardHeader className="text-center space-y-4">
-          <img src="https://assets.cdn.filesafe.space/9YKSM9vJJwAmtxbBkIyB/media/6a136179fe2210f89e688b6d.png" alt="Sadma Suppliers" className="h-16 mx-auto object-contain" />
+          <img src="https://assets.cdn.filesafe.space/9YKSM9vJJwAmtxbBkIyB/media/6a136179fe2210f89e688b6d.png" alt="Padma Suppliers" className="h-16 mx-auto object-contain" />
           <CardTitle className="text-xl">Staff Login</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">

@@ -45,7 +45,7 @@ const NotFound = () => {
 
       {/* Footer Branding */}
       <div className="absolute bottom-8 text-xs text-slate-600 font-medium tracking-wide text-center w-full">
-        © {new Date().getFullYear()} Sadma Suppliers POS • All rights reserved.
+        © {new Date().getFullYear()} Padma Suppliers POS • All rights reserved.
       </div>
     </div>
   );
