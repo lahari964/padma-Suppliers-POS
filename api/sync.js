@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import ws from 'ws';
 
 export default async function handler(req, res) {
   // 1. Verify App Password
@@ -18,7 +19,10 @@ export default async function handler(req, res) {
   }
 
   const cleanUrl = url.split('/rest')[0].trim().replace(/\/$/, '');
-  const supabase = createClient(cleanUrl, key.trim());
+  const supabase = createClient(cleanUrl, key.trim(), {
+    auth: { persistSession: false },
+    realtime: { transport: ws }
+  });
 
   // 3. Handle GET (Sync Down)
   if (req.method === 'GET') {
