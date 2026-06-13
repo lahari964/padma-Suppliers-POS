@@ -686,7 +686,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   Transport
                 </p>
                 {!isEditingTransport && (
-                  <button onClick={() => { setTransportTemp(String(bill.transportationCharges || 0)); setIsEditingTransport(true); }} className="opacity-0 group-hover:opacity-100 transition-opacity bg-background border shadow-sm p-1 text-muted-foreground hover:text-primary hover:border-primary/30 rounded-md absolute right-2 top-2">
+                  <button onClick={() => { setTransportTemp(String(bill.transportationCharges || 0)); setIsEditingTransport(true); }} className="bg-background border border-border/60 shadow-sm p-1.5 text-muted-foreground hover:text-primary hover:border-primary/30 rounded-md absolute right-2 top-2">
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
                 )}
