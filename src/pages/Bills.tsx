@@ -34,6 +34,9 @@ export default function Bills() {
   }, [searchParams]);
   
   const filteredBills = useMemo(() => {
+    const action = searchParams.get('action');
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    
     return [...bills].reverse().filter(b => {
       // 1. Search filter
       const matchesSearch = b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || b.mobile.includes(searchTerm);
@@ -45,11 +48,10 @@ export default function Bills() {
         matchesEmployee = b.createdBy === emp || b.items.some(i => i.handledBy === emp);
       }
       
-      // 3. Date filter (filtering by eventDate or latest payment date if settled)
+      // 3. Date filter
       let matchesDate = true;
       if (dateFilter) {
         if (b.status === 'Settled') {
-          // If paid, check if last payment matches date
           const lastPayment = b.payments?.[b.payments.length - 1]?.date;
           matchesDate = lastPayment === dateFilter;
         } else {
@@ -57,9 +59,22 @@ export default function Bills() {
         }
       }
 
-      return matchesSearch && matchesEmployee && matchesDate;
+      // 4. Action filter (from Dashboard)
+      let matchesAction = true;
+      if (action === 'overdue-payments') {
+        const paid = b.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+        const balance = b.totalCost - paid - (b.discount || 0);
+        matchesAction = balance > 0 && b.status === 'Pending' && !!b.paymentPromiseDate && b.paymentPromiseDate <= todayStr;
+      } else if (action === 'overdue-returns') {
+        const status = getBillDisplayInfo(b).status;
+        matchesAction = (status === 'Active' || status === 'Partially Active') && !!b.expectedReturnDate && b.expectedReturnDate < todayStr;
+      } else if (action === 'pending-billing') {
+        matchesAction = !b.billingStarted && (b.status === 'Upcoming' || b.status === 'Partially Active') && !!b.eventDate && b.eventDate <= todayStr;
+      }
+
+      return matchesSearch && matchesEmployee && matchesDate && matchesAction;
     });
-  }, [bills, searchTerm, employeeFilter, dateFilter, employees]);
+  }, [bills, searchTerm, employeeFilter, dateFilter, employees, searchParams]);
 
   const upcomingBills = filteredBills.filter(b => ['Upcoming', 'Partially Active'].includes(getBillDisplayInfo(b).status));
   const activeBills = filteredBills.filter(b => ['Active', 'Partially Active'].includes(getBillDisplayInfo(b).status));
@@ -73,6 +88,15 @@ export default function Bills() {
       case 'pending': return pendingBills;
       case 'settled': return settledBills;
       default: return [];
+    }
+  };
+
+  const formatToDDMMYYYY = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      return format(new Date(dateStr), 'dd-MM-yyyy');
+    } catch(e) {
+      return dateStr;
     }
   };
 
@@ -98,7 +122,7 @@ export default function Bills() {
           `"${b.customerName}"`,
           b.mobile,
           getBillDisplayInfo(b).status,
-          b.eventDate || '',
+          formatToDDMMYYYY(b.eventDate || ''),
           b.totalCost,
           paid,
           Math.max(0, balance)
@@ -110,7 +134,7 @@ export default function Bills() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `PadmaPOS_${activeTab}_bills_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+      link.setAttribute('download', `PadmaPOS_${activeTab}_bills_${format(new Date(), 'dd-MM-yyyy')}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();

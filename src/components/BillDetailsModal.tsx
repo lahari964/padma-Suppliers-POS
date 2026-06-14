@@ -35,6 +35,15 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [showReturnAll, setShowReturnAll] = useState(false);
 
   // Common Modal Inputs
+  const formatToDDMMYYYY = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      return format(new Date(dateStr), 'dd-MM-yyyy');
+    } catch(e) {
+      return dateStr;
+    }
+  };
+
   const [modalDate, setModalDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [modalTime, setModalTime] = useState(format(new Date(), 'HH:mm'));
   const [modalQty, setModalQty] = useState<number | ''>('');
@@ -106,12 +115,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const getItemDates = (item: any) => {
     let dates = [];
     if (item.dispatchDate) {
-      try { dates.push(`Sent: ${format(new Date(item.dispatchDate), 'dd MMM yy')} ${item.dispatchTime || ''}`); } catch(e){}
+      try { dates.push(`Sent: ${formatToDDMMYYYY(item.dispatchDate)} ${item.dispatchTime || ''}`); } catch(e){}
     }
     const itemReturns = bill?.returnHistory?.filter(r => r.items.some(i => i.name === item.name));
     if (itemReturns && itemReturns.length > 0) {
       const lastReturn = itemReturns[itemReturns.length - 1];
-      try { dates.push(`Ret: ${format(new Date(lastReturn.date), 'dd MMM yy')} ${lastReturn.time || ''}`); } catch(e){}
+      try { dates.push(`Ret: ${formatToDDMMYYYY(lastReturn.date)} ${lastReturn.time || ''}`); } catch(e){}
     }
     return dates;
   };
@@ -695,7 +704,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             )}
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Event Date</p>
-              <p className="font-semibold text-foreground">{bill.eventDate}</p>
+              <p className="font-semibold text-foreground">{bill.eventDate ? formatToDDMMYYYY(bill.eventDate) : <span className="text-muted-foreground italic text-sm">Not set</span>}</p>
             </div>
             
             {/* Payment Promise Date */}
@@ -728,7 +737,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 </div>
               ) : (
                 <p className="font-semibold text-foreground text-lg tracking-tight mt-1">
-                  {bill.paymentPromiseDate ? format(parseISO(bill.paymentPromiseDate), 'dd MMM yyyy') : <span className="text-muted-foreground italic text-sm">Not set</span>}
+                  {bill.paymentPromiseDate ? formatToDDMMYYYY(bill.paymentPromiseDate) : <span className="text-muted-foreground italic text-sm">Not set</span>}
                 </p>
               )}
             </div>
