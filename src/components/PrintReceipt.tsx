@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { getBillDisplayInfo } from '../hooks/useBillCalculations';
 
 export const PrintReceipt = ({ bill }: { bill: Bill }) => {
-  const { preferences } = useStore();
+  const { preferences, inventory } = useStore();
   const biz = preferences.businessDetails || {
     name: 'Padma POS',
     tagline: '',
@@ -20,6 +20,18 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const thermalSize = preferences.receiptTemplate.includes('112') ? '112mm' : preferences.receiptTemplate.includes('58') ? '58mm' : '80mm';
   const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
   const balance = Math.max(0, bill.totalCost - paid - (bill.discount || 0));
+
+  let totalOverrideDifference = 0;
+  const enrichedItems = bill.items.map(item => {
+    const originalItem = inventory.find(i => i.id === item.inventoryId);
+    const actualPrice = originalItem ? originalItem.price : item.price;
+    const isCustom = actualPrice !== item.price;
+    const itemDays = item.days || 1;
+    if (isCustom) {
+      totalOverrideDifference += (actualPrice - item.price) * item.qtyIssued * itemDays;
+    }
+    return { ...item, actualPrice, isCustom, itemDays };
+  });
 
   if (isThermal) {
     return createPortal(
@@ -49,11 +61,17 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             </tr>
           </thead>
           <tbody>
-            {bill.items.map((item, idx) => (
+            {enrichedItems.map((item, idx) => (
               <tr key={idx}>
-                <td className="py-1">{item.name}</td>
+                <td className="py-1">
+                  {item.name}
+                  {item.isCustom && <span className="block text-[10px] text-gray-500 line-through">₹{item.actualPrice}</span>}
+                </td>
                 <td className="py-1 text-center">{item.qtyIssued}</td>
-                <td className="py-1 text-right">₹{item.price * item.qtyIssued}</td>
+                <td className="py-1 text-right">
+                  {item.isCustom && <span className="block text-[10px] text-gray-500 line-through">₹{item.actualPrice * item.qtyIssued * item.itemDays}</span>}
+                  ₹{item.price * item.qtyIssued * item.itemDays}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -85,6 +103,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
         <div className="border-t border-dashed border-black pt-2 mb-4 space-y-1 text-right">
           <p>Base Amount: <strong>₹{bill.totalCost - (bill.damageCharges || 0)}</strong></p>
+          {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
           <p>Total Cost: <strong>₹{bill.totalCost}</strong></p>
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
@@ -162,9 +181,10 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           </tr>
         </thead>
         <tbody className="align-top">
-          {bill.items.map((item, idx) => {
+          {enrichedItems.map((item, idx) => {
             const retDate = getReturnDate(item);
-            const amount = item.price * item.qtyIssued;
+            const amount = item.price * item.qtyIssued * item.itemDays;
+            const actualAmount = item.actualPrice * item.qtyIssued * item.itemDays;
             return (
               <tr key={idx} className="border-b border-gray-200">
                 <td className="py-4 px-1 pr-4">
@@ -181,10 +201,26 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                   </div>
                 </td>
                 <td className="py-4 px-1 text-center">{item.qtyIssued}</td>
-                <td className="py-4 px-1 text-center">{item.days || 1} Days</td>
-                <td className="py-4 px-1 text-center">₹{item.price}/day</td>
+                <td className="py-4 px-1 text-center">{item.itemDays} Days</td>
+                <td className="py-4 px-1 text-center">
+                  {item.isCustom ? (
+                    <div className="flex flex-col items-center">
+                      <span className="text-xs text-gray-400 line-through">₹{item.actualPrice}/day</span>
+                      <span>₹{item.price}/day</span>
+                    </div>
+                  ) : (
+                    <span>₹{item.price}/day</span>
+                  )}
+                </td>
                 <td className={`py-4 px-1 text-right ${isEstStatus ? 'italic text-gray-500' : 'font-medium'}`}>
-                  ₹{amount} {isEstStatus ? '(Est.)' : ''}
+                  {item.isCustom ? (
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs text-gray-400 line-through">₹{actualAmount}</span>
+                      <span>₹{amount} {isEstStatus ? '(Est.)' : ''}</span>
+                    </div>
+                  ) : (
+                    <span>₹{amount} {isEstStatus ? '(Est.)' : ''}</span>
+                  )}
                 </td>
               </tr>
             );
@@ -201,6 +237,13 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <span>{isEstStatus ? 'Items Total (Est.):' : 'Items Total:'}</span>
               <span>₹{bill.totalCost}</span>
             </div>
+            
+            {totalOverrideDifference > 0 && (
+              <div className="flex justify-between text-gray-500 font-normal">
+                <span>Rate Savings:</span>
+                <span>₹{totalOverrideDifference}</span>
+              </div>
+            )}
             
             {bill.payments && bill.payments.length > 0 ? (
               <div className="pt-2">
