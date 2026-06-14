@@ -210,9 +210,13 @@ export default function CalendarView() {
                       <button 
                         onClick={() => setSelectedDate(day)}
                         className={`relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium transition-all ${
-                          !isCurrentMonth ? 'text-muted-foreground/30' : 'text-foreground hover:bg-muted'
-                        } ${isSelected ? 'bg-primary text-primary-foreground font-bold shadow-md' : ''} ${
-                          isTodayDate && !isSelected ? 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 font-bold' : ''
+                          isSelected 
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-md' 
+                            : isTodayDate 
+                              ? 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 font-bold hover:bg-sky-200 dark:hover:bg-sky-900/50' 
+                              : !isCurrentMonth 
+                                ? 'text-muted-foreground/30 hover:bg-muted/50' 
+                                : 'text-foreground hover:bg-muted'
                         }`}
                       >
                         {format(day, 'd')}
