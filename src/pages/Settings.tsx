@@ -22,7 +22,7 @@ export default function Settings() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { bills, inventory, employees, currentUser, setCurrentUser, preferences, setPreferences, isDatabaseConnected } = useStore();
   const [activeTab, setActiveTab] = useState('General');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(window.innerWidth >= 768);
   
   // Database State
   const [wipeConfirmation, setWipeConfirmation] = useState('');
@@ -303,37 +303,39 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   };
 
   return (
-    <div className="flex relative h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
-      {/* Drawer Backdrop */}
+    <div className="flex relative h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8 overflow-hidden">
+      {/* Mobile Backdrop (only visible on mobile when open) */}
       {isMenuOpen && (
         <div 
-          className="absolute inset-0 bg-background/80 backdrop-blur-sm z-40"
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar (Drawer on mobile, Collapsible on desktop) */}
       <div className={`
-        absolute z-50 h-full bg-card
-        w-64 border-r border-border p-4
-        transition-transform duration-300 ease-in-out
-        ${isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
+        absolute md:relative z-50 h-full bg-card md:bg-transparent
+        border-r border-border p-4 shrink-0
+        transition-all duration-300 ease-in-out
+        ${isMenuOpen ? 'translate-x-0 w-64 shadow-2xl md:shadow-none opacity-100' : '-translate-x-full md:translate-x-0 md:w-0 md:opacity-0 md:p-0 md:border-r-0'}
       `}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-          <h2 className="font-bold text-lg">Settings Menu</h2>
+        <div className={`flex items-center justify-between mb-6 pb-4 border-b border-border ${!isMenuOpen && 'md:hidden'}`}>
+          <h2 className="font-bold text-lg whitespace-nowrap overflow-hidden">Settings Menu</h2>
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
-            <Menu className="w-5 h-5" />
+            <Menu className="w-5 h-5 shrink-0" />
           </Button>
         </div>
-        <nav className="space-y-1">
+        <nav className={`space-y-1 ${!isMenuOpen && 'md:hidden'}`}>
           {tabs.map((t) => (
             <button
               key={t.name}
               onClick={() => {
                 setActiveTab(t.name);
-                setIsMenuOpen(false);
+                if (window.innerWidth < 768) {
+                  setIsMenuOpen(false);
+                }
               }}
-              className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap overflow-hidden ${
                 activeTab === t.name 
                   ? 'bg-primary/10 text-primary' 
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -346,10 +348,10 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full min-w-0">
         {/* Menu Trigger */}
         <div className="mb-6 flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(true)}>
+          <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <Menu className="w-5 h-5" />
           </Button>
           <h2 className="text-xl font-bold">{activeTab} Settings</h2>
