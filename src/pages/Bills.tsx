@@ -178,7 +178,7 @@ export default function Bills() {
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Total (₹)</TableHead>
             <TableHead className="text-right">Balance (₹)</TableHead>
-            <TableHead className="w-[120px] text-right">Actions</TableHead>
+            {currentUser?.role === 'Admin' && <TableHead className="w-[80px] text-right">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -216,37 +216,15 @@ export default function Bills() {
                     {Math.max(0, Number(bill.totalCost || 0) - (bill.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0) - (bill.discount || 0)).toLocaleString('en-IN')}
                   </span>
                 </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0" onClick={e => e.stopPropagation()}>
-                        <MoreHorizontal className="h-4 w-4" />
+                {currentUser?.role === 'Admin' && (
+                  <TableCell className="text-right">
+                    {(getBillDisplayInfo(bill).status === 'Upcoming' || getBillDisplayInfo(bill).status === 'Active' || getBillDisplayInfo(bill).status === 'Partially Active') ? (
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={(e) => handleCancelOrder(e, bill.id)} title="Delete Bill">
+                        <Trash className="w-4 h-4" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[160px]">
-                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedBillId(bill.id); }}>
-                        <Eye className="w-4 h-4 mr-2" /> View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedBillId(bill.id); }}>
-                        <Edit className="w-4 h-4 mr-2" /> Edit Order
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedBillId(bill.id); }}>
-                        <CreditCard className="w-4 h-4 mr-2" /> Add Payment
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem onClick={(e) => handleWhatsApp(e, bill)}>
-                        <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      {currentUser?.role !== 'Staff' && (
-                        <DropdownMenuItem onClick={(e) => handleCancelOrder(e, bill.id)} className="text-destructive focus:text-destructive">
-                          <Trash className="w-4 h-4 mr-2" /> Cancel Order
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                    ) : null}
+                  </TableCell>
+                )}
               </TableRow>
             ))
           )}
