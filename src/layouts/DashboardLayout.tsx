@@ -62,6 +62,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
+    let consecutiveFailures = 0; // Tracks consecutive sync failures
+    
     const unsubscribe = useStore.subscribe((state, prevState) => {
       // Only trigger sync if actual data changed (ignore UI state changes)
       if (
@@ -73,15 +75,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         timeout = setTimeout(async () => {
           const { success } = await syncUpToCloud();
           if (success) {
+            consecutiveFailures = 0; // Reset on success
             setIsDatabaseConnected(true);
             const now = new Date();
             useStore.setState({ lastSyncTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
           } else {
-            // We intentionally do NOT set isDatabaseConnected(false) here.
-            // If a background sync fails (Vercel timeout, tiny network hiccup),
-            // we shouldn't throw the user into an annoying "Offline" panic state.
-            // Data is safe locally, and the next save will try again.
-            console.warn('Background auto-sync had a hiccup, but keeping UI stable.');
+            consecutiveFailures += 1;
+            if (consecutiveFailures >= 3) {
+              // It failed 3 times in a row. This is a real outage.
+              setIsDatabaseConnected(false);
+              toast.error('Warning: Cloud database unreachable. Your changes are saved safely to your device.', { id: 'db-fail' });
+            } else {
+              console.warn(`Background auto-sync failed ${consecutiveFailures} time(s). Hiccup ignored.`);
+            }
           }
         }, 2000); // Wait 2 seconds after the last change before pushing to cloud
       }
