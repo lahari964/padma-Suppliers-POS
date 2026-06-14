@@ -842,7 +842,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   <Button size="sm" onClick={openSendAllModal} className="h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold">Send All</Button>
                 </div>
               </div>
-              <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -883,6 +883,34 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Mobile Cards (Items To Dispatch) */}
+              <div className="block md:hidden space-y-3">
+                {bill.items.filter(isItemPendingDispatch).map(item => {
+                  const dispatchedQty = bill.items.filter(i => i.inventoryId === item.inventoryId && isItemConsideredDispatched(i)).reduce((acc, curr) => acc + curr.qtyIssued, 0);
+                  const totalBooked = item.qtyIssued + dispatchedQty;
+                  return (
+                    <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-3 shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-foreground">{item.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
+                        </div>
+                        <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 shrink-0">Upcoming</Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm font-medium bg-muted/30 p-2 rounded-lg">
+                        <div className="flex-1 text-center">Booked: {totalBooked}</div>
+                        <div className="w-px h-4 bg-border"></div>
+                        <div className="flex-1 text-center text-blue-600">Sent: {dispatchedQty}</div>
+                      </div>
+                      <div className="flex items-center gap-2 pt-2 border-t border-border mt-1">
+                        <Button size="sm" onClick={() => openSendModal(item)} className="flex-1 h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold">Send</Button>
+                        <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="flex-1 h-9 text-destructive border-destructive/30 hover:bg-destructive/10">Edit / Delete</Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -908,7 +936,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   </div>
                 </div>
               </div>
-              <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -961,6 +989,40 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Mobile Cards (Active Items) */}
+              <div className="block md:hidden space-y-3">
+                {bill.items.filter(isItemConsideredDispatched).map(item => {
+                  const pendingReturn = item.qtyIssued - (item.qtyReturned || 0);
+                  return (
+                    <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-3 shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-foreground">{item.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
+                        </div>
+                        {pendingReturn === 0 ? (
+                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shrink-0">Returned</Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 shrink-0">Sent</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm font-medium bg-muted/30 p-2 rounded-lg">
+                        <div className="flex-1 text-center">Issued: {item.qtyIssued}</div>
+                        <div className="w-px h-4 bg-border"></div>
+                        <div className="flex-1 text-center">Ret: {item.qtyReturned || 0}</div>
+                        <div className="w-px h-4 bg-border"></div>
+                        <div className="flex-1 text-center text-orange-500">Pend: {pendingReturn}</div>
+                      </div>
+                      {pendingReturn > 0 && (
+                        <div className="pt-2 border-t border-border mt-1">
+                          <Button size="sm" onClick={() => openReturnModal(item)} className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Return Items</Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -970,7 +1032,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
                 <h3 className="text-xl font-bold font-serif text-foreground">Returned Items</h3>
               </div>
-              <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -992,6 +1054,22 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+
+              {/* Mobile Cards (Returned Items) */}
+              <div className="block md:hidden space-y-3">
+                {bill.items.filter(isItemConsideredDispatched).map(item => (
+                  <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-2 shadow-sm">
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-foreground">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">Rate: ₹{item.price}</p>
+                    </div>
+                    <div className="flex justify-between items-center text-sm bg-emerald-500/10 p-2 px-3 rounded-lg border border-emerald-500/20">
+                      <span className="font-medium text-emerald-700/70 dark:text-emerald-400/70">Issued: {item.qtyIssued}</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">Returned: {item.qtyReturned || 0}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
