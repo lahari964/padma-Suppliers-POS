@@ -25,7 +25,9 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const enrichedItems = bill.items.map(item => {
     const originalItem = inventory.find(i => i.id === item.inventoryId);
     const actualPrice = originalItem ? originalItem.price : item.price;
-    const isCustom = actualPrice !== item.price;
+    // Only show "discounted" prices if we actually gave them a cheaper rate.
+    // If we charged them more than usual, hide the original price so it doesn't look like we looted them.
+    const isCustom = actualPrice > item.price;
     const itemDays = item.days || 1;
     if (isCustom) {
       totalOverrideDifference += (actualPrice - item.price) * item.qtyIssued * itemDays;
