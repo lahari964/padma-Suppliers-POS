@@ -304,22 +304,22 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
   return (
     <div className="flex relative h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
-      {/* Mobile Backdrop */}
+      {/* Drawer Backdrop */}
       {isMenuOpen && (
         <div 
-          className="absolute inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm z-40"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        absolute md:relative z-50 h-full bg-card md:bg-transparent
-        w-64 md:w-56 border-r border-border p-4
+        absolute z-50 h-full bg-card
+        w-64 border-r border-border p-4
         transition-transform duration-300 ease-in-out
-        ${isMenuOpen ? 'translate-x-0 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0'}
+        ${isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between md:hidden mb-6 pb-4 border-b border-border">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
           <h2 className="font-bold text-lg">Settings Menu</h2>
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
             <Menu className="w-5 h-5" />
@@ -347,8 +347,8 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
       {/* Content */}
       <div className="flex-1 p-4 md:p-8 overflow-y-auto">
-        {/* Mobile Menu Trigger */}
-        <div className="md:hidden mb-6 flex items-center gap-3">
+        {/* Menu Trigger */}
+        <div className="mb-6 flex items-center gap-3">
           <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
