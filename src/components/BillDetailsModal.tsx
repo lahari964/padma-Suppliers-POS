@@ -669,10 +669,10 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar print:hidden">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-10 custom-scrollbar print:hidden">
           
           {/* Bento Grid: Customer Insights */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-card p-6 rounded-2xl border border-border shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 bg-card p-4 sm:p-6 rounded-2xl border border-border shadow-sm">
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Mobile</p>
               <a href={`tel:${bill.mobile}`} className="font-semibold text-primary hover:underline block">{bill.mobile}</a>
