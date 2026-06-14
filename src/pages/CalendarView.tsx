@@ -1,25 +1,23 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Package, Truck, FileText, CheckCircle, Search, Filter, Printer, CreditCard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Package, Truck, Search, Filter, CheckCircle, CreditCard, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '../store/useStore';
-import { Bill, PaymentLog } from '../types';
+import { Bill } from '../types';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-import { toast } from '@/components/ui/sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { getBillDisplayInfo } from '../hooks/useBillCalculations';
+import { BillDetailsModal } from '@/components/BillDetailsModal';
 
 export default function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
-  const [paymentModalBillId, setPaymentModalBillId] = useState<string | null>(null);
-  const [paymentAmount, setPaymentAmount] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   
-  const { bills, updateBill, preferences, currentUser } = useStore();
+  const { bills } = useStore();
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -29,66 +27,93 @@ export default function CalendarView() {
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const goToToday = () => {
-    setCurrentDate(new Date());
-    setSelectedDate(new Date());
-  };
 
-  const selectedBills = useMemo(() => {
-    const dateStr = format(selectedDate, 'yyyy-MM-dd');
-    const matchesDate = bills.filter(b => b.eventDate === dateStr || b.expectedReturnDate === dateStr);
+  // Pre-calculate events mapped to dates for performance
+  const calendarEventsByDate = useMemo(() => {
+    const map: Record<string, { upcoming: Bill[], returns: Bill[], payments: Bill[], active: Bill[] }> = {};
     
-    // Filter by search query if any
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return matchesDate.filter(b => b.customerName.toLowerCase().includes(q) || b.mobile.includes(q));
-    }
-    
-    // Return unique bills
-    return Array.from(new Set(matchesDate));
-  }, [selectedDate, bills, searchQuery]);
-
-
-
-  const handleRecordPayment = () => {
-    if (!paymentModalBillId || !paymentAmount || Number(paymentAmount) <= 0) return;
-    
-    const bill = bills.find(b => b.id === paymentModalBillId);
-    if (!bill) return;
-
-    const newPayments = [...(bill.payments || []), {
-      date: format(new Date(), 'yyyy-MM-dd'),
-      amount: Number(paymentAmount),
-      method: 'Cash',
-      receivedBy: currentUser?.name || 'System'
-    }] as PaymentLog[];
-
-    const totalPaid = newPayments.reduce((acc, p) => acc + p.amount, 0);
-    const newRemaining = bill.totalCost - totalPaid - (bill.discount || 0);
-    
-    let newStatus = bill.status;
-    if (newRemaining <= 0) {
-      const allReturned = bill.items.every(i => (i.qtyReturned || 0) >= i.qtyIssued);
-      if (allReturned) newStatus = 'Settled';
-    }
-
-    const newAuditLog = {
-      timestamp: Date.now(),
-      action: 'Payment Added',
-      employeeName: currentUser?.name || 'System',
-      details: `Amount: ₹${paymentAmount}. New Status: ${newStatus}`
+    const initDay = (dateStr: string) => {
+      if (!map[dateStr]) map[dateStr] = { upcoming: [], returns: [], payments: [], active: [] };
     };
 
-    updateBill(bill.id, { 
-      payments: newPayments, 
-      status: newStatus as any,
-      auditTrail: [...(bill.auditTrail || []), newAuditLog]
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+    bills.forEach(bill => {
+      const info = getBillDisplayInfo(bill);
+      const isSettled = info.status === 'Settled';
+      
+      // Upcoming Dispatches (Event Date)
+      if (bill.eventDate && !isSettled) {
+        initDay(bill.eventDate);
+        map[bill.eventDate].upcoming.push(bill);
+      }
+      
+      // Active / Expected Returns (Expected Return Date)
+      if (bill.expectedReturnDate && !isSettled) {
+        initDay(bill.expectedReturnDate);
+        map[bill.expectedReturnDate].returns.push(bill);
+        
+        // Let's mark as "overdue" if it's past today, but we map it to its expected date
+        if (info.status === 'Active' || info.status === 'Partially Active') {
+          map[bill.expectedReturnDate].active.push(bill);
+        }
+      }
+      
+      // Pending Payments (Promise Date)
+      if (bill.paymentPromiseDate && info.status === 'Pending') {
+        const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
+        const balance = bill.totalCost - paid - (bill.discount || 0);
+        if (balance > 0) {
+          initDay(bill.paymentPromiseDate);
+          map[bill.paymentPromiseDate].payments.push(bill);
+        }
+      }
+    });
+    return map;
+  }, [bills]);
+
+  // Aggregate selected day's data
+  const selectedDateEvents = useMemo(() => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+    const dayData = calendarEventsByDate[dateStr] || { upcoming: [], returns: [], payments: [], active: [] };
+    
+    let combined = [...dayData.upcoming, ...dayData.returns, ...dayData.payments];
+    
+    if (filterType === 'upcoming') combined = dayData.upcoming;
+    if (filterType === 'returns') combined = dayData.returns;
+    if (filterType === 'payments') combined = dayData.payments;
+    
+    let unique = Array.from(new Set(combined));
+    
+    if (filterType === 'active') {
+       unique = unique.filter(b => getBillDisplayInfo(b).status === 'Active' || getBillDisplayInfo(b).status === 'Partially Active');
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      unique = unique.filter(b => b.customerName.toLowerCase().includes(q) || b.mobile.includes(q));
+    }
+    
+    return unique;
+  }, [selectedDate, calendarEventsByDate, filterType, searchQuery]);
+
+  // Selected Day Summary Stats
+  const daySummary = useMemo(() => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+    const dayData = calendarEventsByDate[dateStr] || { upcoming: [], returns: [], payments: [], active: [] };
+    
+    let totalDue = 0;
+    dayData.payments.forEach(b => {
+      const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
+      totalDue += b.totalCost - paid - (b.discount || 0);
     });
 
-    setPaymentAmount('');
-    setPaymentModalBillId(null);
-    toast.success('Payment recorded successfully');
-  };
+    return {
+      dispatches: dayData.upcoming.length,
+      returns: dayData.returns.length,
+      paymentsDue: totalDue
+    };
+  }, [selectedDate, calendarEventsByDate]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col">
@@ -103,159 +128,188 @@ export default function CalendarView() {
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Search by customer name or mobile number..." 
+              placeholder="Search by customer name or mobile..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 bg-background/50 border-transparent focus-visible:border-primary w-full shadow-none" 
             />
           </div>
           <div className="w-px h-6 bg-border hidden md:block"></div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-full md:w-[200px] bg-transparent border-none shadow-none focus:ring-0">
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-full md:w-[220px] bg-transparent border-none shadow-none focus:ring-0">
               <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="All Employees" />
+              <SelectValue placeholder="All Activities" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Employees</SelectItem>
+              <SelectItem value="all">All Activities</SelectItem>
+              <SelectItem value="upcoming">Upcoming Dispatches</SelectItem>
+              <SelectItem value="active">Active Bills</SelectItem>
+              <SelectItem value="returns">Expected Returns</SelectItem>
+              <SelectItem value="payments">Payments Due</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* Main Return Calendar Area */}
+      {/* Main Calendar Area */}
       <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex-1 flex flex-col">
-        <div className="p-6 border-b border-border">
-          <h3 className="text-xl font-bold font-serif text-foreground">Return Calendar</h3>
+        <div className="p-4 sm:p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h3 className="text-xl font-bold font-serif text-foreground">Activity Calendar</h3>
+          
+          {/* Legend */}
+          <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground">
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Dispatch</div>
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500"></div> Return</div>
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500"></div> Overdue</div>
+            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-500"></div> Payment</div>
+          </div>
         </div>
         
-        <div className="flex flex-col lg:flex-row p-6 gap-8 h-full">
+        <div className="flex flex-col lg:flex-row p-4 sm:p-6 gap-6 sm:gap-8 h-full">
           
-          {/* Left Column (Calendar) */}
-          <div className="w-full lg:w-[320px] shrink-0">
-            <div className="border border-border rounded-xl p-4 bg-background/50">
-              <div className="flex items-center justify-between mb-4">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted" onClick={prevMonth}>
+          {/* Left Column (Calendar Grid) */}
+          <div className="w-full lg:w-[420px] shrink-0">
+            <div className="border border-border rounded-xl p-4 sm:p-6 bg-background/50 shadow-inner">
+              <div className="flex items-center justify-between mb-6">
+                <Button variant="outline" size="icon" className="h-9 w-9 rounded-full bg-background" onClick={prevMonth}>
                   <ChevronLeft className="w-4 h-4 text-muted-foreground" />
                 </Button>
-                <h3 className="font-bold text-sm text-foreground">{format(currentDate, 'MMMM yyyy')}</h3>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted" onClick={nextMonth}>
+                <h3 className="font-bold text-lg text-foreground tracking-tight">{format(currentDate, 'MMMM yyyy')}</h3>
+                <Button variant="outline" size="icon" className="h-9 w-9 rounded-full bg-background" onClick={nextMonth}>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </div>
               
-              <div className="grid grid-cols-7 mb-2">
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                  <div key={day} className="py-2 text-center text-[11px] font-semibold text-muted-foreground">
+              <div className="grid grid-cols-7 mb-3">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  <div key={day} className="py-2 text-center text-[11px] font-bold text-muted-foreground tracking-wider uppercase">
                     {day}
                   </div>
                 ))}
               </div>
               
-              <div className="grid grid-cols-7 gap-y-1">
+              <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {Array.from({ length: startingDayIndex }).map((_, i) => (
-                  <div key={`empty-${i}`} className="h-10"></div>
+                  <div key={`empty-${i}`} className="min-h-[60px] sm:min-h-[70px]"></div>
                 ))}
                 {days.map((day) => {
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const todayStr = format(new Date(), 'yyyy-MM-dd');
                   const isCurrentMonth = isSameMonth(day, currentDate);
                   const isTodayDate = isToday(day);
                   const isSelected = isSameDay(day, selectedDate);
                   
+                  const dayData = calendarEventsByDate[dateStr];
+                  const hasUpcoming = dayData && dayData.upcoming.length > 0;
+                  const hasReturns = dayData && dayData.returns.length > 0;
+                  const hasOverdueReturns = hasReturns && dateStr < todayStr;
+                  const hasPayments = dayData && dayData.payments.length > 0;
+                  
                   return (
-                    <div key={day.toString()} className="h-10 flex items-center justify-center">
-                      <button 
-                        onClick={() => setSelectedDate(day)}
-                        className={`relative flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-all ${
-                          !isCurrentMonth ? 'text-muted-foreground/30' : 'text-foreground hover:bg-muted'
-                        } ${isSelected ? 'border-[2px] border-primary text-foreground font-bold shadow-sm' : ''} ${
-                          isTodayDate && !isSelected ? 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 font-bold' : ''
-                        }`}
-                      >
+                    <button 
+                      key={day.toString()}
+                      onClick={() => setSelectedDate(day)}
+                      className={`relative min-h-[60px] sm:min-h-[70px] flex flex-col items-center p-1 sm:p-1.5 rounded-xl border transition-all ${
+                        !isCurrentMonth ? 'opacity-30 border-transparent' : 
+                        isSelected ? 'border-primary bg-primary/5 shadow-sm' : 
+                        isTodayDate ? 'border-sky-500/30 bg-sky-50 dark:bg-sky-950/20' : 
+                        'border-border/50 bg-background hover:border-primary/30 hover:bg-muted/30'
+                      }`}
+                    >
+                      <span className={`text-sm font-semibold ${isSelected ? 'text-primary' : isTodayDate ? 'text-sky-600 dark:text-sky-400' : 'text-foreground'}`}>
                         {format(day, 'd')}
-                      </button>
-                    </div>
+                      </span>
+                      
+                      {/* Status Indicators */}
+                      <div className="mt-auto flex flex-wrap justify-center gap-1 w-full px-0.5">
+                        {hasUpcoming && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500" title="Dispatches"></div>}
+                        {hasReturns && !hasOverdueReturns && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500" title="Expected Returns"></div>}
+                        {hasOverdueReturns && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500" title="Overdue Returns"></div>}
+                        {hasPayments && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500" title="Payments Due"></div>}
+                      </div>
+                    </button>
                   );
                 })}
               </div>
             </div>
           </div>
           
-          {/* Right Column (Schedule) */}
-          <div className="flex-1 space-y-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold font-serif text-foreground">Schedule for {format(selectedDate, 'd MMM yyyy')}</h3>
-              <Select defaultValue="all">
-                <SelectTrigger className="w-[160px] bg-background border-border shadow-sm">
-                  <SelectValue placeholder="All Activities" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Activities</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Right Column (Schedule & Summary) */}
+          <div className="flex-1 space-y-6 flex flex-col h-full max-h-[700px]">
+            {/* Daily Summary Header */}
+            <div className="bg-muted/30 rounded-xl p-4 sm:p-5 border border-border shrink-0">
+              <h3 className="text-lg font-bold font-serif text-foreground mb-4">
+                Schedule for <span className="text-primary">{format(selectedDate, 'EEEE, d MMM yyyy')}</span>
+              </h3>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-background rounded-lg p-3 border border-border shadow-sm flex flex-col items-center justify-center text-center">
+                  <span className="text-2xl font-bold text-blue-600">{daySummary.dispatches}</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Dispatches</span>
+                </div>
+                <div className="bg-background rounded-lg p-3 border border-border shadow-sm flex flex-col items-center justify-center text-center">
+                  <span className="text-2xl font-bold text-amber-600">{daySummary.returns}</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Returns</span>
+                </div>
+                <div className="bg-background rounded-lg p-3 border border-border shadow-sm flex flex-col items-center justify-center text-center">
+                  <span className="text-lg sm:text-xl font-bold text-orange-600">₹{(daySummary.paymentsDue / 1000).toFixed(1)}k</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Payments Due</span>
+                </div>
+              </div>
             </div>
             
-            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-              {selectedBills.length === 0 ? (
-                <div className="text-center py-20 bg-background/50 rounded-xl border border-dashed border-border flex flex-col items-center justify-center">
+            {/* Event List */}
+            <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar pb-6">
+              {selectedDateEvents.length === 0 ? (
+                <div className="text-center py-20 bg-background/50 rounded-xl border border-dashed border-border flex flex-col items-center justify-center h-full">
                   <CalendarIcon className="w-10 h-10 text-muted-foreground/30 mb-3" />
-                  <p className="text-muted-foreground font-medium">No activities scheduled for {format(selectedDate, 'dd MMM yyyy')}</p>
+                  <p className="text-muted-foreground font-medium">No activities found for this date.</p>
                 </div>
               ) : (
-                selectedBills.map(bill => {
+                selectedDateEvents.map(bill => {
                   const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
                   const balance = bill.totalCost - paid - (bill.discount || 0);
-                  const isFullyPaid = balance <= 0;
+                  const info = getBillDisplayInfo(bill);
+                  const isOverdue = bill.expectedReturnDate && bill.expectedReturnDate < format(new Date(), 'yyyy-MM-dd') && info.status !== 'Settled';
                   
                   return (
-                    <div key={bill.id} className="p-5 rounded-xl border border-border bg-background/50 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start mb-1">
+                    <div 
+                      key={bill.id} 
+                      onClick={() => setSelectedBill(bill)}
+                      className="group p-5 rounded-xl border border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer relative overflow-hidden"
+                    >
+                      {/* Left color border accent */}
+                      <div className={`absolute left-0 top-0 bottom-0 w-1 ${
+                        isOverdue ? 'bg-red-500' :
+                        info.status === 'Upcoming' ? 'bg-blue-500' :
+                        info.status === 'Active' || info.status === 'Partially Active' ? 'bg-emerald-500' :
+                        'bg-orange-500'
+                      }`}></div>
+                      
+                      <div className="flex justify-between items-start mb-2 pl-2">
                         <div className="flex items-center gap-3">
-                          <h4 className="text-lg font-bold text-primary">{bill.customerName}</h4>
-                          <Badge className="bg-orange-100 text-orange-600 hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-400 border-none font-semibold h-5 px-2.5 text-[10px] rounded-full uppercase tracking-wider">
-                            {bill.status}
-                          </Badge>
+                          <h4 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">{bill.customerName}</h4>
+                          {isOverdue && (
+                            <Badge variant="destructive" className="h-5 px-2 text-[10px] uppercase tracking-wider">Overdue</Badge>
+                          )}
+                          {!isOverdue && (
+                            <Badge variant="outline" className="h-5 px-2 text-[10px] uppercase tracking-wider border-primary/20 text-primary bg-primary/5">
+                              {info.status}
+                            </Badge>
+                          )}
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-base text-foreground">₹{bill.totalCost}</div>
-                          <div className="text-[10px] text-muted-foreground uppercase font-mono">{bill.id}</div>
+                        <div className="text-right shrink-0">
+                          <div className="font-bold text-base text-foreground">₹{bill.totalCost.toLocaleString('en-IN')}</div>
+                          {balance > 0 && (
+                            <div className="text-xs text-orange-500 font-medium mt-0.5">Due: ₹{balance.toLocaleString('en-IN')}</div>
+                          )}
                         </div>
                       </div>
                       
-                      <div className="text-sm text-muted-foreground mb-4">
-                        {bill.mobile}
-                      </div>
-                      
-                      {bill.items.length > 0 && (
-                        <div className="space-y-1.5 mb-5 bg-card border border-border/50 rounded-lg p-3">
-                          {bill.items.map(item => {
-                            let itemStatus = 'Pending';
-                            let statusColor = 'text-orange-500';
-                            if (item.qtyReturned && item.qtyReturned >= item.qtyIssued) {
-                              itemStatus = 'Returned';
-                              statusColor = 'text-emerald-500';
-                            } else if (item.isDispatched) {
-                              itemStatus = 'Sent';
-                              statusColor = 'text-emerald-500';
-                            }
-                            
-                            return (
-                              <div key={item.id} className="flex justify-between items-center text-sm">
-                                <span className="font-medium text-muted-foreground">{item.qtyIssued}x {item.name}</span>
-                                <span className={`font-semibold text-xs ${statusColor}`}>{itemStatus}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
-                        <Button variant="outline" size="sm" onClick={() => setPaymentModalBillId(bill.id)} className="h-8 rounded-full px-4 text-xs font-medium bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100 hover:text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-500/20">
-                          <CreditCard className="w-3.5 h-3.5 mr-2" /> Add Payment
-                        </Button>
-                        <Button size="sm" className={`h-8 rounded-full px-4 text-xs font-medium ${isFullyPaid ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`}>
-                          <CheckCircle className="w-3.5 h-3.5 mr-2" /> {isFullyPaid ? 'Paid' : 'Unpaid'}
-                        </Button>
+                      <div className="text-sm text-muted-foreground flex items-center gap-4 pl-2">
+                        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {bill.eventDate ? format(new Date(bill.eventDate), 'd MMM') : 'N/A'} - {bill.expectedReturnDate ? format(new Date(bill.expectedReturnDate), 'd MMM') : 'N/A'}</span>
+                        <span className="opacity-50">|</span>
+                        <span>{bill.items.length} Items</span>
                       </div>
                     </div>
                   );
@@ -267,33 +321,13 @@ export default function CalendarView() {
         </div>
       </div>
 
-      <Dialog open={!!paymentModalBillId} onOpenChange={(open) => !open && setPaymentModalBillId(null)}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Record Payment</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="amount" className="text-right">
-                Amount (₹)
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                value={paymentAmount}
-                onChange={(e) => setPaymentAmount(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter amount"
-                autoFocus
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPaymentModalBillId(null)}>Cancel</Button>
-            <Button type="submit" onClick={handleRecordPayment}>Save Payment</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {selectedBill && (
+        <BillDetailsModal 
+          billId={selectedBill.id} 
+          isOpen={true} 
+          onClose={() => setSelectedBill(null)} 
+        />
+      )}
     </div>
   );
 }
