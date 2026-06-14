@@ -189,6 +189,14 @@ export const useStore = create<StoreState>((set) => ({
   deleteBill: (id) => set((state) => {
     const newBills = state.bills.filter(b => b.id !== id);
     localStorage.setItem('sadma_bills', JSON.stringify(newBills));
+    
+    // Immediately tell the API to delete it from Supabase
+    const password = import.meta.env.VITE_APP_PASSWORD || 'padma_pos_secure_2024';
+    fetch(`/api/sync?id=${id}`, {
+       method: 'DELETE',
+       headers: { 'Authorization': password }
+    }).catch(console.error);
+    
     return { bills: newBills };
   }),
   setPreferences: (prefs) => set((state) => {

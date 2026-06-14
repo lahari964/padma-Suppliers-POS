@@ -93,6 +93,22 @@ export default async function handler(req, res) {
     }
   }
 
+  // 5. Handle DELETE (Delete Bill)
+  if (req.method === 'DELETE') {
+    try {
+      const id = req.query.id;
+      if (!id) return res.status(400).json({ success: false, error: 'Missing bill ID' });
+
+      const { error } = await supabase.from('bills').delete().eq('id', id);
+      if (error) throw error;
+
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Server DELETE Error:', error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
   // Fallback
   return res.status(405).json({ success: false, error: 'Method not allowed' });
 }
