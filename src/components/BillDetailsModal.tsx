@@ -656,14 +656,14 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         <PrintReceipt bill={bill} />
 
         {/* Sticky Header */}
-        <div className="flex justify-between items-start md:items-center px-4 md:px-6 py-4 border-b border-border bg-card z-10 print:hidden gap-2">
+        <div className="flex justify-between items-start lg:items-center px-4 lg:px-6 py-4 border-b border-border bg-card z-10 print:hidden gap-2">
           <div className="flex items-center gap-4 flex-1">
-            <h2 className="flex flex-col md:flex-row md:items-center text-xl md:text-2xl font-bold font-serif tracking-tight text-foreground leading-tight">
+            <h2 className="flex flex-col lg:flex-row lg:items-center text-xl lg:text-2xl font-bold font-serif tracking-tight text-foreground leading-tight">
               <span>Customer Insights:</span>
-              <span className="text-primary md:ml-2">{bill.customerName}</span>
+              <span className="text-primary lg:ml-2">{bill.customerName}</span>
             </h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full shrink-0 bg-muted/50 hover:bg-destructive hover:text-destructive-foreground transition-colors mt-0.5 md:mt-0">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full shrink-0 bg-muted/50 hover:bg-destructive hover:text-destructive-foreground transition-colors mt-0.5 lg:mt-0">
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -834,7 +834,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               {/* Desktop Header */}
-              <div className="hidden md:flex justify-between items-center border-b border-border pb-2 mt-6">
+              <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-xl font-bold font-serif text-foreground">Items To Dispatch</h3>
                   <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
@@ -848,7 +848,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile Header Stack */}
-              <div className="flex md:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
+              <div className="flex lg:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
                 <h3 className="text-xl font-bold font-serif text-foreground">Items To Dispatch</h3>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="flex-1 h-9 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
@@ -938,7 +938,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {bill.items.some(isItemConsideredDispatched) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               {/* Desktop Header */}
-              <div className="hidden md:flex justify-between items-center border-b border-border pb-2 mt-6">
+              <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-xl font-bold font-serif text-foreground">Active / Dispatched Items Status</h3>
                   {displayStatus !== 'Settled' && (
@@ -959,7 +959,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile Header Stack */}
-              <div className="flex md:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
+              <div className="flex lg:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
                 <h3 className="text-xl font-bold font-serif text-foreground leading-tight">Active / Dispatched Items Status</h3>
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
