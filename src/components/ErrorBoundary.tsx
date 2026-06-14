@@ -7,6 +7,11 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
   }
 
   static getDerivedStateFromError(error: Error) {
+    // Automatically reload the page if a chunk fails to load due to a new deployment
+    if (error.message.includes('Failed to fetch dynamically imported module')) {
+      window.location.reload();
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
