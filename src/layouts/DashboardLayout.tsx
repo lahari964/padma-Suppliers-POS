@@ -41,7 +41,7 @@ const AppSidebar = ({ navItems }: { navItems: any[] }) => {
       </SidebarContent>
       <SidebarFooter className="border-t border-border p-4">
         <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
-          v1.0
+          v1.1
         </div>
       </SidebarFooter>
     </Sidebar>

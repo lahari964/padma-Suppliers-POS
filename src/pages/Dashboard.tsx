@@ -171,8 +171,10 @@ export default function Dashboard() {
                     {pendingBillingBills.length}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-blue-900 dark:text-blue-300">Pending Billing Start</h4>
-                    <p className="text-xs text-blue-700/80 dark:text-blue-400/80 mt-0.5">Events starting today or in the past</p>
+                      <h4 className="font-semibold text-blue-900 dark:text-blue-300">Pending Billing Start</h4>
+                      <p className="text-xs text-blue-700/80 dark:text-blue-400/80 mt-0.5">
+                        {pendingBillingBills.map(b => b.customerName).join(', ')} (Events starting today or in the past)
+                      </p>
                   </div>
                 </div>
                 <Button 
