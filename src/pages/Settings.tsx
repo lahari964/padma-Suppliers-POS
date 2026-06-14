@@ -359,7 +359,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
         
                 {/* --- GENERAL TAB --- */}
         {activeTab === 'General' && (
-          <div className="max-w-3xl space-y-8 animate-in fade-in duration-300">
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <SettingsIcon className="w-6 h-6 text-primary" />
@@ -462,7 +462,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
         {/* --- STAFF TAB --- */}
         {activeTab === 'Staff' && (
-          <div className="max-w-4xl space-y-8 animate-in fade-in duration-300">
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <UserCircle className="w-6 h-6 text-primary" />
@@ -472,18 +472,18 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
             </div>
 
             <div className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col shadow-sm">
-              <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <input type="text" placeholder="Search staff..." className="pl-8 pr-4 py-2 bg-background border border-border rounded-lg text-sm w-64 focus:outline-none focus:ring-1 focus:ring-primary" value={staffSearchTerm} onChange={e => setStaffSearchTerm(e.target.value)} />
+              <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center gap-4">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="relative w-full md:w-auto">
+                    <input type="text" placeholder="Search staff..." className="pl-8 pr-4 py-2 bg-background border border-border rounded-lg text-sm w-full md:w-64 focus:outline-none focus:ring-1 focus:ring-primary" value={staffSearchTerm} onChange={e => setStaffSearchTerm(e.target.value)} />
                     <svg className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   </div>
                 </div>
                 
                 <Dialog open={isAddStaffOpen} onOpenChange={setIsAddStaffOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
-                      <Plus className="w-4 h-4 mr-2" /> Add Employee
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm whitespace-nowrap shrink-0">
+                      <Plus className="w-4 h-4 md:mr-2" /> <span className="hidden md:inline">Add Employee</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
@@ -537,27 +537,37 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                   <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
                     <tr>
                       <th className="px-6 py-4 font-semibold tracking-wider">User</th>
-                      <th className="px-6 py-4 font-semibold tracking-wider">Mobile (Login ID)</th>
-                      <th className="px-6 py-4 font-semibold tracking-wider">Role</th>
-                      <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider hidden md:table-cell">Mobile (Login ID)</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider hidden md:table-cell">Role</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider hidden md:table-cell">Status</th>
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {employees.filter(emp => emp.name.toLowerCase().includes(staffSearchTerm.toLowerCase()) || (emp.mobile || '').includes(staffSearchTerm)).map(emp => (
                       <tr key={emp.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td 
+                          className="px-6 py-4 whitespace-nowrap cursor-pointer md:cursor-auto" 
+                          onClick={() => {
+                            if (window.innerWidth < 768) {
+                              setSelectedStaff(emp);
+                              setIsEditStaffOpen(true);
+                            }
+                          }}
+                        >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold border border-primary/20 shrink-0">
                               {emp.name.charAt(0).toUpperCase()}
                             </div>
                             <div>
                               <div className="font-semibold text-foreground">{emp.name}</div>
+                              {/* Show role indicator under name on mobile */}
+                              <div className="text-xs text-muted-foreground md:hidden mt-0.5">{emp.role}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-medium text-muted-foreground">{emp.mobile || '—'}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 font-medium text-muted-foreground hidden md:table-cell">{emp.mobile || '—'}</td>
+                        <td className="px-6 py-4 hidden md:table-cell">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                             emp.role === 'Admin' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 
                             emp.role === 'Manager' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' : 
@@ -566,7 +576,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                             {emp.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 hidden md:table-cell">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                             emp.status === 'Inactive' ? 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-slate-700' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                           }`}>
@@ -674,7 +684,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
         {/* --- EXPORT TAB --- */}
         {activeTab === 'Export / Download' && (
-          <div className="max-w-3xl space-y-8">
+          <div className="w-full space-y-8">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Download className="w-5 h-5" />
@@ -711,7 +721,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
                 {/* --- NOTIFICATIONS TAB --- */}
         {activeTab === 'Notifications' && (
-          <div className="max-w-3xl space-y-8 animate-in fade-in duration-300">
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Bell className="w-6 h-6 text-primary" />
@@ -843,7 +853,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
         {/* --- DATABASE TAB --- */}
         {activeTab === 'Database' && (
-          <div className="max-w-3xl space-y-8 animate-in fade-in duration-300">
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Database className="w-6 h-6 text-primary" />
@@ -986,7 +996,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
 
         {/* --- PASSWORD TAB --- */}
         {activeTab === 'Password' && (
-          <div className="max-w-3xl space-y-8 animate-in fade-in duration-300">
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <KeyRound className="w-6 h-6 text-primary" />

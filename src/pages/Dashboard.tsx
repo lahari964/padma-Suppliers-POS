@@ -114,6 +114,89 @@ export default function Dashboard() {
         <Button onClick={() => navigate('/bills')}>View All Bills</Button>
       </div>
       
+      {/* Action Required (Priority 1) */}
+      <Card className="border-destructive/20 shadow-sm">
+        <CardHeader className="pb-3 border-b border-border bg-destructive/5 rounded-t-xl">
+          <CardTitle className="text-destructive flex items-center gap-2 text-lg">
+            <AlertTriangle className="w-5 h-5" />
+            Action Required
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="space-y-4">
+            {overduePayments.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 font-bold text-lg shrink-0">
+                    {overduePayments.length}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-red-900 dark:text-red-300">Payments Overdue</h4>
+                    <p className="text-xs text-red-700/80 dark:text-red-400/80 mt-0.5">Outstanding balances on past/current events</p>
+                  </div>
+                </div>
+                <Button 
+                  className="bg-red-600 hover:bg-red-700 text-white shadow-sm whitespace-nowrap shrink-0" 
+                  onClick={() => navigate('/bills?action=overdue-payments')}
+                >
+                  Check Payments
+                </Button>
+              </div>
+            )}
+
+            {overdueReturns.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-100 dark:border-amber-900/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 font-bold text-lg shrink-0">
+                    {overdueReturns.length}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-amber-900 dark:text-amber-300">Orders Pending Return</h4>
+                    <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">Items not returned by their expected date</p>
+                  </div>
+                </div>
+                <Button 
+                  className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm whitespace-nowrap shrink-0" 
+                  onClick={() => navigate('/bills?action=overdue-returns')}
+                >
+                  View Orders
+                </Button>
+              </div>
+            )}
+
+            {pendingBillingBills.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 font-bold text-lg shrink-0">
+                    {pendingBillingBills.length}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900 dark:text-blue-300">Pending Billing Start</h4>
+                    <p className="text-xs text-blue-700/80 dark:text-blue-400/80 mt-0.5">Events starting today or in the past</p>
+                  </div>
+                </div>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm whitespace-nowrap shrink-0" 
+                  onClick={() => navigate('/bills?action=pending-billing')}
+                >
+                  Start Billing
+                </Button>
+              </div>
+            )}
+
+            {overduePayments.length === 0 && overdueReturns.length === 0 && pendingBillingBills.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-10 text-muted-foreground border border-dashed rounded-xl bg-muted/20">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-3">
+                  <div className="w-6 h-6 text-emerald-500 font-bold text-xl">✓</div>
+                </div>
+                <p className="text-base font-semibold text-foreground">All caught up!</p>
+                <p className="text-sm mt-1">No urgent actions required.</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* 4 Core Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="bg-card hover:bg-muted/50 transition-colors border-l-4 border-l-blue-500">
@@ -252,88 +335,6 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground text-center py-8">No activities for this category in the next 7 days</p>
                 )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-destructive/20 shadow-sm">
-          <CardHeader className="pb-3 border-b border-border bg-destructive/5 rounded-t-xl">
-            <CardTitle className="text-destructive flex items-center gap-2 text-lg">
-              <AlertTriangle className="w-5 h-5" />
-              Action Required
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="space-y-4">
-              {overduePayments.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 font-bold text-lg shrink-0">
-                      {overduePayments.length}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-red-900 dark:text-red-300">Payments Overdue</h4>
-                      <p className="text-xs text-red-700/80 dark:text-red-400/80 mt-0.5">Outstanding balances on past/current events</p>
-                    </div>
-                  </div>
-                  <Button 
-                    className="bg-red-600 hover:bg-red-700 text-white shadow-sm whitespace-nowrap shrink-0" 
-                    onClick={() => navigate('/bills?action=overdue-payments')}
-                  >
-                    Check Payments
-                  </Button>
-                </div>
-              )}
-
-              {overdueReturns.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-100 dark:border-amber-900/30">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 font-bold text-lg shrink-0">
-                      {overdueReturns.length}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-amber-900 dark:text-amber-300">Orders Pending Return</h4>
-                      <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">Items not returned by their expected date</p>
-                    </div>
-                  </div>
-                  <Button 
-                    className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm whitespace-nowrap shrink-0" 
-                    onClick={() => navigate('/bills?action=overdue-returns')}
-                  >
-                    View Orders
-                  </Button>
-                </div>
-              )}
-
-              {pendingBillingBills.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 font-bold text-lg shrink-0">
-                      {pendingBillingBills.length}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900 dark:text-blue-300">Pending Billing Start</h4>
-                      <p className="text-xs text-blue-700/80 dark:text-blue-400/80 mt-0.5">Events starting today or in the past</p>
-                    </div>
-                  </div>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm whitespace-nowrap shrink-0" 
-                    onClick={() => navigate('/bills?action=pending-billing')}
-                  >
-                    Start Billing
-                  </Button>
-                </div>
-              )}
-
-              {overduePayments.length === 0 && overdueReturns.length === 0 && pendingBillingBills.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-10 text-muted-foreground border border-dashed rounded-xl bg-muted/20">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-3">
-                    <div className="w-6 h-6 text-emerald-500 font-bold text-xl">✓</div>
-                  </div>
-                  <p className="text-base font-semibold text-foreground">All caught up!</p>
-                  <p className="text-sm mt-1">No urgent actions required.</p>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
