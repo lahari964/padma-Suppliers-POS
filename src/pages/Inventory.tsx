@@ -96,7 +96,7 @@ export default function Inventory() {
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead>Item Name</TableHead>
-              <TableHead>Category</TableHead>
+              <TableHead className="hidden sm:table-cell">Category</TableHead>
               <TableHead className="text-right">Price (₹)</TableHead>
               <TableHead className="w-[100px] text-right">Actions</TableHead>
             </TableRow>
@@ -112,14 +112,14 @@ export default function Inventory() {
               filteredInventory.map(item => (
                 <TableRow key={item.id} className="group">
                   <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                       {item.category}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">{item.price.toLocaleString('en-IN')}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-1 sm:gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenDialog(item)}>
                         <Edit className="w-4 h-4" />
                       </Button>
