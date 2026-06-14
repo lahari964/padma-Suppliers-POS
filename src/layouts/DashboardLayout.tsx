@@ -34,13 +34,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       // Verify silently in background
       try {
-        const client = (await import('../lib/supabase')).getSupabaseClient();
-        if (!client) {
-          setIsDatabaseConnected(false);
-          return;
-        }
-        const { error } = await client.from('employees').select('id').limit(1);
-        if (error) setIsDatabaseConnected(false);
+        const password = import.meta.env.VITE_APP_PASSWORD || 'padma_pos_secure_2024';
+        const response = await fetch('/api/sync', {
+          method: 'GET',
+          headers: { 'Authorization': password }
+        });
+        setIsDatabaseConnected(response.ok);
       } catch (err) {
         setIsDatabaseConnected(false);
       }
