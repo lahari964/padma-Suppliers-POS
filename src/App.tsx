@@ -52,6 +52,9 @@ const App = () => {
   const setPreferences = useStore(state => state.setPreferences);
 
   useEffect(() => {
+    // Clear dynamic import reload flag on successful load
+    sessionStorage.removeItem('chunk_failed_reload');
+
     if (!preferences.businessDetails?.address?.includes('ganugapalem')) {
       setPreferences({
         businessDetails: {

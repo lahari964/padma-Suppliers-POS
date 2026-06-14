@@ -7,16 +7,33 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
   }
 
   static getDerivedStateFromError(error: Error) {
-    // Automatically reload the page if a chunk fails to load due to a new deployment
-    if (error.message.includes('Failed to fetch dynamically imported module')) {
-      window.location.reload();
-      return { hasError: false, error: null };
-    }
     return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    if (error.message.includes('Failed to fetch dynamically imported module')) {
+      // Prevent infinite reload loop just in case
+      const reloaded = sessionStorage.getItem('chunk_failed_reload');
+      if (!reloaded) {
+        sessionStorage.setItem('chunk_failed_reload', 'true');
+        window.location.reload();
+      }
+    }
   }
 
   render() {
     if (this.state.hasError) {
+      if (this.state.error?.message.includes('Failed to fetch dynamically imported module')) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4 text-muted-foreground">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p>Applying updates...</p>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="p-10 text-red-500 bg-red-100 min-h-screen">
           <h1 className="text-2xl font-bold mb-4">React Error!</h1>
