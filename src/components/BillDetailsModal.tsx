@@ -658,8 +658,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         {/* Sticky Header */}
         <div className="flex justify-between items-start md:items-center px-4 md:px-6 py-4 border-b border-border bg-card z-10 print:hidden gap-2">
           <div className="flex items-center gap-4 flex-1">
-            <h2 className="text-xl md:text-2xl font-bold font-serif tracking-tight text-foreground leading-tight">
-              Customer Insights: <span className="text-primary block md:inline">{bill.customerName}</span>
+            <h2 className="flex flex-col md:flex-row md:items-center text-xl md:text-2xl font-bold font-serif tracking-tight text-foreground leading-tight">
+              <span>Customer Insights:</span>
+              <span className="text-primary md:ml-2">{bill.customerName}</span>
             </h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full shrink-0 bg-muted/50 hover:bg-destructive hover:text-destructive-foreground transition-colors mt-0.5 md:mt-0">
