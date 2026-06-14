@@ -79,6 +79,11 @@ export default function NewBill() {
     setStagedItems(prev => prev.map(i => i.inventoryId === inventoryId ? { ...i, qty: newQty } : i));
   };
 
+  const updateItemPrice = (inventoryId: string, newPrice: number) => {
+    if (newPrice < 0) return;
+    setStagedItems(prev => prev.map(i => i.inventoryId === inventoryId ? { ...i, price: newPrice } : i));
+  };
+
   const removeStagedItem = (inventoryId: string) => {
     setStagedItems(prev => prev.filter(i => i.inventoryId !== inventoryId));
   };
@@ -280,7 +285,19 @@ export default function NewBill() {
                       <td className="py-2 px-4">
                         <div className="font-medium text-foreground">{item.name}</div>
                       </td>
-                      <td className="text-center py-2 px-4 text-muted-foreground">₹ {item.price}</td>
+                      <td className="py-2 px-4">
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-muted-foreground">₹</span>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            className="w-20 h-8 text-center" 
+                            value={item.price} 
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateItemPrice(item.inventoryId, Number(e.target.value))}
+                          />
+                        </div>
+                      </td>
                       <td className="py-2 px-4">
                         <Input 
                           type="number" 

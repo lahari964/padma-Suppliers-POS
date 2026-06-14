@@ -92,6 +92,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [showAddItems, setShowAddItems] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [addQty, setAddQty] = useState<Record<string, number>>({});
+  const [addPrice, setAddPrice] = useState<Record<string, number>>({});
   
   const [showStartBilling, setShowStartBilling] = useState(false);
   const [billingStartDate, setBillingStartDate] = useState(bill?.eventDate || format(new Date(), 'yyyy-MM-dd'));
@@ -371,11 +372,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     
     itemsToAdd.forEach(invItem => {
       const qty = addQty[invItem.id];
+      const finalPrice = addPrice[invItem.id] ?? invItem.price;
       const newItem = {
         id: `ITM-${Date.now()}-${Math.random()}`,
         inventoryId: invItem.id,
         name: invItem.name,
-        price: invItem.price,
+        price: finalPrice,
         issueDate: bill.eventDate || format(new Date(), 'yyyy-MM-dd'),
         issueTime: bill.eventTime || format(new Date(), 'HH:mm'),
         issueTimestamp: Date.now(),
@@ -388,7 +390,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       };
       
       updatedItems.push(newItem);
-      newCost += invItem.price * qty * 1; // base 1 day cost
+      newCost += finalPrice * qty * 1; // base 1 day cost
       
       // Deduct stock
       updateInventoryQty(invItem.id, -qty);
@@ -1256,12 +1258,29 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                  <div key={item.id} className="flex justify-between items-center p-3 border border-border rounded-lg">
                    <div>
                      <p className="font-medium text-sm">{item.name}</p>
-                     <p className="text-xs text-muted-foreground">₹{item.price}/day | Available: {item.qtyAvailable || 0}</p>
+                     <p className="text-xs text-muted-foreground">Available: {item.qtyAvailable || 0}</p>
                    </div>
-                   <div className="flex items-center gap-2">
-                     <Input 
-                        type="number" 
-                        min="0"
+                   <div className="flex items-center gap-4">
+                     <div className="flex flex-col items-center gap-1">
+                       <span className="text-[10px] text-muted-foreground uppercase font-semibold">Rate</span>
+                       <div className="flex items-center">
+                         <span className="text-muted-foreground text-sm mr-1">₹</span>
+                         <Input 
+                            type="number" 
+                            min="0"
+                            placeholder={item.price.toString()}
+                            value={addPrice[item.id] !== undefined ? addPrice[item.id] : item.price}
+                            onChange={(e) => setAddPrice(prev => ({ ...prev, [item.id]: e.target.value ? parseFloat(e.target.value) : 0 }))}
+                            className="w-16 h-8 text-center"
+                            onFocus={(e) => e.target.select()}
+                         />
+                       </div>
+                     </div>
+                     <div className="flex flex-col items-center gap-1">
+                       <span className="text-[10px] text-muted-foreground uppercase font-semibold">Qty</span>
+                       <Input 
+                          type="number" 
+                          min="0"
                         max={item.qtyAvailable || 1000}
                         placeholder="0"
                         value={addQty[item.id] || ''}
