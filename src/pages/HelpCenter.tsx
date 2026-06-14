@@ -27,6 +27,8 @@ const FAQ_DATA = [
       { q: "What does 'Total Revenue' show?", a: "It shows the total amount of money (advance payments + final settlements) collected TODAY. It resets to zero at midnight." },
       { q: "What does 'Active Bills' show?", a: "It shows the total number of customers who currently have rented items that have not yet been returned." },
       { q: "What does 'Expected Returns' show?", a: "It shows the number of active bills where the agreed 'Return Date' is exactly today (or earlier, meaning they are overdue)." },
+      { q: "What is the 'Action Required' widget?", a: "It acts as an automated priority queue. It instantly alerts you to bills that need immediate attention, specifically those with Overdue items or Pending final payments." },
+      { q: "What does 'Total Due Payments' show?", a: "It calculates the total pending balance ONLY across bills that are in the 'Pending' status (meaning all items have been returned, but the final payment is still due)." },
       { q: "What is the 'Recent Activity' table?", a: "It is a quick list of the last 5 bills you created. You can click on any of them to view the full details." },
       { q: "How can I see a customer's entire history?", a: "In the Recent Activity table or Bills tab, simply click on the customer's name! This opens 'Customer Insights', a powerful screen showing their total money spent, active rentals, and past history." },
       { q: "Why are all the numbers zero?", a: "If you just started using the software or if there is no activity for today, the numbers will be zero. They will update as soon as you create a bill." }
@@ -87,10 +89,11 @@ const FAQ_DATA = [
     items: [
       { q: "How do I open the Calendar?", a: "Click 'Calendar' in the left sidebar menu." },
       { q: "What is on the left side of the calendar screen?", a: "The left side shows a mini-calendar grid, like a standard wall calendar. You can click any day to see what is happening on that day." },
-      { q: "What is on the right side of the calendar screen?", a: "The right side shows a detailed list of all bills related to the date you clicked on the left." },
-      { q: "What does a Gray dot under a date mean?", a: "It means a bill was created on that specific date." },
+      { q: "What is on the right side of the calendar screen?", a: "The right side shows a detailed list of all bills related to the date you clicked, along with total summaries (Total Dispatches, Total Returns, Total Payments) for that day." },
       { q: "What does a Blue dot under a date mean?", a: "It means items are scheduled to be Dispatched (given to the customer) on that date." },
-      { q: "What does an Orange dot under a date mean?", a: "It means items are Expected to Return from a customer on that date." },
+      { q: "What does an Amber/Yellow dot mean?", a: "It means items are Expected to Return from a customer on that date." },
+      { q: "What does a Red dot mean?", a: "It means there are Overdue returns (items were supposed to be returned before today but haven't been)." },
+      { q: "What does an Orange dot mean?", a: "It means there are Payments Due on that date." },
       { q: "How do I change the month?", a: "Click the small left (<) and right (>) arrows at the top of the mini-calendar to flip through months." }
     ]
   },
