@@ -1287,6 +1287,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                         onChange={(e) => setAddQty(prev => ({ ...prev, [item.id]: parseInt(e.target.value) || undefined as any }))}
                         className="w-16 h-8 text-center"
                      />
+                     </div>
                    </div>
                  </div>
                ))}
