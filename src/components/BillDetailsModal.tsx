@@ -656,11 +656,13 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         <PrintReceipt bill={bill} />
 
         {/* Sticky Header */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-border bg-card z-10 print:hidden">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold font-serif tracking-tight text-foreground">Customer Insights: <span className="text-primary">{bill.customerName}</span></h2>
+        <div className="flex justify-between items-start md:items-center px-4 md:px-6 py-4 border-b border-border bg-card z-10 print:hidden gap-2">
+          <div className="flex items-center gap-4 flex-1">
+            <h2 className="text-xl md:text-2xl font-bold font-serif tracking-tight text-foreground leading-tight">
+              Customer Insights: <span className="text-primary block md:inline">{bill.customerName}</span>
+            </h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full bg-muted/50 hover:bg-destructive hover:text-destructive-foreground transition-colors">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full shrink-0 bg-muted/50 hover:bg-destructive hover:text-destructive-foreground transition-colors mt-0.5 md:mt-0">
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -934,7 +936,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {/* Current Items Status (Active / Partially Active) */}
           {bill.items.some(isItemConsideredDispatched) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
+              {/* Desktop Header */}
+              <div className="hidden md:flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-xl font-bold font-serif text-foreground">Active / Dispatched Items Status</h3>
                   {displayStatus !== 'Settled' && (
@@ -951,6 +954,27 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={openReturnAllModal} className="h-8 border-primary/30 text-primary hover:bg-primary/10">Return All Remaining</Button>
                   </div>
+                </div>
+              </div>
+
+              {/* Mobile Header Stack */}
+              <div className="flex md:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
+                <h3 className="text-xl font-bold font-serif text-foreground leading-tight">Active / Dispatched Items Status</h3>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                    <input type="checkbox" checked={hasDamages} onChange={e => setHasDamages(e.target.checked)} className="accent-red-500 w-4 h-4" />
+                    Report Damages
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  {displayStatus !== 'Settled' && (
+                    <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="flex-1 h-9 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
+                      + Add New Items
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" onClick={openReturnAllModal} className="flex-1 h-9 border-primary/30 text-primary hover:bg-primary/10">
+                    Return All
+                  </Button>
                 </div>
               </div>
               <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
