@@ -443,6 +443,14 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>Landline No</Label>
+                  <Input 
+                    value={preferences.businessDetails?.landline || ''} 
+                    onChange={e => setPreferences({ businessDetails: { ...(preferences.businessDetails as any), landline: e.target.value } })}
+                    placeholder="e.g. 08592-200000"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label>Signature Label</Label>
                   <Input 
                     value={preferences.businessDetails?.signatureLabel || ''} 

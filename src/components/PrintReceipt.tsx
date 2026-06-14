@@ -44,6 +44,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           {biz.tagline && <p className="text-xs">{biz.tagline}</p>}
           {biz.address && <p className="text-xs mt-1">{biz.address}</p>}
           {biz.phone && <p className="text-xs">Ph: {biz.phone}</p>}
+          {biz.landline && <p className="text-xs">Landline: {biz.landline}</p>}
         </div>
 
         <div className="border-b border-dashed border-black pb-2 mb-2">
@@ -155,6 +156,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
             <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
             {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
+            {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
           </div>
         </div>
         <div className="text-right">
