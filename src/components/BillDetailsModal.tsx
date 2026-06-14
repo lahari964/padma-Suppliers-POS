@@ -862,7 +862,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   Send All Items
                 </Button>
               </div>
-              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden lg:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -905,7 +905,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile Cards (Items To Dispatch) */}
-              <div className="block md:hidden space-y-3">
+              <div className="block lg:hidden space-y-3">
                 {bill.items.filter(isItemPendingDispatch).map(item => {
                   const dispatchedQty = bill.items.filter(i => i.inventoryId === item.inventoryId && isItemConsideredDispatched(i)).reduce((acc, curr) => acc + curr.qtyIssued, 0);
                   const totalBooked = item.qtyIssued + dispatchedQty;
@@ -978,7 +978,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   </Button>
                 </div>
               </div>
-              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden lg:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -1033,7 +1033,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile Cards (Active Items) */}
-              <div className="block md:hidden space-y-3">
+              <div className="block lg:hidden space-y-3">
                 {bill.items.filter(isItemConsideredDispatched).map(item => {
                   const pendingReturn = item.qtyIssued - (item.qtyReturned || 0);
                   return (
@@ -1074,7 +1074,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
                 <h3 className="text-xl font-bold font-serif text-foreground">Returned Items</h3>
               </div>
-              <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="hidden lg:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
@@ -1099,7 +1099,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile Cards (Returned Items) */}
-              <div className="block md:hidden space-y-3">
+              <div className="block lg:hidden space-y-3">
                 {bill.items.filter(isItemConsideredDispatched).map(item => (
                   <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-2 shadow-sm">
                     <div className="flex justify-between items-center">
