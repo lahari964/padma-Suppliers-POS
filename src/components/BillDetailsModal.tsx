@@ -830,7 +830,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {/* Items To Be Dispatched (Upcoming) */}
           {bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-border pb-2 mt-6">
+              {/* Desktop Header */}
+              <div className="hidden md:flex justify-between items-center border-b border-border pb-2 mt-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-xl font-bold font-serif text-foreground">Items To Dispatch</h3>
                   <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
@@ -841,6 +842,22 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   <Button variant="outline" size="sm" onClick={() => setShowDeleteAll(true)} className="h-8 text-destructive border-destructive/30 hover:bg-destructive/10">Delete All</Button>
                   <Button size="sm" onClick={openSendAllModal} className="h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold">Send All</Button>
                 </div>
+              </div>
+
+              {/* Mobile Header Stack */}
+              <div className="flex md:hidden flex-col gap-3 border-b border-border pb-3 mt-6">
+                <h3 className="text-xl font-bold font-serif text-foreground">Items To Dispatch</h3>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="flex-1 h-9 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
+                    + Add New Items
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setShowDeleteAll(true)} className="flex-1 h-9 text-destructive border-destructive/30 hover:bg-destructive/10">
+                    Delete All
+                  </Button>
+                </div>
+                <Button size="sm" onClick={openSendAllModal} className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm">
+                  Send All Items
+                </Button>
               </div>
               <div className="hidden md:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
