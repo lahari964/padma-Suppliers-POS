@@ -689,19 +689,33 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 }>{displayStatus}</Badge>
               </div>
             </div>
-            {!bill.billingStarted && displayStatus === 'Upcoming' && bill.eventDate && bill.eventDate <= format(new Date(), 'yyyy-MM-dd') && (
-              <div className="col-span-2 md:col-span-4 mt-2">
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-bold text-blue-700 dark:text-blue-400">Billing Has Not Started</h4>
-                    <p className="text-xs text-blue-600/80 dark:text-blue-300/80 mt-0.5">Start billing to move this order to Active and officially begin the rental clock.</p>
+            {(() => {
+              const todayStr = format(new Date(), 'yyyy-MM-dd');
+              const isPureUpcoming = displayStatus === 'Upcoming';
+              const isUpcomingEvent = bill.eventDate && bill.eventDate > todayStr;
+              const isEventArrived = bill.eventDate && bill.eventDate <= todayStr;
+              const isSentEarly = (displayStatus === 'Active' || displayStatus === 'Partially Active') && isUpcomingEvent;
+              
+              const showStartBillingBanner = !bill.billingStarted && (
+                (isPureUpcoming && isEventArrived) || isSentEarly
+              );
+
+              if (!showStartBillingBanner) return null;
+
+              return (
+                <div className="col-span-2 md:col-span-4 mt-2">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-bold text-blue-700 dark:text-blue-400">Billing Has Not Started</h4>
+                      <p className="text-xs text-blue-600/80 dark:text-blue-300/80 mt-0.5">Start billing to move this order to Active and officially begin the rental clock.</p>
+                    </div>
+                    <Button onClick={() => setShowStartBilling(true)} className="bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm font-bold w-full sm:w-auto">
+                      Start Billing Now
+                    </Button>
                   </div>
-                  <Button onClick={() => setShowStartBilling(true)} className="bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm font-bold w-full sm:w-auto">
-                    Start Billing Now
-                  </Button>
                 </div>
-              </div>
-            )}
+              );
+            })()}
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Event Date</p>
               <p className="font-semibold text-foreground">{bill.eventDate ? formatToDDMMYYYY(bill.eventDate) : <span className="text-muted-foreground italic text-sm">Not set</span>}</p>
