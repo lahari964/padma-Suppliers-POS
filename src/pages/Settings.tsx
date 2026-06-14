@@ -302,15 +302,15 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
-      {/* Sidebar */}
-      <div className="w-56 border-r border-border bg-card/30 p-4">
-        <nav className="space-y-1">
+    <div className="flex flex-col md:flex-row h-full min-h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
+      {/* Sidebar / Top Menu on Mobile */}
+      <div className="md:w-56 border-b md:border-b-0 md:border-r border-border bg-card/30 p-4 shrink-0">
+        <nav className="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
           {tabs.map((t) => (
             <button
               key={t.name}
               onClick={() => setActiveTab(t.name)}
-              className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              className={`flex-shrink-0 md:w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === t.name 
                   ? 'bg-primary/10 text-primary' 
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -323,7 +323,7 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto">
         
                 {/* --- GENERAL TAB --- */}
         {activeTab === 'General' && (
