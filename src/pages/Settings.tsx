@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
-import { Trash2, Plus, UserCircle, Bell, Download, FileText, Settings as SettingsIcon, Package, Database, Sun, Moon, Activity, Wrench, Code, AlertTriangle, Key } from 'lucide-react';
+import { Trash2, Plus, UserCircle, Bell, Download, FileText, Settings as SettingsIcon, Package, Database, Sun, Moon, Activity, Wrench, Code, AlertTriangle, Key, Menu } from 'lucide-react';
 import { syncUpToCloud } from '../lib/supabase';
 import { getBillDisplayInfo } from '../hooks/useBillCalculations';
 import { format } from 'date-fns';
@@ -22,6 +22,7 @@ export default function Settings() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { bills, inventory, employees, currentUser, setCurrentUser, preferences, setPreferences, isDatabaseConnected } = useStore();
   const [activeTab, setActiveTab] = useState('General');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Database State
   const [wipeConfirmation, setWipeConfirmation] = useState('');
@@ -302,14 +303,36 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
+    <div className="flex relative h-[calc(100vh-8rem)] animate-in fade-in duration-300 -m-4 md:-m-6 lg:-m-8">
+      {/* Mobile Backdrop */}
+      {isMenuOpen && (
+        <div 
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-56 border-r border-border bg-card/30 p-4">
+      <div className={`
+        absolute md:relative z-50 h-full bg-card md:bg-transparent
+        w-64 md:w-56 border-r border-border p-4
+        transition-transform duration-300 ease-in-out
+        ${isMenuOpen ? 'translate-x-0 shadow-2xl md:shadow-none' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="flex items-center justify-between md:hidden mb-6 pb-4 border-b border-border">
+          <h2 className="font-bold text-lg">Settings Menu</h2>
+          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
+            <Menu className="w-5 h-5" />
+          </Button>
+        </div>
         <nav className="space-y-1">
           {tabs.map((t) => (
             <button
               key={t.name}
-              onClick={() => setActiveTab(t.name)}
+              onClick={() => {
+                setActiveTab(t.name);
+                setIsMenuOpen(false);
+              }}
               className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === t.name 
                   ? 'bg-primary/10 text-primary' 
@@ -323,7 +346,14 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+        {/* Mobile Menu Trigger */}
+        <div className="md:hidden mb-6 flex items-center gap-3">
+          <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(true)}>
+            <Menu className="w-5 h-5" />
+          </Button>
+          <h2 className="text-xl font-bold">{activeTab} Settings</h2>
+        </div>
         
                 {/* --- GENERAL TAB --- */}
         {activeTab === 'General' && (
