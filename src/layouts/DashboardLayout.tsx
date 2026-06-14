@@ -18,12 +18,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const activeUser = employees.find(e => e.id === currentUser?.id) || currentUser;
   const { resolvedTheme, setTheme } = useTheme();
   const [logoError, setLogoError] = useState(false);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
 
   useEffect(() => {
     const checkConnection = async () => {
+      setIsCheckingConnection(true);
       const client = (await import('../lib/supabase')).getSupabaseClient();
       if (!client) {
         setIsDatabaseConnected(false);
+        setIsCheckingConnection(false);
         return;
       }
       try {
@@ -31,6 +34,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         setIsDatabaseConnected(!error);
       } catch (err) {
         setIsDatabaseConnected(false);
+      } finally {
+        setIsCheckingConnection(false);
       }
     };
     checkConnection();
@@ -152,7 +157,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-background border border-border">
-                {isDatabaseConnected ? (
+                {isCheckingConnection ? (
+                  <>
+                    <div className="w-3 h-3 rounded-full border-2 border-muted-foreground border-t-transparent animate-spin"></div>
+                    <span className="text-xs font-medium text-muted-foreground">Checking...</span>
+                  </>
+                ) : isDatabaseConnected ? (
                   <>
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Connected</span>
@@ -204,7 +214,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
           </header>
           
-          {!isDatabaseConnected && (
+          {!isCheckingConnection && !isDatabaseConnected && (
             <div className="bg-destructive/10 border-b border-destructive/20 p-2.5 px-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3 shrink-0">
               <div className="flex items-center gap-3">
                 <span className="relative flex h-2.5 w-2.5">
