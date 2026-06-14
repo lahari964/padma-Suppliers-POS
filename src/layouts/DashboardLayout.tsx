@@ -1,7 +1,7 @@
 import { useNotifications } from '../hooks/useNotifications';
 import { ReactNode, useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Home, ListTodo, Package, Settings, LogOut, Sun, Moon, BookOpen, Calendar, CloudUpload, RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { syncUpToCloud, syncDownFromCloud } from '../lib/supabase';
@@ -10,6 +10,43 @@ import { useTheme } from 'next-themes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+
+const AppSidebar = ({ navItems }: { navItems: any[] }) => {
+  const location = useLocation();
+  const { setOpenMobile } = useSidebar();
+  
+  return (
+    <Sidebar className="border-r border-border">
+      <SidebarHeader className="h-16 flex items-center px-4 border-b border-border">
+        {/* Logo moved to Top Header */}
+      </SidebarHeader>
+      <SidebarContent className="py-4">
+        <SidebarMenu>
+          {navItems.map((item) => (
+            <SidebarMenuItem key={item.path}>
+              <SidebarMenuButton 
+                asChild 
+                isActive={location.pathname === item.path}
+                tooltip={item.label}
+                onClick={() => setOpenMobile(false)}
+              >
+                <Link to={item.path}>
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="border-t border-border p-4">
+        <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
+          v1.0
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  );
+};
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
@@ -134,34 +171,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className={`flex min-h-screen w-full transition-colors duration-300 bg-background`}>
-        <Sidebar className="border-r border-border">
-          <SidebarHeader className="h-16 flex items-center px-4 border-b border-border">
-            {/* Logo moved to Top Header */}
-          </SidebarHeader>
-          <SidebarContent className="py-4">
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={location.pathname === item.path}
-                    tooltip={item.label}
-                  >
-                    <Link to={item.path}>
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter className="border-t border-border p-4">
-            <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
-              v1.0
-            </div>
-          </SidebarFooter>
-        </Sidebar>
+        <AppSidebar navItems={navItems} />
 
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30 flex items-center justify-between px-4 gap-4">
