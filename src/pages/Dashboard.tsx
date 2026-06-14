@@ -43,10 +43,10 @@ export default function Dashboard() {
     });
   });
 
-  // Calculate exact total due across all unpaid bills
+  // Calculate exact total due across only 'Pending' bills (returned but unpaid)
   let trueTotalPending = 0;
   bills.forEach(b => {
-    if (b.status !== 'Settled') {
+    if (getBillDisplayInfo(b).status === 'Pending') {
       const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
       trueTotalPending += Math.max(0, b.totalCost - paid - (b.discount || 0));
     }
@@ -310,7 +310,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-500">₹{trueTotalPending.toLocaleString('en-IN')}</div>
-            <p className="text-xs text-muted-foreground mt-1">Across all unpaid bills</p>
+            <p className="text-xs text-muted-foreground mt-1">From pending bills</p>
           </CardContent>
         </Card>
       </div>
