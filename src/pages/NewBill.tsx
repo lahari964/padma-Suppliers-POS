@@ -182,7 +182,7 @@ export default function NewBill() {
   };
 
   return (
-    <div className="h-full flex flex-col-reverse lg:flex-row gap-6 animate-in fade-in duration-300">
+    <div className="h-full flex flex-col md:flex-row gap-6 animate-in fade-in duration-300">
       
       {/* Left Column: Form */}
       <div className="flex-1 flex flex-col bg-card rounded-2xl border border-border overflow-hidden h-fit max-h-full">
@@ -332,7 +332,7 @@ export default function NewBill() {
       </div>
 
       {/* Right Column: Inventory */}
-      <div className="w-full lg:w-[400px] flex flex-col h-full max-h-[calc(100vh-6rem)] overflow-hidden space-y-4">
+      <div className="w-full md:w-[400px] flex flex-col h-full max-h-[calc(100vh-6rem)] overflow-hidden space-y-4">
         <div className="flex items-center justify-between shrink-0">
           <h2 className="text-2xl font-bold">Inventory</h2>
           <div className="relative w-48">
