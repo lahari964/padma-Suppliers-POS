@@ -172,12 +172,12 @@ export default function Bills() {
       <Table>
         <TableHeader className="bg-muted/50">
           <TableRow>
-            <TableHead>Bill ID</TableHead>
+            <TableHead className="hidden md:table-cell">Bill ID</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Contact</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Total (₹)</TableHead>
-            <TableHead className="text-right">Balance (₹)</TableHead>
+            <TableHead className="hidden md:table-cell">Status</TableHead>
+            <TableHead className="hidden md:table-cell text-right">Total (₹)</TableHead>
+            <TableHead className="hidden sm:table-cell text-right">Balance (₹)</TableHead>
             {currentUser?.role === 'Admin' && <TableHead className="w-[80px] text-right">Actions</TableHead>}
           </TableRow>
         </TableHeader>
@@ -195,10 +195,10 @@ export default function Bills() {
                 className="group cursor-pointer hover:bg-muted/50"
                 onClick={() => setSelectedBillId(bill.id)}
               >
-                <TableCell className="font-medium text-xs text-muted-foreground">{bill.id}</TableCell>
+                <TableCell className="hidden md:table-cell font-medium text-xs text-muted-foreground">{bill.id}</TableCell>
                 <TableCell className="font-medium">{bill.customerName}</TableCell>
                 <TableCell>{bill.mobile}</TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <Badge variant="outline" className={
                     bill.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                     bill.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
@@ -208,10 +208,10 @@ export default function Bills() {
                     {getBillDisplayInfo(bill).status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right font-medium">
+                <TableCell className="hidden md:table-cell text-right font-medium">
                   {Number(bill.totalCost || 0).toLocaleString('en-IN')}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="hidden sm:table-cell text-right">
                   <span className={bill.status === 'Settled' ? 'text-emerald-500 font-semibold' : 'text-orange-500 font-semibold'}>
                     {Math.max(0, Number(bill.totalCost || 0) - (bill.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0) - (bill.discount || 0)).toLocaleString('en-IN')}
                   </span>
