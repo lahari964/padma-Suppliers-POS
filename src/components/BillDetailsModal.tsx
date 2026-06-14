@@ -136,12 +136,13 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const remainingBalance = bill.totalCost - totalPaid - (bill.discount || 0);
 
   // Define clear rules for when an item should appear in the "To Dispatch" vs "Active" tables
-  const isItemPendingDispatch = (i: any) => {
-    return i.isDispatched === false && (!bill.billingStarted || i.isAddedPostBilling);
+  const isItemConsideredDispatched = (i: any) => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    return i.isDispatched === true || (!('isDispatched' in i) && i.issueDate <= todayStr) || (bill.billingStarted && !i.isAddedPostBilling);
   };
 
-  const isItemConsideredDispatched = (i: any) => {
-    return i.isDispatched !== false || (bill.billingStarted && !i.isAddedPostBilling);
+  const isItemPendingDispatch = (i: any) => {
+    return !isItemConsideredDispatched(i);
   };
 
   const displayStatus = getBillDisplayInfo(bill).status;
