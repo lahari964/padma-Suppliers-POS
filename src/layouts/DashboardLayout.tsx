@@ -28,9 +28,8 @@ const AppSidebar = ({ navItems }: { navItems: any[] }) => {
                 asChild 
                 isActive={location.pathname === item.path}
                 tooltip={item.label}
-                onClick={() => setOpenMobile(false)}
               >
-                <Link to={item.path}>
+                <Link to={item.path} onClick={() => setOpenMobile(false)}>
                   <item.icon className="w-5 h-5" />
                   <span>{item.label}</span>
                 </Link>

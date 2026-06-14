@@ -80,7 +80,7 @@ export default function Dashboard() {
   });
 
   const pendingBillingBills = bills.filter(b => {
-    return !b.billingStarted && (b.status === 'Upcoming' || b.status === 'Partially Active') && b.eventDate && b.eventDate <= todayStr;
+    return !b.billingStarted && getBillDisplayInfo(b).status === 'Upcoming' && b.eventDate && b.eventDate <= todayStr;
   });
 
   // 6-Month Revenue Aggregation

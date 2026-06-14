@@ -69,7 +69,7 @@ export default function Bills() {
         const status = getBillDisplayInfo(b).status;
         matchesAction = (status === 'Active' || status === 'Partially Active') && !!b.expectedReturnDate && b.expectedReturnDate < todayStr;
       } else if (action === 'pending-billing') {
-        matchesAction = !b.billingStarted && (b.status === 'Upcoming' || b.status === 'Partially Active') && !!b.eventDate && b.eventDate <= todayStr;
+        matchesAction = !b.billingStarted && getBillDisplayInfo(b).status === 'Upcoming' && !!b.eventDate && b.eventDate <= todayStr;
       }
 
       return matchesSearch && matchesEmployee && matchesDate && matchesAction;

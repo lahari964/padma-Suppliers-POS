@@ -689,7 +689,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 }>{displayStatus}</Badge>
               </div>
             </div>
-            {!bill.billingStarted && (displayStatus === 'Upcoming' || displayStatus === 'Partially Active') && bill.eventDate && bill.eventDate <= format(new Date(), 'yyyy-MM-dd') && (
+            {!bill.billingStarted && displayStatus === 'Upcoming' && bill.eventDate && bill.eventDate <= format(new Date(), 'yyyy-MM-dd') && (
               <div className="col-span-2 md:col-span-4 mt-2">
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
