@@ -77,7 +77,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             const now = new Date();
             useStore.setState({ lastSyncTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
           } else {
-            setIsDatabaseConnected(false);
+            // We intentionally do NOT set isDatabaseConnected(false) here.
+            // If a background sync fails (Vercel timeout, tiny network hiccup),
+            // we shouldn't throw the user into an annoying "Offline" panic state.
+            // Data is safe locally, and the next save will try again.
+            console.warn('Background auto-sync had a hiccup, but keeping UI stable.');
           }
         }, 2000); // Wait 2 seconds after the last change before pushing to cloud
       }
