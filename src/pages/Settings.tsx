@@ -428,14 +428,16 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label>Business Address</Label>
-                  <Input 
+                  <textarea 
+                    className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-y"
                     value={preferences.businessDetails?.address || ''} 
                     onChange={e => setPreferences({ businessDetails: { ...(preferences.businessDetails as any), address: e.target.value } })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Contact Number(s)</Label>
-                  <Input 
+                  <textarea 
+                    className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-y"
                     value={preferences.businessDetails?.phone || ''} 
                     onChange={e => setPreferences({ businessDetails: { ...(preferences.businessDetails as any), phone: e.target.value } })}
                   />
