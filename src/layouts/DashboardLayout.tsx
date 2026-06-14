@@ -22,23 +22,43 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkConnection = async () => {
-      setIsCheckingConnection(true);
-      const client = (await import('../lib/supabase')).getSupabaseClient();
-      if (!client) {
+      if (!navigator.onLine) {
         setIsDatabaseConnected(false);
         setIsCheckingConnection(false);
         return;
       }
+      
+      // Optimistically assume connected for instant UI feel
+      setIsDatabaseConnected(true);
+      setIsCheckingConnection(false);
+
+      // Verify silently in background
       try {
+        const client = (await import('../lib/supabase')).getSupabaseClient();
+        if (!client) {
+          setIsDatabaseConnected(false);
+          return;
+        }
         const { error } = await client.from('employees').select('id').limit(1);
-        setIsDatabaseConnected(!error);
+        if (error) setIsDatabaseConnected(false);
       } catch (err) {
         setIsDatabaseConnected(false);
-      } finally {
-        setIsCheckingConnection(false);
       }
     };
+    
     checkConnection();
+
+    // Listen to native browser connection events for instant toggles
+    const handleOnline = () => { setIsDatabaseConnected(true); setIsCheckingConnection(false); checkConnection(); };
+    const handleOffline = () => { setIsDatabaseConnected(false); setIsCheckingConnection(false); };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, [setIsDatabaseConnected]);
 
   useEffect(() => {
