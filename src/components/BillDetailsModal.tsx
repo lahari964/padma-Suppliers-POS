@@ -910,22 +910,22 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   const dispatchedQty = bill.items.filter(i => i.inventoryId === item.inventoryId && isItemConsideredDispatched(i)).reduce((acc, curr) => acc + curr.qtyIssued, 0);
                   const totalBooked = item.qtyIssued + dispatchedQty;
                   return (
-                    <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-3 shadow-sm">
+                    <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col gap-4 shadow-sm">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-semibold text-foreground">{item.name}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
+                          <p className="font-semibold text-foreground text-base">{item.name}</p>
+                          <p className="text-sm text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
                         </div>
                         <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 shrink-0">Upcoming</Badge>
                       </div>
-                      <div className="flex items-center gap-4 text-sm font-medium bg-muted/30 p-2 rounded-lg">
-                        <div className="flex-1 text-center">Booked: {totalBooked}</div>
-                        <div className="w-px h-4 bg-border"></div>
-                        <div className="flex-1 text-center text-blue-600">Sent: {dispatchedQty}</div>
+                      <div className="flex items-center gap-4 text-sm font-medium bg-muted/30 py-3 px-4 rounded-lg">
+                        <div className="flex-1 text-center">Booked: <span className="font-bold">{totalBooked}</span></div>
+                        <div className="w-px h-5 bg-border"></div>
+                        <div className="flex-1 text-center text-blue-600">Sent: <span className="font-bold">{dispatchedQty}</span></div>
                       </div>
-                      <div className="flex items-center gap-2 pt-2 border-t border-border mt-1">
-                        <Button size="sm" onClick={() => openSendModal(item)} className="flex-1 h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold">Send</Button>
-                        <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="flex-1 h-9 text-destructive border-destructive/30 hover:bg-destructive/10">Edit / Delete</Button>
+                      <div className="flex items-center gap-3 mt-1">
+                        <Button size="sm" onClick={() => openSendModal(item)} className="flex-1 h-11 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-base">Send</Button>
+                        <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="flex-1 h-11 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium">Edit / Delete</Button>
                       </div>
                     </div>
                   );
@@ -1037,11 +1037,11 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 {bill.items.filter(isItemConsideredDispatched).map(item => {
                   const pendingReturn = item.qtyIssued - (item.qtyReturned || 0);
                   return (
-                    <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-3 shadow-sm">
+                    <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col gap-4 shadow-sm">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-semibold text-foreground">{item.name}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
+                          <p className="font-semibold text-foreground text-base">{item.name}</p>
+                          <p className="text-sm text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
                         </div>
                         {pendingReturn === 0 ? (
                           <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shrink-0">Returned</Badge>
@@ -1049,16 +1049,16 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 shrink-0">Sent</Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-4 text-sm font-medium bg-muted/30 p-2 rounded-lg">
-                        <div className="flex-1 text-center">Issued: {item.qtyIssued}</div>
-                        <div className="w-px h-4 bg-border"></div>
-                        <div className="flex-1 text-center">Ret: {item.qtyReturned || 0}</div>
-                        <div className="w-px h-4 bg-border"></div>
-                        <div className="flex-1 text-center text-orange-500">Pend: {pendingReturn}</div>
+                      <div className="flex items-center gap-2 text-sm font-medium bg-muted/30 py-3 px-2 rounded-lg">
+                        <div className="flex-1 text-center">Issued: <span className="font-bold">{item.qtyIssued}</span></div>
+                        <div className="w-px h-5 bg-border"></div>
+                        <div className="flex-1 text-center">Ret: <span className="font-bold">{item.qtyReturned || 0}</span></div>
+                        <div className="w-px h-5 bg-border"></div>
+                        <div className="flex-1 text-center text-orange-500">Pend: <span className="font-bold">{pendingReturn}</span></div>
                       </div>
                       {pendingReturn > 0 && (
-                        <div className="pt-2 border-t border-border mt-1">
-                          <Button size="sm" onClick={() => openReturnModal(item)} className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Return Items</Button>
+                        <div className="mt-1">
+                          <Button size="sm" onClick={() => openReturnModal(item)} className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base">Return Items</Button>
                         </div>
                       )}
                     </div>
@@ -1101,14 +1101,17 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               {/* Mobile Cards (Returned Items) */}
               <div className="block lg:hidden space-y-3">
                 {bill.items.filter(isItemConsideredDispatched).map(item => (
-                  <div key={item.id} className="bg-card border border-border rounded-xl p-3 flex flex-col gap-2 shadow-sm">
-                    <div className="flex justify-between items-center">
-                      <p className="font-semibold text-foreground">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">Rate: ₹{item.price}</p>
+                  <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col gap-4 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-foreground text-base">{item.name}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">Rate: ₹{item.price}</p>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center text-sm bg-emerald-500/10 p-2 px-3 rounded-lg border border-emerald-500/20">
-                      <span className="font-medium text-emerald-700/70 dark:text-emerald-400/70">Issued: {item.qtyIssued}</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">Returned: {item.qtyReturned || 0}</span>
+                    <div className="flex items-center gap-4 text-sm font-medium bg-emerald-500/10 py-3 px-4 rounded-lg border border-emerald-500/20">
+                      <div className="flex-1 text-center text-emerald-700/80 dark:text-emerald-400/80">Issued: <span className="font-bold">{item.qtyIssued}</span></div>
+                      <div className="w-px h-5 bg-emerald-500/30"></div>
+                      <div className="flex-1 text-center text-emerald-600 dark:text-emerald-400">Returned: <span className="font-bold">{item.qtyReturned || 0}</span></div>
                     </div>
                   </div>
                 ))}
