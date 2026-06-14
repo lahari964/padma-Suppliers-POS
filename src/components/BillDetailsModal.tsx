@@ -1174,35 +1174,29 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         </div>
 
         {/* Sticky Footer */}
-        <div className="bg-card border-t border-border p-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
-          
-          <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
+        <div className="bg-card border-t border-border p-4 sm:px-8 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
+          <Button onClick={() => setShowPaymentModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1">
+            <Wallet className="w-4 h-4 shrink-0" /> <span className="truncate">Record Payment</span>
+          </Button>
+          {currentUser?.role !== 'Staff' && (
+            <Button variant="outline" onClick={() => setShowDiscountModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 text-sm sm:text-base transition-all gap-1.5 sm:gap-2 col-span-1">
+              <Tag className="w-4 h-4 shrink-0" /> <span className="truncate">Discount / Waive</span>
+            </Button>
+          )}
 
-            <Button onClick={() => setShowPaymentModal(true)} className="h-12 px-6 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-base transition-all gap-2 shadow-sm shrink-0">
-              <Wallet className="w-4 h-4" /> Record Payment
-            </Button>
-            {currentUser?.role !== 'Staff' && (
-              <Button variant="outline" onClick={() => setShowDiscountModal(true)} className="h-12 px-6 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 text-base transition-all gap-2 shrink-0">
-                <Tag className="w-4 h-4" /> Discount / Waive
-              </Button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button 
-              className="flex-1 sm:flex-none h-12 px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-2 shadow-sm shrink-0"
-              onClick={handleShareReceipt}
-            >
-              <MessageCircle className="w-4 h-4" /> WhatsApp
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex-1 sm:flex-none h-12 px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-2 shrink-0"
-              onClick={() => window.print()}
-            >
-              <Printer className="w-4 h-4" /> Print
-            </Button>
-          </div>
+          <Button 
+            className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1 md:ml-auto"
+            onClick={handleShareReceipt}
+          >
+            <MessageCircle className="w-4 h-4 shrink-0" /> <span className="truncate">WhatsApp</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-1.5 sm:gap-2 col-span-1"
+            onClick={() => window.print()}
+          >
+            <Printer className="w-4 h-4 shrink-0" /> <span className="truncate">Print</span>
+          </Button>
         </div>
 
 
