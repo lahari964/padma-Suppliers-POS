@@ -105,7 +105,6 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
         <div className="border-t border-dashed border-black pt-2 mb-4 space-y-1 text-right">
           <p>Base Amount: <strong>₹{bill.totalCost - (bill.damageCharges || 0)}</strong></p>
-          {totalOverrideDifference > 0 ? <p className="text-gray-600">Total Discount/Override applied: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
           <p>Total Cost: <strong>₹{bill.totalCost}</strong></p>
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
@@ -239,13 +238,6 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <span>{isEstStatus ? 'Items Total (Est.):' : 'Items Total:'}</span>
               <span>₹{bill.totalCost}</span>
             </div>
-            
-            {totalOverrideDifference > 0 && (
-              <div className="flex justify-between text-gray-500 font-normal">
-                <span>Total Discount/Override applied:</span>
-                <span>₹{totalOverrideDifference}</span>
-              </div>
-            )}
             
             {bill.payments && bill.payments.length > 0 ? (
               <div className="pt-2">
