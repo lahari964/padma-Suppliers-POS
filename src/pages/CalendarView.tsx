@@ -188,9 +188,9 @@ export default function CalendarView() {
                 ))}
               </div>
               
-              <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-7 gap-y-2">
                 {Array.from({ length: startingDayIndex }).map((_, i) => (
-                  <div key={`empty-${i}`} className="min-h-[60px] sm:min-h-[70px]"></div>
+                  <div key={`empty-${i}`} className="h-10"></div>
                 ))}
                 {days.map((day) => {
                   const dateStr = format(day, 'yyyy-MM-dd');
@@ -206,28 +206,26 @@ export default function CalendarView() {
                   const hasPayments = dayData && dayData.payments.length > 0;
                   
                   return (
-                    <button 
-                      key={day.toString()}
-                      onClick={() => setSelectedDate(day)}
-                      className={`relative min-h-[60px] sm:min-h-[70px] flex flex-col items-center p-1 sm:p-1.5 rounded-xl border transition-all ${
-                        !isCurrentMonth ? 'opacity-30 border-transparent' : 
-                        isSelected ? 'border-primary bg-primary/5 shadow-sm' : 
-                        isTodayDate ? 'border-sky-500/30 bg-sky-50 dark:bg-sky-950/20' : 
-                        'border-border/50 bg-background hover:border-primary/30 hover:bg-muted/30'
-                      }`}
-                    >
-                      <span className={`text-sm font-semibold ${isSelected ? 'text-primary' : isTodayDate ? 'text-sky-600 dark:text-sky-400' : 'text-foreground'}`}>
+                    <div key={day.toString()} className="h-10 flex items-center justify-center">
+                      <button 
+                        onClick={() => setSelectedDate(day)}
+                        className={`relative flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium transition-all ${
+                          !isCurrentMonth ? 'text-muted-foreground/30' : 'text-foreground hover:bg-muted'
+                        } ${isSelected ? 'bg-primary text-primary-foreground font-bold shadow-md' : ''} ${
+                          isTodayDate && !isSelected ? 'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 font-bold' : ''
+                        }`}
+                      >
                         {format(day, 'd')}
-                      </span>
-                      
-                      {/* Status Indicators */}
-                      <div className="mt-auto flex flex-wrap justify-center gap-1 w-full px-0.5">
-                        {hasUpcoming && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500" title="Dispatches"></div>}
-                        {hasReturns && !hasOverdueReturns && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500" title="Expected Returns"></div>}
-                        {hasOverdueReturns && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500" title="Overdue Returns"></div>}
-                        {hasPayments && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500" title="Payments Due"></div>}
-                      </div>
-                    </button>
+                        
+                        {/* Status Dots */}
+                        <div className="absolute -bottom-1 flex justify-center gap-[2px]">
+                          {hasUpcoming && <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-blue-500'}`} title="Dispatches"></div>}
+                          {hasReturns && !hasOverdueReturns && <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-amber-500'}`} title="Expected Returns"></div>}
+                          {hasOverdueReturns && <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-red-500'}`} title="Overdue Returns"></div>}
+                          {hasPayments && <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-orange-500'}`} title="Payments Due"></div>}
+                        </div>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
