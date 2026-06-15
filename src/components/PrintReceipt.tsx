@@ -144,7 +144,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
   // A4 Layout - Exactly matching screenshots
   return createPortal(
-    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-12">
+    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8">
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex gap-4">
