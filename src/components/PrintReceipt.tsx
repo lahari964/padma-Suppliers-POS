@@ -269,20 +269,6 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                 <span>- ₹{paid}</span>
               </div>
             )}
-
-            {bill.transportationCharges && bill.transportationCharges > 0 ? (
-              <div className="flex justify-between pt-2">
-                <span>Transportation:</span>
-                <span>₹{bill.transportationCharges}</span>
-              </div>
-            ) : null}
-
-            {bill.discount && bill.discount > 0 ? (
-              <div className="flex justify-between pt-2">
-                <span>Discount:</span>
-                <span>- ₹{bill.discount}</span>
-              </div>
-            ) : null}
           </div>
 
           {/* Grand Total */}
