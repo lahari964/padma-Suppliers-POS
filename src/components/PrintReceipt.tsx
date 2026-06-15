@@ -144,7 +144,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
   // A4 Layout - Exactly matching screenshots
   return createPortal(
-    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-12">
+    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8">
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex gap-4">
@@ -267,6 +267,20 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <div className="flex justify-between">
                 <span>Advance Received:</span>
                 <span>- ₹{paid}</span>
+              </div>
+            )}
+
+            {!!bill.transportationCharges && bill.transportationCharges > 0 && (
+              <div className="flex justify-between pt-2">
+                <span>Transportation:</span>
+                <span>₹{bill.transportationCharges}</span>
+              </div>
+            )}
+
+            {!!bill.discount && bill.discount > 0 && (
+              <div className="flex justify-between pt-2">
+                <span>Discount:</span>
+                <span>- ₹{bill.discount}</span>
               </div>
             )}
           </div>
