@@ -68,7 +68,11 @@ const Discounts = () => {
                     </TableRow>
                   ) : (
                     totalDiscounts.map(bill => (
-                      <TableRow key={bill.id}>
+                      <TableRow 
+                        key={bill.id}
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => setSelectedBill(bill)}
+                      >
                         <TableCell className="font-medium">{bill.eventDate || 'N/A'}</TableCell>
                         <TableCell className="font-medium">{bill.customerName}</TableCell>
                         <TableCell className="text-right">₹{bill.totalCost}</TableCell>
@@ -123,50 +127,66 @@ const Discounts = () => {
               </Table>
             </div>
           </div>
-
-          <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
-            <DialogContent className="max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Discounted Items for {selectedBill?.customerName}</DialogTitle>
-              </DialogHeader>
-              <div className="overflow-y-auto max-h-[60vh] mt-4 rounded-md border border-border">
-                <Table>
-                  <TableHeader className="bg-muted/30">
-                    <TableRow>
-                      <TableHead>Item Name</TableHead>
-                      <TableHead>Qty</TableHead>
-                      <TableHead className="text-right">Std Price</TableHead>
-                      <TableHead className="text-right">Billed Price</TableHead>
-                      <TableHead className="text-right text-emerald-600">Discount</TableHead>
-                      <TableHead className="text-right">Staff</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedBill?.items.map((item, idx) => {
-                      const hasDiscount = item.originalPrice && item.price < item.originalPrice;
-                      const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
-                      return (
-                        <TableRow key={idx} className={hasDiscount ? "bg-emerald-50 dark:bg-emerald-950/20" : ""}>
-                          <TableCell className={hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}>{item.name}</TableCell>
-                          <TableCell>{item.qtyIssued}</TableCell>
-                          <TableCell className="text-right">₹{item.originalPrice || item.price}</TableCell>
-                          <TableCell className="text-right font-medium">₹{item.price}</TableCell>
-                          <TableCell className="text-right font-bold text-emerald-600">
-                            {hasDiscount ? `₹${itemDiscount}` : '-'}
-                          </TableCell>
-                          <TableCell className="text-right text-muted-foreground text-xs">
-                            {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill.createdBy) : '-'}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </DialogContent>
-          </Dialog>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Discount Details for {selectedBill?.customerName}</DialogTitle>
+          </DialogHeader>
+          
+          {selectedBill?.discount && selectedBill.discount > 0 ? (
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-400 font-medium mb-1">Cart-Level Discount Applied</p>
+                  <h4 className="text-2xl font-bold text-emerald-700 dark:text-emerald-500">₹{selectedBill.discount}</h4>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Authorized By</p>
+                  <p className="font-semibold text-foreground">{getStaffDisplay(selectedBill?.createdBy)}</p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="overflow-y-auto max-h-[50vh] mt-2 rounded-md border border-border">
+            <Table>
+              <TableHeader className="bg-muted/30">
+                <TableRow>
+                  <TableHead>Item Name</TableHead>
+                  <TableHead>Qty</TableHead>
+                  <TableHead className="text-right">Std Price</TableHead>
+                  <TableHead className="text-right">Billed Price</TableHead>
+                  <TableHead className="text-right text-emerald-600">Item Discount</TableHead>
+                  <TableHead className="text-right">Staff</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {selectedBill?.items.map((item, idx) => {
+                  const hasDiscount = item.originalPrice && item.price < item.originalPrice;
+                  const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
+                  return (
+                    <TableRow key={idx} className={hasDiscount ? "bg-emerald-50 dark:bg-emerald-950/20" : ""}>
+                      <TableCell className={hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}>{item.name}</TableCell>
+                      <TableCell>{item.qtyIssued}</TableCell>
+                      <TableCell className="text-right">₹{item.originalPrice || item.price}</TableCell>
+                      <TableCell className="text-right font-medium">₹{item.price}</TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600">
+                        {hasDiscount ? `₹${itemDiscount}` : '-'}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground text-xs">
+                        {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill.createdBy) : '-'}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
