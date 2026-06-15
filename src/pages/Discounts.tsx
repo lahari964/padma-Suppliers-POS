@@ -177,7 +177,7 @@ const Discounts = () => {
                         {hasDiscount ? `₹${itemDiscount}` : '-'}
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground text-xs">
-                        {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill.createdBy) : '-'}
+                        {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill?.createdBy) : '-'}
                       </TableCell>
                     </TableRow>
                   );
