@@ -18,6 +18,7 @@ const Inventory = lazy(() => import("./pages/Inventory"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CalendarView = lazy(() => import("./pages/CalendarView"));
+const Discounts = lazy(() => import("./pages/Discounts"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
@@ -87,6 +88,7 @@ const App = () => {
                 <Route path="/new-bill" element={<ProtectedRoute><NewBill /></ProtectedRoute>} />
                 <Route path="/inventory" element={<ProtectedRoute allowedRoles={['Admin', 'Manager']}><Inventory /></ProtectedRoute>} />
                 <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
+                <Route path="/discounts" element={<ProtectedRoute allowedRoles={['Admin', 'Manager']}><Discounts /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/manual" element={<ProtectedRoute><HelpCenter /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />

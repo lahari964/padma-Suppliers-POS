@@ -2,7 +2,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import { ReactNode, useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { Home, ListTodo, Package, Settings, LogOut, Sun, Moon, BookOpen, Calendar, CloudUpload, RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
+import { Home, ListTodo, Package, Settings, LogOut, Sun, Moon, BookOpen, Calendar, CloudUpload, RefreshCw, Clock, CheckCircle2, Percent } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { syncUpToCloud, syncDownFromCloud } from '../lib/supabase';
 import { toast } from '@/components/ui/sonner';
@@ -163,6 +163,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     { label: 'Bills', icon: ListTodo, path: '/bills' },
     { label: 'Inventory', icon: Package, path: '/inventory' },
     { label: 'Calendar', icon: Calendar, path: '/calendar' },
+    { label: 'Discounts', icon: Percent, path: '/discounts' },
     { label: 'Settings', icon: Settings, path: '/settings' },
     { label: 'Help / Manual', icon: BookOpen, path: '/manual' },
   ];
