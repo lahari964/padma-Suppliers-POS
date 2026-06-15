@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Bill } from '../types';
 
 const Discounts = () => {
   const bills = useStore(state => state.bills);
   const employees = useStore(state => state.employees);
   const [activeTab, setActiveTab] = useState('total');
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
 
   const getStaffDisplay = (creatorName?: string) => {
     if (!creatorName) return 'Admin';
@@ -17,35 +20,17 @@ const Discounts = () => {
   // Total Discounts (Cart level)
   const totalDiscounts = bills.filter(b => b.discount && b.discount > 0);
 
-  // Item Wise Discounts
-  const itemWiseDiscounts: {
-    billId: string;
-    customerName: string;
-    itemName: string;
-    totalBillCost: number;
-    discountProvided: number;
-    staff: string;
-    date: string;
-  }[] = [];
-
-  bills.forEach(bill => {
+  // Group by bill for Item Wise
+  const billsWithItemDiscounts = bills.filter(bill => 
+    bill.items.some(item => item.originalPrice && item.price < item.originalPrice)
+  ).map(bill => {
+    let totalItemDiscount = 0;
     bill.items.forEach(item => {
-      // If originalPrice exists and we charged less than originalPrice
       if (item.originalPrice && item.price < item.originalPrice) {
-        const itemDiscount = (item.originalPrice - item.price) * item.qtyIssued * (item.days || 1);
-        if (itemDiscount > 0) {
-          itemWiseDiscounts.push({
-            billId: bill.id,
-            customerName: bill.customerName,
-            itemName: item.name,
-            totalBillCost: bill.totalCost,
-            discountProvided: itemDiscount,
-            staff: getStaffDisplay(bill.createdBy || item.handledBy),
-            date: bill.eventDate || 'N/A'
-          });
-        }
+        totalItemDiscount += (item.originalPrice - item.price) * item.qtyIssued * (item.days || 1);
       }
     });
+    return { bill, totalItemDiscount };
   });
 
   return (
@@ -101,7 +86,7 @@ const Discounts = () => {
         <TabsContent value="item" className="mt-0 outline-none">
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="p-4 bg-muted/20 border-b border-border">
-              <p className="text-xs text-muted-foreground">Note: Item-wise discounts are calculated based on the standard inventory price at the exact time the item was added to the bill.</p>
+              <p className="text-xs text-muted-foreground">Click on a bill to view the exact items that were discounted.</p>
             </div>
             <div className="overflow-x-auto">
               <Table>
@@ -109,26 +94,28 @@ const Discounts = () => {
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="font-semibold text-foreground">Date</TableHead>
                     <TableHead className="font-semibold text-foreground">Customer Name</TableHead>
-                    <TableHead className="font-semibold text-foreground">Item Name</TableHead>
                     <TableHead className="font-semibold text-foreground text-right">Final Bill Amount</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right text-emerald-600">Item Discount</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right text-emerald-600">Total Item Discounts</TableHead>
                     <TableHead className="font-semibold text-foreground text-right">Staff</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {itemWiseDiscounts.length === 0 ? (
+                  {billsWithItemDiscounts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">No item-wise discounts found for recent bills.</TableCell>
+                      <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">No item-wise discounts found for recent bills.</TableCell>
                     </TableRow>
                   ) : (
-                    itemWiseDiscounts.map((discount, idx) => (
-                      <TableRow key={`${discount.billId}-${idx}`}>
-                        <TableCell className="font-medium">{discount.date}</TableCell>
-                        <TableCell className="font-medium">{discount.customerName}</TableCell>
-                        <TableCell>{discount.itemName}</TableCell>
-                        <TableCell className="text-right">₹{discount.totalBillCost}</TableCell>
-                        <TableCell className="text-right font-bold text-emerald-600">₹{discount.discountProvided}</TableCell>
-                        <TableCell className="text-right text-muted-foreground text-sm">{discount.staff}</TableCell>
+                    billsWithItemDiscounts.map(({ bill, totalItemDiscount }) => (
+                      <TableRow 
+                        key={bill.id} 
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => setSelectedBill(bill)}
+                      >
+                        <TableCell className="font-medium">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium">{bill.customerName}</TableCell>
+                        <TableCell className="text-right">₹{bill.totalCost}</TableCell>
+                        <TableCell className="text-right font-bold text-emerald-600">₹{totalItemDiscount}</TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm">{getStaffDisplay(bill.createdBy)}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -136,6 +123,48 @@ const Discounts = () => {
               </Table>
             </div>
           </div>
+
+          <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Discounted Items for {selectedBill?.customerName}</DialogTitle>
+              </DialogHeader>
+              <div className="overflow-y-auto max-h-[60vh] mt-4 rounded-md border border-border">
+                <Table>
+                  <TableHeader className="bg-muted/30">
+                    <TableRow>
+                      <TableHead>Item Name</TableHead>
+                      <TableHead>Qty</TableHead>
+                      <TableHead className="text-right">Std Price</TableHead>
+                      <TableHead className="text-right">Billed Price</TableHead>
+                      <TableHead className="text-right text-emerald-600">Discount</TableHead>
+                      <TableHead className="text-right">Staff</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedBill?.items.map((item, idx) => {
+                      const hasDiscount = item.originalPrice && item.price < item.originalPrice;
+                      const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
+                      return (
+                        <TableRow key={idx} className={hasDiscount ? "bg-emerald-50 dark:bg-emerald-950/20" : ""}>
+                          <TableCell className={hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}>{item.name}</TableCell>
+                          <TableCell>{item.qtyIssued}</TableCell>
+                          <TableCell className="text-right">₹{item.originalPrice || item.price}</TableCell>
+                          <TableCell className="text-right font-medium">₹{item.price}</TableCell>
+                          <TableCell className="text-right font-bold text-emerald-600">
+                            {hasDiscount ? `₹${itemDiscount}` : '-'}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground text-xs">
+                            {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill.createdBy) : '-'}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>
