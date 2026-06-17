@@ -87,7 +87,7 @@ export default function Login() {
               <SelectTrigger>
                 <SelectValue placeholder="Choose your name" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
                 {employees.filter((e: any) => e.status !== 'Inactive').map((emp: any) => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.name}
