@@ -11,6 +11,7 @@ import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft
 import { toast } from '@/components/ui/sonner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const getCategoryIcon = (category: string) => {
   switch (category?.toLowerCase()) {
@@ -314,7 +315,7 @@ export default function NewBill() {
 
           <p className="text-xs italic text-muted-foreground">* If Event Date is in the future, order will be saved as an "Upcoming Order".</p>
 
-          <div className={compactView ? "space-y-1.5" : "space-y-3"}>
+          <div className={`md:hidden ${compactView ? "space-y-1.5" : "space-y-3"}`}>
             {stagedItems.length === 0 ? (
               <div className={`bg-card border border-border rounded-2xl ${compactView ? "p-4" : "p-6"} text-center text-muted-foreground text-sm`}>
                 No items added yet
@@ -358,6 +359,60 @@ export default function NewBill() {
                 </div>
               ))
             )}
+          </div>
+
+          <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="font-bold">Item</TableHead>
+                  <TableHead className="text-center font-bold w-32">Daily Rate</TableHead>
+                  <TableHead className="text-center font-bold w-32">Qty</TableHead>
+                  <TableHead className="text-center font-bold w-16"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {stagedItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No items added yet</TableCell>
+                  </TableRow>
+                ) : (
+                  stagedItems.map((item) => (
+                    <TableRow key={item.inventoryId}>
+                      <TableCell className="font-medium text-foreground">{item.name}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-muted-foreground">₹</span>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            className={`${compactView ? "h-7 text-xs" : "h-8"} w-20 text-center bg-background`} 
+                            value={item.price} 
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateItemPrice(item.inventoryId, Number(e.target.value))}
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Input 
+                          type="number" 
+                          min="1" 
+                          className={`${compactView ? "h-7 text-xs" : "h-8"} w-16 text-center mx-auto bg-background`} 
+                          value={item.qty} 
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}
+                        />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className={`${compactView ? "w-7 h-7" : "w-8 h-8"} text-destructive hover:text-destructive hover:bg-destructive/10`} title="Remove Item">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
 

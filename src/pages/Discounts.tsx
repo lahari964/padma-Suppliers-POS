@@ -201,7 +201,7 @@ const Discounts = () => {
             </div>
           ) : null}
 
-          <div className={`overflow-auto max-h-[50vh] mt-2 pb-2 ${compactView ? "space-y-1.5" : "space-y-3"}`}>
+          <div className={`md:hidden overflow-auto max-h-[50vh] mt-2 pb-2 ${compactView ? "space-y-1.5" : "space-y-3"}`}>
             {selectedBill?.items.map((item, idx) => {
               const hasDiscount = item.originalPrice && item.price < item.originalPrice;
               const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
@@ -227,6 +227,39 @@ const Discounts = () => {
                 </div>
               );
             })}
+          </div>
+
+          <div className="hidden md:block overflow-auto max-h-[50vh] mt-2 pb-2 rounded-xl border border-border">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="font-bold">Item</TableHead>
+                  <TableHead className="text-center font-bold">Qty</TableHead>
+                  <TableHead className="text-right font-bold w-24">Std Rate</TableHead>
+                  <TableHead className="text-right font-bold w-24">Billed</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-600 w-32">Discount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {selectedBill?.items.map((item, idx) => {
+                  const hasDiscount = item.originalPrice && item.price < item.originalPrice;
+                  const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
+                  return (
+                    <TableRow key={idx}>
+                      <TableCell className="font-medium text-foreground">{item.name}</TableCell>
+                      <TableCell className="text-center">{item.qtyIssued}</TableCell>
+                      <TableCell className={`text-right ${hasDiscount ? 'line-through text-muted-foreground' : ''}`}>
+                        ₹{item.originalPrice || item.price}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">₹{item.price}</TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600">
+                        {hasDiscount ? `-₹${itemDiscount}` : '-'}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         </DialogContent>
       </Dialog>
