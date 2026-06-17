@@ -427,7 +427,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   };
 
   const handleSendReminder = () => {
-    const text = `Hi ${bill.customerName},\n\nJust a quick reminder for your upcoming event on ${bill.eventDate}. You have a pending balance of ₹${Math.max(0, bill.totalCost - (bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0) - (bill.discount || 0))}. Please prepare for the dispatch.\n\nThank you,\nPadma POS`;
+    const text = `Hi ${bill.customerName},\n\nJust a quick reminder for your upcoming event on ${formatToDDMMYYYY(bill.eventDate || '')}. You have a pending balance of ₹${Math.max(0, bill.totalCost - (bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0) - (bill.discount || 0))}. Please prepare for the dispatch.\n\nThank you,\nPadma POS`;
     const safeMobile = bill.mobile.replace(/\D/g, '');
     window.open(`https://wa.me/91${safeMobile}?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -435,7 +435,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const handleShareReceipt = () => {
     let text = `*Rental Receipt - Padma Suppliers*\n`;
     text += `Customer: ${bill.customerName}\n`;
-    text += `Event Date: ${bill.eventDate}\n\n`;
+    text += `Event Date: ${formatToDDMMYYYY(bill.eventDate || '')}\n\n`;
     
     const activeItems = bill.items.filter(i => i.isDispatched);
     if (activeItems.length > 0) {

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Bill } from '../types';
+import { formatDateDisplay } from '../lib/utils';
 
 const Discounts = () => {
   const bills = useStore(state => state.bills);
@@ -84,7 +85,7 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium hidden sm:table-cell">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium hidden sm:table-cell">{formatDateDisplay(bill.eventDate)}</TableCell>
                         <TableCell className="font-medium max-w-[150px] truncate">{bill.customerName}</TableCell>
                         <TableCell className="text-right hidden sm:table-cell">₹{bill.totalCost}</TableCell>
                         <TableCell className="text-right font-bold text-emerald-600">₹{bill.discount}</TableCell>
@@ -126,7 +127,7 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium hidden sm:table-cell">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium hidden sm:table-cell">{formatDateDisplay(bill.eventDate)}</TableCell>
                         <TableCell className="font-medium max-w-[150px] truncate">{bill.customerName}</TableCell>
                         <TableCell className="text-right hidden sm:table-cell">₹{bill.totalCost}</TableCell>
                         <TableCell className="text-right font-bold text-emerald-600">₹{totalItemDiscount}</TableCell>
@@ -160,14 +161,22 @@ const Discounts = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 border-t border-emerald-200/50 dark:border-emerald-800/50 pt-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-emerald-200/50 dark:border-emerald-800/50 pt-3">
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Cart-Level Discount</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-lg">₹{selectedCartDiscount}</p>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Date</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">{formatDateDisplay(selectedBill?.eventDate)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Item-Wise Discount Sum</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-lg">₹{selectedItemDiscount}</p>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Final Bill Amt</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedBill?.totalCost}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Cart-Level Discount</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedCartDiscount}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Item-Wise Sum</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedItemDiscount}</p>
                 </div>
               </div>
             </div>

@@ -52,7 +52,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <p><strong>Date:</strong> {format(new Date(), 'dd MMM yyyy HH:mm')}</p>
           <p><strong>Customer:</strong> {bill.customerName}</p>
           {bill.mobile && <p><strong>Phone:</strong> {bill.mobile}</p>}
-          <p><strong>Event Date:</strong> {bill.eventDate || 'N/A'}</p>
+          <p><strong>Event Date:</strong> {bill.eventDate ? bill.eventDate.split('-').reverse().join('-') : 'N/A'}</p>
         </div>
 
         <table className="w-full text-left mb-2">
