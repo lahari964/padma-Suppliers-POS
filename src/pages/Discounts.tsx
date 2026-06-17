@@ -47,7 +47,7 @@ const Discounts = () => {
   const selectedTotalDiscount = selectedCartDiscount + selectedItemDiscount;
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500">
+    <div className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto space-y-6 md:space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-serif font-bold text-foreground">Discounts</h1>
@@ -56,7 +56,7 @@ const Discounts = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 w-full justify-start h-auto p-1 bg-muted/50 rounded-xl">
+        <TabsList className="mb-4 md:mb-6 w-full flex flex-col sm:flex-row justify-start h-auto p-1 bg-muted/50 rounded-xl">
           <TabsTrigger value="total" className="text-base px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Total Discount</TabsTrigger>
           <TabsTrigger value="item" className="text-base px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Item-Wise Discount</TabsTrigger>
         </TabsList>
@@ -67,11 +67,11 @@ const Discounts = () => {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="font-semibold text-foreground">Date</TableHead>
-                    <TableHead className="font-semibold text-foreground">Customer Name</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">Final Bill Amount</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right text-emerald-600">Discount Provided</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">Staff</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Date</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Customer Name</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Final Bill Amount</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right text-emerald-600 whitespace-nowrap">Discount Provided</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Staff</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -86,11 +86,11 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium">{bill.eventDate || 'N/A'}</TableCell>
-                        <TableCell className="font-medium">{bill.customerName}</TableCell>
-                        <TableCell className="text-right">₹{bill.totalCost}</TableCell>
-                        <TableCell className="text-right font-bold text-emerald-600">₹{bill.discount}</TableCell>
-                        <TableCell className="text-right text-muted-foreground text-sm">{getStaffDisplay(bill.createdBy)}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap max-w-[150px] truncate">{bill.customerName}</TableCell>
+                        <TableCell className="text-right whitespace-nowrap">₹{bill.totalCost}</TableCell>
+                        <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">₹{bill.discount}</TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">{getStaffDisplay(bill.createdBy)}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -109,11 +109,11 @@ const Discounts = () => {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="font-semibold text-foreground">Date</TableHead>
-                    <TableHead className="font-semibold text-foreground">Customer Name</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">Final Bill Amount</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right text-emerald-600">Total Item Discounts</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">Staff</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Date</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Customer Name</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Final Bill Amount</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right text-emerald-600 whitespace-nowrap">Total Item Discounts</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Staff</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -128,11 +128,11 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium">{bill.eventDate || 'N/A'}</TableCell>
-                        <TableCell className="font-medium">{bill.customerName}</TableCell>
-                        <TableCell className="text-right">₹{bill.totalCost}</TableCell>
-                        <TableCell className="text-right font-bold text-emerald-600">₹{totalItemDiscount}</TableCell>
-                        <TableCell className="text-right text-muted-foreground text-sm">{getStaffDisplay(bill.createdBy)}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap max-w-[150px] truncate">{bill.customerName}</TableCell>
+                        <TableCell className="text-right whitespace-nowrap">₹{bill.totalCost}</TableCell>
+                        <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">₹{totalItemDiscount}</TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">{getStaffDisplay(bill.createdBy)}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -175,16 +175,16 @@ const Discounts = () => {
             </div>
           ) : null}
 
-          <div className="overflow-y-auto max-h-[50vh] mt-2 rounded-md border border-border">
+          <div className="overflow-auto max-h-[50vh] mt-2 rounded-md border border-border">
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow>
-                  <TableHead>Item Name</TableHead>
-                  <TableHead>Qty</TableHead>
-                  <TableHead className="text-right">Std Price</TableHead>
-                  <TableHead className="text-right">Billed Price</TableHead>
-                  <TableHead className="text-right text-emerald-600">Item Discount</TableHead>
-                  <TableHead className="text-right">Staff</TableHead>
+                  <TableHead className="whitespace-nowrap">Item Name</TableHead>
+                  <TableHead className="whitespace-nowrap">Qty</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Std Price</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Billed Price</TableHead>
+                  <TableHead className="text-right text-emerald-600 whitespace-nowrap">Item Discount</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Staff</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -193,14 +193,14 @@ const Discounts = () => {
                   const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
                   return (
                     <TableRow key={idx} className={hasDiscount ? "bg-emerald-50 dark:bg-emerald-950/20" : ""}>
-                      <TableCell className={hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}>{item.name}</TableCell>
-                      <TableCell>{item.qtyIssued}</TableCell>
-                      <TableCell className="text-right">₹{item.originalPrice || item.price}</TableCell>
-                      <TableCell className="text-right font-medium">₹{item.price}</TableCell>
-                      <TableCell className="text-right font-bold text-emerald-600">
+                      <TableCell className={`whitespace-nowrap max-w-[150px] truncate ${hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}`}>{item.name}</TableCell>
+                      <TableCell className="whitespace-nowrap">{item.qtyIssued}</TableCell>
+                      <TableCell className="text-right whitespace-nowrap">₹{item.originalPrice || item.price}</TableCell>
+                      <TableCell className="text-right font-medium whitespace-nowrap">₹{item.price}</TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">
                         {hasDiscount ? `₹${itemDiscount}` : '-'}
                       </TableCell>
-                      <TableCell className="text-right text-muted-foreground text-xs">
+                      <TableCell className="text-right text-muted-foreground text-xs whitespace-nowrap">
                         {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill?.createdBy) : '-'}
                       </TableCell>
                     </TableRow>
