@@ -169,10 +169,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className={`flex min-h-screen w-full transition-colors duration-300 bg-background`}>
-        <AppSidebar navItems={navItems} />
+      <AppSidebar navItems={navItems} />
 
-        <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen bg-background transition-colors duration-300">
           <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30 flex items-center justify-between px-4 gap-4">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
@@ -272,7 +271,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative">
             {children}
           </main>
-        </div>
       </div>
     </SidebarProvider>
   );
