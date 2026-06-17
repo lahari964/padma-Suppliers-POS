@@ -313,8 +313,8 @@ export default function NewBill() {
 
           <p className="text-xs italic text-muted-foreground">* If Event Date is in the future, order will be saved as an "Upcoming Order".</p>
 
-          <div className="bg-card border border-border rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-card border border-border rounded-2xl overflow-x-auto overflow-y-hidden">
+            <table className="w-full text-sm whitespace-nowrap">
               <thead className="bg-muted/50 text-foreground border-b border-border">
                 <tr>
                   <th className="text-left font-bold py-4 px-6">Item</th>
