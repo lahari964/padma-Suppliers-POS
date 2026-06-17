@@ -144,7 +144,7 @@ const Discounts = () => {
       </Tabs>
 
       <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[90dvh] overflow-y-auto flex flex-col">
           <DialogHeader>
             <DialogTitle>Discount Details for {selectedBill?.customerName}</DialogTitle>
           </DialogHeader>
@@ -162,22 +162,22 @@ const Discounts = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-emerald-200/50 dark:border-emerald-800/50 pt-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 border-t border-emerald-200/50 dark:border-emerald-800/50 pt-3">
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Date</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">{formatDateDisplay(selectedBill?.eventDate)}</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Date</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-sm sm:text-base">{formatDateDisplay(selectedBill?.eventDate)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Final Bill Amt</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedBill?.totalCost}</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Final Bill Amt</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-sm sm:text-base">₹{selectedBill?.totalCost}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Cart-Level Discount</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedCartDiscount}</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Cart-Level Discount</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-sm sm:text-base">₹{selectedCartDiscount}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Item-Wise Sum</p>
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-base">₹{selectedItemDiscount}</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Item-Wise Sum</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-sm sm:text-base">₹{selectedItemDiscount}</p>
                 </div>
               </div>
             </div>
