@@ -68,14 +68,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       setIsDatabaseConnected(true);
       setIsCheckingConnection(false);
 
-      // Verify silently in background
+      // Verify and sync silently in background
       try {
-        const password = import.meta.env.VITE_APP_PASSWORD || 'padma_pos_secure_2024';
-        const response = await fetch('/api/sync', {
-          method: 'GET',
-          headers: { 'Authorization': password }
-        });
-        setIsDatabaseConnected(response.ok);
+        const { syncDownFromCloud } = await import('../lib/supabase');
+        const { success } = await syncDownFromCloud();
+        setIsDatabaseConnected(success);
       } catch (err) {
         setIsDatabaseConnected(false);
       }

@@ -90,7 +90,10 @@ export const useStore = create<StoreState>((set) => ({
     return saved ? JSON.parse(saved) : null;
   })(),
   isDatabaseConnected: false,
-  lastSyncTime: null,
+  lastSyncTime: (() => {
+    const saved = localStorage.getItem('sadma_lastSync');
+    return saved || null;
+  })(),
   visualTheme: 'minimal',
   colorTheme: 'purple',
   preferences: (() => {
@@ -170,11 +173,15 @@ export const useStore = create<StoreState>((set) => ({
     }
     set({ currentUser: user });
   },
-  setIsDatabaseConnected: (isDatabaseConnected) => set({ isDatabaseConnected }),
-  setLastSyncTime: (lastSyncTime) => set({ lastSyncTime }),
-  setVisualTheme: (visualTheme) => set({ visualTheme }),
+  setIsDatabaseConnected: (status) => set({ isDatabaseConnected: status }),
+  setLastSyncTime: (time) => {
+    if (time) localStorage.setItem('sadma_lastSync', time);
+    else localStorage.removeItem('sadma_lastSync');
+    set({ lastSyncTime: time });
+  },
+  setVisualTheme: (theme) => set({ visualTheme: theme }),
   setColorTheme: (colorTheme) => set({ colorTheme }),
-
+  
   addBill: (bill) => set((state) => {
     const newBills = [...state.bills, bill];
     localStorage.setItem('sadma_bills', JSON.stringify(newBills));
