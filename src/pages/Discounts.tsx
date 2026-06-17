@@ -33,6 +33,19 @@ const Discounts = () => {
     return { bill, totalItemDiscount };
   });
 
+  // Calculate discount summaries for the selected bill
+  let selectedCartDiscount = 0;
+  let selectedItemDiscount = 0;
+  if (selectedBill) {
+    selectedCartDiscount = selectedBill.discount || 0;
+    selectedBill.items.forEach(item => {
+      if (item.originalPrice && item.price < item.originalPrice) {
+        selectedItemDiscount += (item.originalPrice - item.price) * item.qtyIssued * (item.days || 1);
+      }
+    });
+  }
+  const selectedTotalDiscount = selectedCartDiscount + selectedItemDiscount;
+
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <div className="flex items-center justify-between">
@@ -136,16 +149,27 @@ const Discounts = () => {
             <DialogTitle>Discount Details for {selectedBill?.customerName}</DialogTitle>
           </DialogHeader>
           
-          {selectedBill?.discount && selectedBill.discount > 0 ? (
+          {selectedTotalDiscount > 0 ? (
             <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-2">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 <div>
-                  <p className="text-sm text-emerald-800 dark:text-emerald-400 font-medium mb-1">Cart-Level Discount Applied</p>
-                  <h4 className="text-2xl font-bold text-emerald-700 dark:text-emerald-500">₹{selectedBill.discount}</h4>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-400 font-medium mb-1">Total Discount Provided</p>
+                  <h4 className="text-3xl font-bold text-emerald-700 dark:text-emerald-500">₹{selectedTotalDiscount}</h4>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Authorized By</p>
                   <p className="font-semibold text-foreground">{getStaffDisplay(selectedBill?.createdBy)}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 border-t border-emerald-200/50 dark:border-emerald-800/50 pt-3">
+                <div>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Cart-Level Discount</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-lg">₹{selectedCartDiscount}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-emerald-800/70 dark:text-emerald-400/70 font-medium uppercase tracking-wide">Item-Wise Discount Sum</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-500 text-lg">₹{selectedItemDiscount}</p>
                 </div>
               </div>
             </div>
