@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { Bill, StagedItem, InventoryItem } from '../types';
@@ -41,6 +41,44 @@ export default function NewBill() {
   const [stagedItems, setStagedItems] = useState<StagedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [inventoryQty, setInventoryQty] = useState<Record<string, number | string>>({});
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
+  useEffect(() => {
+    const draft = localStorage.getItem('sadma_newbill_draft');
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        if (parsed.customerName) setCustomerName(parsed.customerName);
+        if (parsed.mobile) setMobile(parsed.mobile);
+        if (parsed.address) setAddress(parsed.address);
+        if (parsed.eventDate) setEventDate(parsed.eventDate);
+        if (parsed.eventTime) setEventTime(parsed.eventTime);
+        if (parsed.expectedReturnDate) setExpectedReturnDate(parsed.expectedReturnDate);
+        if (parsed.transportation) setTransportation(parsed.transportation);
+        if (parsed.advance) setAdvance(parsed.advance);
+        if (parsed.discount) setDiscount(parsed.discount);
+        if (parsed.referral) setReferral(parsed.referral);
+        if (parsed.notes) setNotes(parsed.notes);
+        if (parsed.stagedItems) setStagedItems(parsed.stagedItems);
+        if (parsed.stagedItems?.length > 0 || parsed.customerName) {
+          toast.success('Draft restored automatically.');
+        }
+      } catch (e) {
+        console.error("Failed to parse draft", e);
+      }
+    }
+    setDraftLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!draftLoaded) return;
+    const draft = { customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, advance, discount, referral, notes, stagedItems };
+    if (customerName || mobile || stagedItems.length > 0) {
+      localStorage.setItem('sadma_newbill_draft', JSON.stringify(draft));
+    } else {
+      localStorage.removeItem('sadma_newbill_draft');
+    }
+  }, [customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, advance, discount, referral, notes, stagedItems, draftLoaded]);
 
   const groupedInventory = useMemo(() => {
     const filtered = inventory.filter(item => 
@@ -173,9 +211,14 @@ export default function NewBill() {
     });
 
     toast.loading('Saving and syncing to cloud...', { id: 'create-bill' });
+    
+    // Clear draft on successful creation
+    localStorage.removeItem('sadma_newbill_draft');
+    
     import('../lib/supabase').then(async ({ syncUpToCloud }) => {
       const { success, error } = await syncUpToCloud();
       toast.dismiss('create-bill');
+      
       if (success) {
         toast.success('Bill created and synced successfully!');
       } else {

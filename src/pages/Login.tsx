@@ -82,12 +82,14 @@ export default function Login() {
             <Label>Select Employee</Label>
             <Select value={loginUserId} onValueChange={(val) => {
               setLoginUserId(val);
-              setTimeout(() => pinInputRef.current?.focus(), 100);
             }}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose your name" />
               </SelectTrigger>
-              <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
+              <SelectContent onCloseAutoFocus={(e) => {
+                e.preventDefault();
+                pinInputRef.current?.focus();
+              }}>
                 {employees.filter((e: any) => e.status !== 'Inactive').map((emp: any) => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.name}
