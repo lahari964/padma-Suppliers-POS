@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { Bill } from '../types';
 import { formatDateDisplay } from '../lib/utils';
 
@@ -12,16 +14,22 @@ const Discounts = () => {
   const employees = useStore(state => state.employees);
   const [activeTab, setActiveTab] = useState('total');
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const getStaffDisplay = (creatorName?: string) => {
     return creatorName || 'System';
   };
 
+  const filteredBills = bills.filter(b => 
+    b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (b.mobile && b.mobile.includes(searchTerm))
+  );
+
   // Total Discounts (Cart level)
-  const totalDiscounts = bills.filter(b => b.discount && b.discount > 0);
+  const totalDiscounts = filteredBills.filter(b => b.discount && b.discount > 0);
 
   // Group by bill for Item Wise
-  const billsWithItemDiscounts = bills.filter(bill => 
+  const billsWithItemDiscounts = filteredBills.filter(bill => 
     bill.items.some(item => item.originalPrice && item.price < item.originalPrice)
   ).map(bill => {
     let totalItemDiscount = 0;
@@ -48,10 +56,19 @@ const Discounts = () => {
 
   return (
     <div className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto space-y-6 md:space-y-8 animate-in fade-in zoom-in-95 duration-500">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl font-serif font-bold text-foreground">Discounts</h1>
           <p className="text-muted-foreground mt-1">Track all discounts provided to customers.</p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search customer or mobile..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 w-full bg-card"
+          />
         </div>
       </div>
 
