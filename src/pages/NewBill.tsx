@@ -313,60 +313,50 @@ export default function NewBill() {
 
           <p className="text-xs italic text-muted-foreground">* If Event Date is in the future, order will be saved as an "Upcoming Order".</p>
 
-          <div className="bg-card border border-border rounded-2xl overflow-x-auto overflow-y-hidden">
-            <table className="w-full text-sm whitespace-nowrap">
-              <thead className="bg-muted/50 text-foreground border-b border-border">
-                <tr>
-                  <th className="text-left font-bold py-4 px-6">Item</th>
-                  <th className="text-center font-bold py-4 px-6 w-32">Daily Rate</th>
-                  <th className="text-center font-bold py-4 px-6 w-32">Qty</th>
-                  <th className="text-center font-bold py-4 px-4 w-16"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {stagedItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="text-center py-6 text-muted-foreground">No items added yet</td>
-                  </tr>
-                ) : (
-                  stagedItems.map((item) => (
-                    <tr key={item.inventoryId} className="border-b border-emerald-50 dark:border-border last:border-0">
-                      <td className="py-2 px-4">
-                        <div className="font-medium text-foreground">{item.name}</div>
-                      </td>
-                      <td className="py-2 px-4">
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="text-muted-foreground">₹</span>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            className="w-20 h-8 text-center" 
-                            value={item.price} 
-                            onFocus={(e) => e.target.select()}
-                            onChange={(e) => updateItemPrice(item.inventoryId, Number(e.target.value))}
-                          />
-                        </div>
-                      </td>
-                      <td className="py-2 px-4">
+          <div className="space-y-3">
+            {stagedItems.length === 0 ? (
+              <div className="bg-card border border-border rounded-2xl p-6 text-center text-muted-foreground text-sm">
+                No items added yet
+              </div>
+            ) : (
+              stagedItems.map((item) => (
+                <div key={item.inventoryId} className="bg-card border border-border rounded-2xl p-3 sm:p-4 shadow-sm flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-2 border-b border-border/50 pb-2">
+                    <span className="font-semibold text-foreground text-sm pt-1 leading-tight">{item.name}</span>
+                    <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className="w-7 h-7 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0" title="Remove Item">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <label className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide font-medium block mb-1">Daily Rate</label>
+                      <div className="flex items-center relative">
+                        <span className="text-muted-foreground text-sm font-medium absolute left-3">₹</span>
                         <Input 
                           type="number" 
-                          min="1" 
-                          className="w-16 h-8 text-center mx-auto" 
-                          value={item.qty} 
+                          min="0" 
+                          className="h-9 w-full font-medium pl-7 bg-background" 
+                          value={item.price} 
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}
+                          onChange={(e) => updateItemPrice(item.inventoryId, Number(e.target.value))}
                         />
-                      </td>
-                      <td className="text-center py-2 px-2">
-                        <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className="w-8 h-8 text-destructive hover:text-destructive hover:bg-destructive/10" title="Remove Item">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide font-medium block mb-1">Quantity</label>
+                      <Input 
+                        type="number" 
+                        min="1" 
+                        className="h-9 w-full font-medium text-center bg-background" 
+                        value={item.qty} 
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
