@@ -24,7 +24,8 @@ const getCategoryIcon = (category: string) => {
 
 export default function NewBill() {
   const navigate = useNavigate();
-  const { inventory, updateInventoryQty, addBill, currentUser } = useStore();
+  const { inventory, updateInventoryQty, addBill, currentUser, preferences } = useStore();
+  const compactView = preferences?.compactView;
 
   const [customerName, setCustomerName] = useState('');
   const [mobile, setMobile] = useState('');
@@ -313,29 +314,29 @@ export default function NewBill() {
 
           <p className="text-xs italic text-muted-foreground">* If Event Date is in the future, order will be saved as an "Upcoming Order".</p>
 
-          <div className="space-y-3">
+          <div className={compactView ? "space-y-1.5" : "space-y-3"}>
             {stagedItems.length === 0 ? (
-              <div className="bg-card border border-border rounded-2xl p-6 text-center text-muted-foreground text-sm">
+              <div className={`bg-card border border-border rounded-2xl ${compactView ? "p-4" : "p-6"} text-center text-muted-foreground text-sm`}>
                 No items added yet
               </div>
             ) : (
               stagedItems.map((item) => (
-                <div key={item.inventoryId} className="bg-card border border-border rounded-2xl p-3 sm:p-4 shadow-sm flex flex-col gap-3">
-                  <div className="flex items-start justify-between gap-2 border-b border-border/50 pb-2">
-                    <span className="font-semibold text-foreground text-sm pt-1 leading-tight">{item.name}</span>
-                    <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className="w-7 h-7 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0" title="Remove Item">
+                <div key={item.inventoryId} className={`bg-card border border-border rounded-2xl ${compactView ? "p-2.5 sm:p-3" : "p-3 sm:p-4"} shadow-sm flex flex-col ${compactView ? "gap-2" : "gap-3"}`}>
+                  <div className={`flex items-start justify-between gap-2 border-b border-border/50 ${compactView ? "pb-1.5" : "pb-2"}`}>
+                    <span className={`font-semibold text-foreground ${compactView ? "text-xs pt-0.5" : "text-sm pt-1"} leading-tight`}>{item.name}</span>
+                    <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className={`${compactView ? "w-6 h-6" : "w-7 h-7"} text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0`} title="Remove Item">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className={`grid grid-cols-2 ${compactView ? "gap-2" : "gap-3 sm:gap-4"}`}>
                     <div>
-                      <label className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide font-medium block mb-1">Daily Rate</label>
+                      <label className={`text-[10px] text-muted-foreground uppercase tracking-wide font-medium block ${compactView ? "mb-0.5" : "mb-1 sm:text-xs"}`}>Daily Rate</label>
                       <div className="flex items-center relative">
-                        <span className="text-muted-foreground text-sm font-medium absolute left-3">₹</span>
+                        <span className={`text-muted-foreground ${compactView ? "text-xs left-2.5" : "text-sm left-3"} font-medium absolute`}>₹</span>
                         <Input 
                           type="number" 
                           min="0" 
-                          className="h-9 w-full font-medium pl-7 bg-background" 
+                          className={`${compactView ? "h-7 text-xs pl-6" : "h-9 pl-7"} w-full font-medium bg-background`} 
                           value={item.price} 
                           onFocus={(e) => e.target.select()}
                           onChange={(e) => updateItemPrice(item.inventoryId, Number(e.target.value))}
@@ -343,11 +344,11 @@ export default function NewBill() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide font-medium block mb-1">Quantity</label>
+                      <label className={`text-[10px] text-muted-foreground uppercase tracking-wide font-medium block ${compactView ? "mb-0.5" : "mb-1 sm:text-xs"}`}>Quantity</label>
                       <Input 
                         type="number" 
                         min="1" 
-                        className="h-9 w-full font-medium text-center bg-background" 
+                        className={`${compactView ? "h-7 text-xs" : "h-9"} w-full font-medium text-center bg-background`} 
                         value={item.qty} 
                         onFocus={(e) => e.target.select()}
                         onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}

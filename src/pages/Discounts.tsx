@@ -12,6 +12,7 @@ import { formatDateDisplay } from '../lib/utils';
 const Discounts = () => {
   const bills = useStore(state => state.bills);
   const employees = useStore(state => state.employees);
+  const compactView = useStore(state => state.preferences?.compactView);
   const [activeTab, setActiveTab] = useState('total');
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,12 +201,12 @@ const Discounts = () => {
             </div>
           ) : null}
 
-          <div className="overflow-auto max-h-[50vh] mt-2 space-y-3 pb-2">
+          <div className={`overflow-auto max-h-[50vh] mt-2 pb-2 ${compactView ? "space-y-1.5" : "space-y-3"}`}>
             {selectedBill?.items.map((item, idx) => {
               const hasDiscount = item.originalPrice && item.price < item.originalPrice;
               const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
               return (
-                <div key={idx} className="bg-card border border-border rounded-xl p-3 shadow-sm flex flex-col gap-2">
+                <div key={idx} className={`bg-card border border-border rounded-xl shadow-sm flex flex-col ${compactView ? "p-2 gap-1.5" : "p-3 gap-2"}`}>
                   <div className="flex justify-between items-start">
                     <span className="font-semibold text-sm">{item.name}</span>
                     {hasDiscount && (
@@ -214,7 +215,7 @@ const Discounts = () => {
                       </Badge>
                     )}
                   </div>
-                  <div className="flex justify-between items-center text-xs text-muted-foreground bg-muted/30 p-2 rounded-lg">
+                  <div className={`flex justify-between items-center text-xs text-muted-foreground bg-muted/30 rounded-lg ${compactView ? "p-1.5" : "p-2"}`}>
                     <div>
                       <span className="block">Qty: {item.qtyIssued}</span>
                     </div>
