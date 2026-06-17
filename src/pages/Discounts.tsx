@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { Bill } from '../types';
 import { formatDateDisplay } from '../lib/utils';
 
@@ -182,39 +183,32 @@ const Discounts = () => {
             </div>
           ) : null}
 
-          <div className="overflow-auto max-h-[50vh] mt-2 rounded-md border border-border">
-            <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow>
-                  <TableHead className="whitespace-nowrap">Item Name</TableHead>
-                  <TableHead className="whitespace-nowrap">Qty</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">Std Price</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">Billed Price</TableHead>
-                  <TableHead className="text-right text-emerald-600 whitespace-nowrap">Item Discount</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">Staff</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedBill?.items.map((item, idx) => {
-                  const hasDiscount = item.originalPrice && item.price < item.originalPrice;
-                  const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
-                  return (
-                    <TableRow key={idx} className={hasDiscount ? "bg-emerald-50 dark:bg-emerald-950/20" : ""}>
-                      <TableCell className={`whitespace-nowrap max-w-[150px] truncate ${hasDiscount ? "font-semibold text-emerald-700 dark:text-emerald-400" : ""}`}>{item.name}</TableCell>
-                      <TableCell className="whitespace-nowrap">{item.qtyIssued}</TableCell>
-                      <TableCell className="text-right whitespace-nowrap">₹{item.originalPrice || item.price}</TableCell>
-                      <TableCell className="text-right font-medium whitespace-nowrap">₹{item.price}</TableCell>
-                      <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">
-                        {hasDiscount ? `₹${itemDiscount}` : '-'}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground text-xs whitespace-nowrap">
-                        {hasDiscount ? getStaffDisplay(item.handledBy || selectedBill?.createdBy) : '-'}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+          <div className="overflow-auto max-h-[50vh] mt-2 space-y-3 pb-2">
+            {selectedBill?.items.map((item, idx) => {
+              const hasDiscount = item.originalPrice && item.price < item.originalPrice;
+              const itemDiscount = hasDiscount ? (item.originalPrice! - item.price) * item.qtyIssued * (item.days || 1) : 0;
+              return (
+                <div key={idx} className="bg-card border border-border rounded-xl p-3 shadow-sm flex flex-col gap-2">
+                  <div className="flex justify-between items-start">
+                    <span className="font-semibold text-sm">{item.name}</span>
+                    {hasDiscount && (
+                      <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-xs shrink-0">
+                        -₹{itemDiscount}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-muted-foreground bg-muted/30 p-2 rounded-lg">
+                    <div>
+                      <span className="block">Qty: {item.qtyIssued}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className={hasDiscount ? "line-through opacity-70" : ""}>Std: ₹{item.originalPrice || item.price}</span>
+                      {hasDiscount && <span className="block text-foreground font-medium mt-0.5">Billed: ₹{item.price}</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>
