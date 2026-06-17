@@ -67,9 +67,9 @@ const Discounts = () => {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Date</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap hidden sm:table-cell">Date</TableHead>
                     <TableHead className="font-semibold text-foreground whitespace-nowrap">Customer Name</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Final Bill Amount</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap hidden sm:table-cell">Final Bill Amount</TableHead>
                     <TableHead className="font-semibold text-foreground text-right text-emerald-600 whitespace-nowrap">Discount Provided</TableHead>
                     <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Staff</TableHead>
                   </TableRow>
@@ -86,9 +86,9 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium whitespace-nowrap">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap hidden sm:table-cell">{bill.eventDate || 'N/A'}</TableCell>
                         <TableCell className="font-medium whitespace-nowrap max-w-[150px] truncate">{bill.customerName}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap">₹{bill.totalCost}</TableCell>
+                        <TableCell className="text-right whitespace-nowrap hidden sm:table-cell">₹{bill.totalCost}</TableCell>
                         <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">₹{bill.discount}</TableCell>
                         <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">{getStaffDisplay(bill.createdBy)}</TableCell>
                       </TableRow>
@@ -109,9 +109,9 @@ const Discounts = () => {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="font-semibold text-foreground whitespace-nowrap">Date</TableHead>
+                    <TableHead className="font-semibold text-foreground whitespace-nowrap hidden sm:table-cell">Date</TableHead>
                     <TableHead className="font-semibold text-foreground whitespace-nowrap">Customer Name</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Final Bill Amount</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right whitespace-nowrap hidden sm:table-cell">Final Bill Amount</TableHead>
                     <TableHead className="font-semibold text-foreground text-right text-emerald-600 whitespace-nowrap">Total Item Discounts</TableHead>
                     <TableHead className="font-semibold text-foreground text-right whitespace-nowrap">Staff</TableHead>
                   </TableRow>
@@ -128,9 +128,9 @@ const Discounts = () => {
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setSelectedBill(bill)}
                       >
-                        <TableCell className="font-medium whitespace-nowrap">{bill.eventDate || 'N/A'}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap hidden sm:table-cell">{bill.eventDate || 'N/A'}</TableCell>
                         <TableCell className="font-medium whitespace-nowrap max-w-[150px] truncate">{bill.customerName}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap">₹{bill.totalCost}</TableCell>
+                        <TableCell className="text-right whitespace-nowrap hidden sm:table-cell">₹{bill.totalCost}</TableCell>
                         <TableCell className="text-right font-bold text-emerald-600 whitespace-nowrap">₹{totalItemDiscount}</TableCell>
                         <TableCell className="text-right text-muted-foreground text-sm whitespace-nowrap">{getStaffDisplay(bill.createdBy)}</TableCell>
                       </TableRow>
