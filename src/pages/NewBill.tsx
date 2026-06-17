@@ -206,8 +206,10 @@ export default function NewBill() {
                 className="bg-background border-border h-11 rounded-xl" 
                 value={mobile} 
                 onChange={e => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  if (val.length <= 10) setMobile(val);
+                  let val = e.target.value.replace(/\D/g, '');
+                  if (val.startsWith('91') && val.length > 10) val = val.substring(2);
+                  if (val.startsWith('0') && val.length > 10) val = val.substring(1);
+                  setMobile(val.substring(0, 10));
                 }} 
                 placeholder="e.g. 9876543210" 
               />
