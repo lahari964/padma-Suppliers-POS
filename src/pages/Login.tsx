@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +30,7 @@ export default function Login() {
 
   const [loginUserId, setLoginUserId] = useState('');
   const [loginPin, setLoginPin] = useState('');
+  const pinInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const saved = sessionStorage.getItem('sadma_current_user');
@@ -79,7 +80,10 @@ export default function Login() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Select Employee</Label>
-            <Select value={loginUserId} onValueChange={setLoginUserId}>
+            <Select value={loginUserId} onValueChange={(val) => {
+              setLoginUserId(val);
+              setTimeout(() => pinInputRef.current?.focus(), 100);
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose your name" />
               </SelectTrigger>
@@ -94,6 +98,7 @@ export default function Login() {
           <div className="space-y-2">
             <Label>Enter PIN</Label>
             <Input 
+              ref={pinInputRef}
               type="password" 
               inputMode="numeric"
               maxLength={4} 
