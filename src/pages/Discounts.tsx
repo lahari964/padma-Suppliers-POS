@@ -55,9 +55,9 @@ const Discounts = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-4 md:mb-6 w-full flex flex-col sm:flex-row justify-start h-auto p-1 bg-muted/50 rounded-xl">
-          <TabsTrigger value="total" className="text-base px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Total Discount</TabsTrigger>
-          <TabsTrigger value="item" className="text-base px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Item-Wise Discount</TabsTrigger>
+        <TabsList className="mb-4 md:mb-6 grid w-full grid-cols-2 md:w-auto md:inline-flex h-auto p-1 bg-muted/50 rounded-xl">
+          <TabsTrigger value="total" className="text-xs sm:text-sm md:text-base px-2 sm:px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Total Discount</TabsTrigger>
+          <TabsTrigger value="item" className="text-xs sm:text-sm md:text-base px-2 sm:px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Item-Wise Discount</TabsTrigger>
         </TabsList>
         
         <TabsContent value="total" className="mt-0 outline-none">
