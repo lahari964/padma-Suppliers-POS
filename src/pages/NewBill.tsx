@@ -148,7 +148,7 @@ export default function NewBill() {
         isDispatched: initialStatus === 'Active',
         dispatchDate: initialStatus === 'Active' ? format(new Date(), 'yyyy-MM-dd') : undefined,
         dispatchTime: initialStatus === 'Active' ? format(new Date(), 'HH:mm') : undefined,
-        handledBy: currentUser?.name || 'Admin'
+        handledBy: currentUser?.name || 'System'
       })),
       returnHistory: [],
       payments: Number(advance) > 0 ? [{

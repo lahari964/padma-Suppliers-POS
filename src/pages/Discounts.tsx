@@ -12,9 +12,7 @@ const Discounts = () => {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
 
   const getStaffDisplay = (creatorName?: string) => {
-    if (!creatorName) return 'Admin';
-    const emp = employees.find(e => e.name === creatorName);
-    return emp ? `${emp.name} (${emp.role})` : creatorName;
+    return creatorName || 'System';
   };
 
   // Total Discounts (Cart level)

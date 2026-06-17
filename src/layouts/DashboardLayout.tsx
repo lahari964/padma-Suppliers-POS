@@ -229,7 +229,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   <div className="flex items-center gap-3 border-l border-border pl-4 cursor-pointer hover:opacity-80 transition-opacity">
                     <div className="text-right hidden md:block">
                       <p className="text-sm font-semibold leading-none">{activeUser?.name || 'Lahari'}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{activeUser?.role || 'Admin'}</p>
+                      {/* <p className="text-xs text-muted-foreground mt-1">{activeUser?.role || 'Admin'}</p> */}
                     </div>
                     <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold border border-primary/20">
                       {activeUser?.name?.charAt(0).toUpperCase() || 'L'}
@@ -241,7 +241,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   <div className="px-2 pb-2">
                     <p className="text-sm font-medium">{activeUser?.name || 'Lahari'}</p>
                     <p className="text-xs text-muted-foreground">{activeUser?.mobile || 'No Mobile Available'}</p>
-                    <Badge variant="secondary" className="mt-1">{activeUser?.role || 'Admin'}</Badge>
+                    {/* <Badge variant="secondary" className="mt-1">{activeUser?.role || 'Admin'}</Badge> */}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive focus:text-destructive-foreground cursor-pointer">

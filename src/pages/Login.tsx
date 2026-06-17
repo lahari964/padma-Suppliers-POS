@@ -86,7 +86,7 @@ export default function Login() {
               <SelectContent>
                 {employees.filter((e: any) => e.status !== 'Inactive').map((emp: any) => (
                   <SelectItem key={emp.id} value={emp.id}>
-                    {emp.name} ({emp.role})
+                    {emp.name}
                   </SelectItem>
                 ))}</SelectContent>
             </Select>
