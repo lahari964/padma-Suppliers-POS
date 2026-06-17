@@ -138,13 +138,17 @@ export default function NewBill() {
         inventoryId: item.inventoryId,
         name: item.name,
         price: item.price,
+        originalPrice: inventory.find(i => i.id === item.inventoryId)?.price || item.price,
         issueDate: eventDate,
         issueTime: eventTime || format(new Date(), 'HH:mm'),
         issueTimestamp: Date.now(),
         qtyIssued: item.qty,
         qtyReturned: 0,
         days: 1,
-        handledBy: currentUser?.name
+        isDispatched: initialStatus === 'Active',
+        dispatchDate: initialStatus === 'Active' ? format(new Date(), 'yyyy-MM-dd') : undefined,
+        dispatchTime: initialStatus === 'Active' ? format(new Date(), 'HH:mm') : undefined,
+        handledBy: currentUser?.name || 'System'
       })),
       returnHistory: [],
       payments: Number(advance) > 0 ? [{

@@ -17,6 +17,7 @@ export type BillItem = {
   dispatchTime?: string;
   days: number;
   handledBy?: string;
+  originalPrice?: number;
 };
 
 export type ReturnLogItem = { name: string; qty: number; days: number; cost: number; time?: string };
