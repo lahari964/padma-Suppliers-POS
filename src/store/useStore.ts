@@ -17,6 +17,7 @@ interface StoreState {
       tagline: string;
       address: string;
       phone: string;
+      landline?: string;
       terms: string;
       signatureLabel: string;
     };
@@ -98,12 +99,20 @@ export const useStore = create<StoreState>((set) => ({
   colorTheme: 'purple',
   preferences: (() => {
     const saved = localStorage.getItem('sadma_preferences');
-    return saved ? JSON.parse(saved) : {
+    let parsedPrefs = saved ? JSON.parse(saved) : null;
+    
+    // Auto-migrate the fake placeholder phone number to the real ones if they haven't changed it manually
+    if (parsedPrefs?.businessDetails?.phone?.includes('+91 9000000000')) {
+      parsedPrefs.businessDetails.phone = '+91 9885247800, +91 9848207130, +91 9059506060';
+    }
+
+    return parsedPrefs || {
       businessDetails: {
         name: 'Padma Suppliers',
         tagline: 'Premium Quality (since 1977)',
         address: 'ganugapalem, ongole, Andhra Pradesh -523001',
-        phone: '+91 9000000000, +91 8000000000, +91 7000000000, 08592-238543',
+        phone: '+91 9885247800, +91 9848207130, +91 9059506060',
+        landline: '08592-238543',
         terms: '1. Transportation and delivery charges are extra.\n2. Customers are fully liable for any damage or loss of rented items and must cover repair/replacement costs.\n3. All payments must be settled strictly according to the prior agreed terms.\n4. Late returns will incur additional daily rental fees.',
         signatureLabel: 'For Padma Suppliers'
       },

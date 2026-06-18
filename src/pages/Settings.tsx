@@ -440,14 +440,17 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                     className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-y"
                     value={preferences.businessDetails?.phone || ''} 
                     onChange={e => setPreferences({ businessDetails: { ...(preferences.businessDetails as any), phone: e.target.value } })}
+                    className="font-medium bg-background"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Landline No</Label>
+                
+                <div className="space-y-2 col-span-1 sm:col-span-2">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Landline Number</Label>
                   <Input 
+                    placeholder="e.g. 08592-238543" 
                     value={preferences.businessDetails?.landline || ''} 
                     onChange={e => setPreferences({ businessDetails: { ...(preferences.businessDetails as any), landline: e.target.value } })}
-                    placeholder="e.g. 08592-200000"
+                    className="font-medium bg-background"
                   />
                 </div>
                 <div className="space-y-2">
