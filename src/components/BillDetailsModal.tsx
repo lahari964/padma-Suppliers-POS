@@ -237,9 +237,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     const sTime = modalTime;
 
     if (qty >= item.qtyIssued) {
-      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: sDate, issueTime: sTime } : i);
+      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime } : i);
     } else {
-      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: sDate, issueTime: sTime };
+      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime };
       const remainingItem = { ...item, qtyIssued: item.qtyIssued - qty };
       updatedItems = updatedItems.map(i => i.id === item.id ? remainingItem : i);
       updatedItems.push(sentItem);
