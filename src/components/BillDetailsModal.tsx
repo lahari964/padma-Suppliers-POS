@@ -108,6 +108,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [billingStartTime, setBillingStartTime] = useState(bill?.eventTime || format(new Date(), 'HH:mm'));
   
   const [showPreBillingReturn, setShowPreBillingReturn] = useState(false);
+  const [isPendingBulkReturn, setIsPendingBulkReturn] = useState(false);
 
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -626,6 +627,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
   const handleReturnAction = (bulkReturn: boolean) => {
     if (!bill.billingStarted && (bill.status === 'Upcoming' || bill.status === 'Partially Active')) {
+      setIsPendingBulkReturn(bulkReturn);
       setShowPreBillingReturn(true);
       return;
     }
@@ -1470,7 +1472,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <Button onClick={() => { setShowPreBillingReturn(false); setShowStartBilling(true); }} className="w-full bg-blue-600 hover:bg-blue-700 font-bold">
                 Start Billing Now
               </Button>
-              <Button variant="outline" onClick={() => confirmReturn(true)} className="w-full border-border hover:bg-muted font-bold">
+              <Button variant="outline" onClick={() => confirmReturn(true, isPendingBulkReturn)} className="w-full border-border hover:bg-muted font-bold">
                 Confirm Return (No Billing)
               </Button>
               <Button variant="ghost" onClick={() => setShowPreBillingReturn(false)} className="w-full text-muted-foreground">Cancel</Button>
