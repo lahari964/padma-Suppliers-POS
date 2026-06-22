@@ -284,7 +284,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       timestamp: Date.now(),
       action: 'Dispatched All Items',
       employeeName: currentUser?.name || 'System',
-      details: `Bulk dispatched ${upcomingItems.length} items.`
+      details: `Bulk dispatched: ${upcomingItems.map(i => `${i.qtyIssued}x ${i.name}`).join(', ')}`
     };
 
     updateBill(bill.id, { 
@@ -357,7 +357,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       timestamp: Date.now(),
       action: 'Bulk Items Removed',
       employeeName: currentUser?.name || 'System',
-      details: `Removed all upcoming items (${upcomingItems.length}).`
+      details: `Removed: ${upcomingItems.map(i => `${i.qtyIssued}x ${i.name}`).join(', ')}`
     };
 
     updateBill(bill.id, { 
