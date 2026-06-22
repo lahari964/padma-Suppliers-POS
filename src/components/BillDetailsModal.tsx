@@ -98,6 +98,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     setIsEditingTransport(false);
   };
   
+  const [modalIssueDate, setModalIssueDate] = useState('');
+  const [modalIssueTime, setModalIssueTime] = useState('');
+  
   const [showAddItems, setShowAddItems] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [addQty, setAddQty] = useState<Record<string, number>>({});
@@ -219,6 +222,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     setSendModalItem(item);
     setModalDate(format(new Date(), 'yyyy-MM-dd'));
     setModalTime(format(new Date(), 'HH:mm'));
+    setModalIssueDate(item.issueDate || bill.eventDate || format(new Date(), 'yyyy-MM-dd'));
+    setModalIssueTime(item.issueTime || bill.eventTime || format(new Date(), 'HH:mm'));
     setModalQty(item.qtyIssued);
   };
 
@@ -235,11 +240,13 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     let updatedItems = [...bill.items];
     const sDate = modalDate;
     const sTime = modalTime;
+    const iDate = modalIssueDate || modalDate;
+    const iTime = modalIssueTime || modalTime;
 
     if (qty >= item.qtyIssued) {
-      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime } : i);
+      updatedItems = updatedItems.map(i => i.id === item.id ? { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: iDate, issueTime: iTime } : i);
     } else {
-      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime };
+      const sentItem = { ...item, id: `ITM-${Date.now()}-${Math.random()}`, qtyIssued: qty, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: iDate, issueTime: iTime };
       const remainingItem = { ...item, qtyIssued: item.qtyIssued - qty };
       updatedItems = updatedItems.map(i => i.id === item.id ? remainingItem : i);
       updatedItems.push(sentItem);
@@ -265,6 +272,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     setShowSendAll(true);
     setModalDate(format(new Date(), 'yyyy-MM-dd'));
     setModalTime(format(new Date(), 'HH:mm'));
+    setModalIssueDate(bill.eventDate || format(new Date(), 'yyyy-MM-dd'));
+    setModalIssueTime(bill.eventTime || format(new Date(), 'HH:mm'));
   };
 
   const confirmSendAll = () => {
@@ -273,10 +282,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
     const sDate = modalDate;
     const sTime = modalTime;
+    const iDate = modalIssueDate || modalDate;
+    const iTime = modalIssueTime || modalTime;
 
     const updatedItems = bill.items.map(i => {
       if (!i.isDispatched) {
-        return { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime };
+        return { ...i, isDispatched: true, dispatchDate: sDate, dispatchTime: sTime, issueDate: iDate, issueTime: iTime };
       }
       return i;
     });
@@ -680,6 +691,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <p className="text-sm font-medium text-muted-foreground">Mobile</p>
               <a href={`tel:${bill.mobile}`} className="font-semibold text-primary hover:underline block">{bill.mobile}</a>
             </div>
+            {bill.address && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                <p className="font-semibold text-foreground text-sm line-clamp-2" title={bill.address}>{bill.address}</p>
+              </div>
+            )}
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Referral</p>
               <p className="font-semibold text-foreground">{bill.referral || 'N/A'}</p>
@@ -1266,6 +1283,19 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   <TimePicker value={modalTime} onChange={setModalTime} className="w-full" />
                 </div>
               </div>
+              <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Official Billing Start / Issue Date</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Issue Date</Label>
+                    <DatePicker value={modalIssueDate} onChange={setModalIssueDate} className="w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Issue Time</Label>
+                    <TimePicker value={modalIssueTime} onChange={setModalIssueTime} className="w-full" />
+                  </div>
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label>Quantity to Send</Label>
                 <Input type="number" min="1" max={sendModalItem?.qtyIssued} value={modalQty} onChange={e => setModalQty(e.target.value ? parseInt(e.target.value) : '')} className="w-full" />
@@ -1289,6 +1319,19 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 <div className="space-y-2">
                   <Label>Dispatch Time</Label>
                   <TimePicker value={modalTime} onChange={setModalTime} className="w-full" />
+                </div>
+              </div>
+              <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Official Billing Start / Issue Date</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Issue Date</Label>
+                    <DatePicker value={modalIssueDate} onChange={setModalIssueDate} className="w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Issue Time</Label>
+                    <TimePicker value={modalIssueTime} onChange={setModalIssueTime} className="w-full" />
+                  </div>
                 </div>
               </div>
               <Button onClick={confirmSendAll} className="w-full bg-blue-600 hover:bg-blue-700 font-bold mt-4">Confirm Send All</Button>
