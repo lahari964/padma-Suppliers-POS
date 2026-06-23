@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { Bill, StagedItem, InventoryItem } from '../types';
+import { Bill, StagedItem, InventoryItem, CustomService } from '../types';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft } from 'lucide-react';
+import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft, FileText } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
