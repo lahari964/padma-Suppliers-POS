@@ -102,51 +102,6 @@ export default function Bills() {
     }
   };
 
-  const exportToCSV = () => {
-    if (!isDatabaseConnected) {
-      toast.error('Database is not connected. Cannot export file.');
-      return;
-    }
-
-    const data = getActiveData();
-    if (data.length === 0) {
-      toast.error(`No bills found in the ${activeTab} tab to export.`);
-      return;
-    }
-    
-    try {
-      const headers = ['Bill ID', 'Customer Name', 'Mobile', 'Status', 'Event Date', 'Total Cost', 'Settled', 'Balance'];
-      const rows = data.map(b => {
-        const paid = b.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
-        const balance = b.totalCost - paid - (b.discount || 0);
-        return [
-          b.id,
-          `"${b.customerName}"`,
-          b.mobile,
-          getBillDisplayInfo(b).status,
-          formatToDDMMYYYY(b.eventDate || ''),
-          b.totalCost,
-          paid,
-          Math.max(0, balance)
-        ];
-      });
-      
-      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `PadmaPOS_${activeTab}_bills_${format(new Date(), 'dd-MM-yyyy')}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success('CSV Exported Successfully');
-    } catch (e) {
-      toast.error('Failed to export CSV');
-    }
-  };
-
 
   const handleWhatsApp = (e: React.MouseEvent, bill: any) => {
     e.stopPropagation(); // Prevent opening modal
@@ -241,10 +196,6 @@ export default function Bills() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Bills & Orders</h2>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={exportToCSV} className="gap-2">
-            <Download className="w-4 h-4" /> Export CSV
-          </Button>
-
           <Button onClick={() => navigate('/new-bill')} className="gap-2">
             <Plus className="w-4 h-4" /> New Order
           </Button>
