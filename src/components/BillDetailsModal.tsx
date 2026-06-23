@@ -1350,7 +1350,6 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 ))}
               </div>
             </div>
-            </div>
           )}
 
           {/* Custom Services & Decorations */}

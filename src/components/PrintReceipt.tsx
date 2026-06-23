@@ -102,6 +102,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                   </tr>
                 ))}
               </tbody>
+            </table>
           </div>
         )}
 
