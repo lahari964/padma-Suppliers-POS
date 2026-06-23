@@ -209,9 +209,9 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
                     {isReturnedStatus && retDate ? (
-                      `Issued: ${format(new Date(item.issueDate), 'dd-MM-yyyy')} | Ret: ${retDate} | By: ${item.handledBy || bill.createdBy || 'Admin'}`
+                      `Issued: ${format(new Date(item.issueDate), 'dd-MM-yyyy')} | Ret: ${retDate}`
                     ) : (
-                      `Issued: ${format(new Date(item.issueDate), 'dd-MM-yyyy')} | By: ${item.handledBy || bill.createdBy || 'Admin'}`
+                      `Issued: ${format(new Date(item.issueDate), 'dd-MM-yyyy')}`
                     )}
                   </div>
                 </td>
