@@ -284,11 +284,11 @@ export default function Bills() {
           </TabsTrigger>
         </TabsList>
         <div className="mt-4 relative">
-          <TabsContent value="upcoming" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
-          <TabsContent value="active" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(activeBills, 'active')}</TabsContent>
-          <TabsContent value="pending" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(pendingBills, 'pending')}</TabsContent>
-          <TabsContent value="settled" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(settledBills, 'settled')}</TabsContent>
-          <TabsContent value="quotations" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(quotationBills, 'quotations')}</TabsContent>
+          <TabsContent value="upcoming" className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
+          <TabsContent value="active" className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out">{renderTable(activeBills, 'active')}</TabsContent>
+          <TabsContent value="pending" className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out">{renderTable(pendingBills, 'pending')}</TabsContent>
+          <TabsContent value="settled" className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out">{renderTable(settledBills, 'settled')}</TabsContent>
+          <TabsContent value="quotations" className="animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out">{renderTable(quotationBills, 'quotations')}</TabsContent>
         </div>
       </Tabs>
 

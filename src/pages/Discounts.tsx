@@ -89,7 +89,7 @@ const Discounts = () => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="total" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">
+        <TabsContent value="total" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-150 ease-out">
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
@@ -128,7 +128,7 @@ const Discounts = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="item" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">
+        <TabsContent value="item" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-150 ease-out">
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="p-4 bg-muted/20 border-b border-border">
               <p className="text-xs text-muted-foreground">Click on a bill to view the exact items that were discounted.</p>
