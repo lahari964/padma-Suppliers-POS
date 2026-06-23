@@ -227,10 +227,6 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   ];
 
   const handleExportFull = () => {
-    if (!isDatabaseConnected) {
-      toast.error('Database is not connected. Cannot export file.');
-      return;
-    }
     try {
       const data = { bills, inventory, employees, exportDate: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -249,11 +245,6 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   };
 
   const handleExportCSV = () => {
-    if (!isDatabaseConnected) {
-      toast.error('Database is not connected. Cannot export file.');
-      return;
-    }
-
     let dataToExport = bills;
     if (exportStartDate && exportEndDate) {
       dataToExport = bills.filter(b => {
