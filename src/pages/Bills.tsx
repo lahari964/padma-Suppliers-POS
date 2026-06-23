@@ -251,18 +251,20 @@ export default function Bills() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full sm:w-auto h-auto p-1 bg-muted/50 flex-wrap">
-          <TabsTrigger value="upcoming" className="flex-1 sm:flex-none">Upcoming ({upcomingBills.length})</TabsTrigger>
-          <TabsTrigger value="active" className="flex-1 sm:flex-none">Active ({activeBills.length})</TabsTrigger>
-          <TabsTrigger value="pending" className="flex-1 sm:flex-none">Pending ({pendingBills.length})</TabsTrigger>
-          <TabsTrigger value="settled" className="flex-1 sm:flex-none">Settled ({settledBills.length})</TabsTrigger>
-          <TabsTrigger value="quotations" className="flex-1 sm:flex-none data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700">Quotations ({quotationBills.length})</TabsTrigger>
+        <TabsList className="w-full h-12 p-1 bg-muted/30 justify-start overflow-x-auto flex-nowrap hide-scrollbar items-center rounded-xl border border-border shadow-inner">
+          <TabsTrigger value="upcoming" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Upcoming ({upcomingBills.length})</TabsTrigger>
+          <TabsTrigger value="active" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Active ({activeBills.length})</TabsTrigger>
+          <TabsTrigger value="pending" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Pending ({pendingBills.length})</TabsTrigger>
+          <TabsTrigger value="settled" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Settled ({settledBills.length})</TabsTrigger>
+          <TabsTrigger value="quotations" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900/40 dark:data-[state=active]:text-purple-300 data-[state=active]:shadow-sm transition-all duration-300">Quotations ({quotationBills.length})</TabsTrigger>
         </TabsList>
-        <TabsContent value="upcoming">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
-        <TabsContent value="active">{renderTable(activeBills, 'active')}</TabsContent>
-        <TabsContent value="pending">{renderTable(pendingBills, 'pending')}</TabsContent>
-        <TabsContent value="settled">{renderTable(settledBills, 'settled')}</TabsContent>
-        <TabsContent value="quotations">{renderTable(quotationBills, 'quotations')}</TabsContent>
+        <div className="mt-4 relative">
+          <TabsContent value="upcoming" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
+          <TabsContent value="active" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(activeBills, 'active')}</TabsContent>
+          <TabsContent value="pending" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(pendingBills, 'pending')}</TabsContent>
+          <TabsContent value="settled" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(settledBills, 'settled')}</TabsContent>
+          <TabsContent value="quotations" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(quotationBills, 'quotations')}</TabsContent>
+        </div>
       </Tabs>
 
       <BillDetailsModal 
