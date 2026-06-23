@@ -33,6 +33,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [showDeleteAll, setShowDeleteAll] = useState(false);
   const [returnModalItem, setReturnModalItem] = useState<any>(null);
   const [showReturnAll, setShowReturnAll] = useState(false);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [newServiceName, setNewServiceName] = useState('');
+  const [newServicePrice, setNewServicePrice] = useState('');
 
   // Common Modal Inputs
   const formatToDDMMYYYY = (dateStr: string) => {
@@ -156,13 +159,17 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   };
 
   const handleAddCustomService = () => {
-    const name = window.prompt('Enter Service / Decoration Name:');
-    if (!name) return;
-    const priceStr = window.prompt('Enter Price (₹):');
-    if (!priceStr) return;
-    const price = Number(priceStr);
+    setIsServiceModalOpen(true);
+  };
+
+  const confirmAddCustomService = () => {
+    if (!newServiceName.trim()) {
+      toast.error('Service name is required');
+      return;
+    }
+    const price = Number(newServicePrice) || 0;
     
-    const newService = { id: `SRV-${Date.now()}`, name, price };
+    const newService = { id: `SRV-${Date.now()}`, name: newServiceName, price };
     const newCustomServices = [...(bill.customServices || []), newService];
     
     const newTotalCost = bill.totalCost + price;
@@ -178,7 +185,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       timestamp: Date.now(),
       action: 'Added Service',
       employeeName: currentUser?.name || 'System',
-      details: `${name} (₹${price})`
+      details: `Added custom service: ${newServiceName} (₹${price})`
     };
 
     updateBill(bill.id, { 
@@ -187,7 +194,11 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       status: newStatus,
       auditTrail: [...(bill.auditTrail || []), newAuditLog]
     });
-    toast.success('Custom service added');
+    
+    setNewServiceName('');
+    setNewServicePrice('');
+    setIsServiceModalOpen(false);
+    toast.success('Custom service added successfully');
   };
 
   const handleRemoveCustomService = (serviceId: string) => {
@@ -1745,6 +1756,36 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             </div>
           </DialogContent>
         </Dialog>
+      {/* Add Custom Service Modal */}
+      <Dialog open={isServiceModalOpen} onOpenChange={setIsServiceModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogTitle>Add Custom Service</DialogTitle>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Service Name</Label>
+              <Input
+                placeholder="e.g. Flower Decoration"
+                value={newServiceName}
+                onChange={(e) => setNewServiceName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Price (₹)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={newServicePrice}
+                onChange={(e) => setNewServicePrice(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="outline" onClick={() => setIsServiceModalOpen(false)}>Cancel</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={confirmAddCustomService}>Add Service</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       </DialogContent>
     </Dialog>
   );

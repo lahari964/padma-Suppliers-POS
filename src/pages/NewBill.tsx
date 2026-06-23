@@ -12,6 +12,7 @@ import { toast } from '@/components/ui/sonner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 const getCategoryIcon = (category: string) => {
   switch (category?.toLowerCase()) {
@@ -42,6 +43,9 @@ export default function NewBill() {
   const [referral, setReferral] = useState('');
   const [notes, setNotes] = useState('');
   const [customServices, setCustomServices] = useState<CustomService[]>([]);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [newServiceName, setNewServiceName] = useState('');
+  const [newServicePrice, setNewServicePrice] = useState('');
   
   const [stagedItems, setStagedItems] = useState<StagedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -425,13 +429,7 @@ export default function NewBill() {
                 <FileText className="w-5 h-5 text-purple-500" />
                 Services & Decorations
               </h3>
-              <Button variant="outline" size="sm" onClick={() => {
-                const name = window.prompt('Enter Service / Decoration Name:');
-                if (!name) return;
-                const price = window.prompt('Enter Price (₹):');
-                if (price === null) return;
-                setCustomServices([...customServices, { id: `SRV-${Date.now()}`, name, price: Number(price) || 0 }]);
-              }} className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50">
+              <Button size="sm" onClick={() => setIsServiceModalOpen(true)} className="gap-2 bg-purple-600 hover:bg-purple-700 text-white shadow-sm font-semibold">
                 <Plus className="w-4 h-4" /> Add Custom Service
               </Button>
             </div>
@@ -552,7 +550,47 @@ export default function NewBill() {
           )}
         </div>
       </div>
-      
+
+      <Dialog open={isServiceModalOpen} onOpenChange={setIsServiceModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Custom Service</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Service Name</Label>
+              <Input
+                placeholder="e.g. Flower Decoration"
+                value={newServiceName}
+                onChange={(e) => setNewServiceName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Price (₹)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={newServicePrice}
+                onChange={(e) => setNewServicePrice(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsServiceModalOpen(false)}>Cancel</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => {
+              if (!newServiceName.trim()) {
+                toast.error('Service name is required');
+                return;
+              }
+              setCustomServices([...customServices, { id: `SRV-${Date.now()}`, name: newServiceName, price: Number(newServicePrice) || 0 }]);
+              setNewServiceName('');
+              setNewServicePrice('');
+              setIsServiceModalOpen(false);
+            }}>Add Service</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
