@@ -251,12 +251,37 @@ export default function Bills() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full h-12 p-1 bg-muted/30 justify-start overflow-x-auto flex-nowrap hide-scrollbar items-center rounded-xl border border-border shadow-inner">
-          <TabsTrigger value="upcoming" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Upcoming ({upcomingBills.length})</TabsTrigger>
-          <TabsTrigger value="active" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Active ({activeBills.length})</TabsTrigger>
-          <TabsTrigger value="pending" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Pending ({pendingBills.length})</TabsTrigger>
-          <TabsTrigger value="settled" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:shadow-sm transition-all duration-300">Settled ({settledBills.length})</TabsTrigger>
-          <TabsTrigger value="quotations" className="min-w-fit px-4 py-2 rounded-lg data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900/40 dark:data-[state=active]:text-purple-300 data-[state=active]:shadow-sm transition-all duration-300">Quotations ({quotationBills.length})</TabsTrigger>
+        <TabsList className="w-full h-auto p-0 bg-transparent flex flex-wrap gap-2 sm:gap-3 justify-start items-center border-none shadow-none">
+          <TabsTrigger 
+            value="upcoming" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Upcoming ({upcomingBills.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="active" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Active ({activeBills.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="pending" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Pending ({pendingBills.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="settled" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Settled ({settledBills.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="quotations" 
+            className="rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:text-white data-[state=active]:border-purple-600 shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Quotations ({quotationBills.length})
+          </TabsTrigger>
         </TabsList>
         <div className="mt-4 relative">
           <TabsContent value="upcoming" className="animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
