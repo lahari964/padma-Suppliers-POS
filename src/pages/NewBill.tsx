@@ -424,12 +424,12 @@ export default function NewBill() {
 
           {/* Custom Services Section */}
           <div className="mt-8">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <FileText className="w-5 h-5 text-purple-500" />
                 Services & Decorations
               </h3>
-              <Button size="sm" onClick={() => setIsServiceModalOpen(true)} className="gap-2 bg-purple-600 hover:bg-purple-700 text-white shadow-sm font-semibold">
+              <Button size="sm" onClick={() => setIsServiceModalOpen(true)} className="w-full sm:w-auto gap-2 bg-purple-600 hover:bg-purple-700 text-white shadow-sm font-semibold">
                 <Plus className="w-4 h-4" /> Add Custom Service
               </Button>
             </div>
