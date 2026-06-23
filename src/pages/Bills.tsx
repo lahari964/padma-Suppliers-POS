@@ -80,6 +80,7 @@ export default function Bills() {
   const activeBills = filteredBills.filter(b => ['Active', 'Partially Active'].includes(getBillDisplayInfo(b).status));
   const pendingBills = filteredBills.filter(b => b.status === 'Pending');
   const settledBills = filteredBills.filter(b => b.status === 'Settled');
+  const quotationBills = filteredBills.filter(b => getBillDisplayInfo(b).status === 'Quotation');
 
   const getActiveData = () => {
     switch (activeTab) {
@@ -87,6 +88,7 @@ export default function Bills() {
       case 'active': return activeBills;
       case 'pending': return pendingBills;
       case 'settled': return settledBills;
+      case 'quotations': return quotationBills;
       default: return [];
     }
   };
@@ -200,6 +202,7 @@ export default function Bills() {
                 <TableCell>{bill.mobile}</TableCell>
                 <TableCell className="hidden md:table-cell">
                   <Badge variant="outline" className={
+                    getBillDisplayInfo(bill).status === 'Quotation' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' :
                     bill.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                     bill.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
                     bill.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
@@ -244,6 +247,9 @@ export default function Bills() {
 
           <Button onClick={() => navigate('/new-bill')} className="gap-2">
             <Plus className="w-4 h-4" /> New Order
+          </Button>
+          <Button onClick={() => navigate('/new-bill?type=quotation')} variant="secondary" className="gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200">
+            <FileText className="w-4 h-4" /> New Quotation
           </Button>
         </div>
       </div>
@@ -290,16 +296,18 @@ export default function Bills() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
-          <TabsTrigger value="upcoming">Upcoming ({upcomingBills.length})</TabsTrigger>
-          <TabsTrigger value="active">Active ({activeBills.length})</TabsTrigger>
-          <TabsTrigger value="pending">Pending ({pendingBills.length})</TabsTrigger>
-          <TabsTrigger value="settled">Settled ({settledBills.length})</TabsTrigger>
+        <TabsList className="w-full sm:w-auto h-auto p-1 bg-muted/50 flex-wrap">
+          <TabsTrigger value="upcoming" className="flex-1 sm:flex-none">Upcoming ({upcomingBills.length})</TabsTrigger>
+          <TabsTrigger value="active" className="flex-1 sm:flex-none">Active ({activeBills.length})</TabsTrigger>
+          <TabsTrigger value="pending" className="flex-1 sm:flex-none">Pending ({pendingBills.length})</TabsTrigger>
+          <TabsTrigger value="settled" className="flex-1 sm:flex-none">Settled ({settledBills.length})</TabsTrigger>
+          <TabsTrigger value="quotations" className="flex-1 sm:flex-none data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700">Quotations ({quotationBills.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="upcoming">{renderTable(upcomingBills, 'upcoming')}</TabsContent>
         <TabsContent value="active">{renderTable(activeBills, 'active')}</TabsContent>
         <TabsContent value="pending">{renderTable(pendingBills, 'pending')}</TabsContent>
         <TabsContent value="settled">{renderTable(settledBills, 'settled')}</TabsContent>
+        <TabsContent value="quotations">{renderTable(quotationBills, 'quotations')}</TabsContent>
       </Tabs>
 
       <BillDetailsModal 

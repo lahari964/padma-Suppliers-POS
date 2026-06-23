@@ -56,6 +56,7 @@ export type Bill = {
   createdBy?: string;
   notes?: string;
   billingStarted?: boolean;
+  isQuotation?: boolean;
   auditTrail?: AuditLog[];
 };
 

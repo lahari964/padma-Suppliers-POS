@@ -3,6 +3,10 @@ import { format } from 'date-fns';
 import { Bill } from '../types';
 
 export const getBillDisplayInfo = (bill: Bill) => {
+  if (bill.isQuotation) {
+    return { status: 'Quotation', dispatchedCount: 0, upcomingCount: bill.items.reduce((acc, i) => acc + i.qtyIssued, 0) };
+  }
+
   if (bill.status === 'Settled' || bill.status === 'Pending') {
     return { status: bill.status, dispatchedCount: 0, upcomingCount: 0 };
   }

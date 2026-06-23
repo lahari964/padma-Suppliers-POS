@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { Bill, StagedItem, InventoryItem } from '../types';
 import { format } from 'date-fns';
@@ -25,6 +25,8 @@ const getCategoryIcon = (category: string) => {
 
 export default function NewBill() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isQuotation = searchParams.get('type') === 'quotation';
   const { inventory, updateInventoryQty, addBill, currentUser, preferences } = useStore();
   const compactView = preferences?.compactView;
 
@@ -150,7 +152,7 @@ export default function NewBill() {
     const totalCost = calculateTotal();
     
     let initialStatus: Bill['status'] = 'Upcoming';
-    if (eventDate <= format(new Date(), 'yyyy-MM-dd')) {
+    if (!isQuotation && eventDate <= format(new Date(), 'yyyy-MM-dd')) {
       initialStatus = 'Active';
       if (!address) {
         toast.error('Warning: Immediate dispatch requires a Customer Address.');
@@ -173,6 +175,7 @@ export default function NewBill() {
       expectedReturnDate,
       transportationCharges: Number(transportation) || 0,
       notes,
+      isQuotation,
       items: stagedItems.map(item => ({
         id: `ITM-${Date.now()}-${Math.random()}`,
         inventoryId: item.inventoryId,
@@ -199,22 +202,20 @@ export default function NewBill() {
       createdBy: currentUser?.name,
       auditTrail: [{
         timestamp: Date.now(),
-        action: 'Bill Created',
+        action: isQuotation ? 'Quotation Created' : 'Bill Created',
         employeeName: currentUser?.name || 'System',
-        details: `Status: ${initialStatus}, Items: ${stagedItems.length}, Total: ₹${totalCost}`
+        details: isQuotation ? 'Initial quotation generated.' : `Status: ${initialStatus}, Items: ${stagedItems.length}, Total: ₹${totalCost}`
       }]
     };
 
-    addBill(newBill);
-    
-    // Deduct stock for all items
-    stagedItems.forEach(item => {
-      updateInventoryQty(item.inventoryId, -item.qty);
-    });
+    if (!isQuotation) {
+      stagedItems.forEach(item => {
+        updateInventoryQty(item.inventoryId, -item.qty);
+      });
+    }
 
+    addBill(newBill);
     toast.loading('Saving and syncing to cloud...', { id: 'create-bill' });
-    
-    // Clear draft on successful creation
     localStorage.removeItem('sadma_newbill_draft');
     
     import('../lib/supabase').then(async ({ syncUpToCloud }) => {
@@ -222,7 +223,7 @@ export default function NewBill() {
       toast.dismiss('create-bill');
       
       if (success) {
-        toast.success('Bill created and synced successfully!');
+        toast.success(isQuotation ? 'Quotation created successfully!' : 'Bill created and synced successfully!');
       } else {
         toast.success('Bill saved locally. Sync failed: ' + (error || 'Unknown network error'));
       }
@@ -232,14 +233,12 @@ export default function NewBill() {
 
   return (
     <div className="h-full flex flex-col md:flex-row gap-6 animate-in fade-in duration-300">
-      
-      {/* Left Column: Form */}
       <div className="flex-1 flex flex-col bg-card rounded-2xl border border-border overflow-hidden h-fit max-h-full">
         <div className="p-6 pb-4 bg-muted/50 border-b border-border flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/bills')} className="h-8 w-8 rounded-full">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </Button>
-          <h2 className="text-2xl font-bold text-foreground">New Rental Bill</h2>
+          <h2 className="text-2xl font-bold text-foreground">{isQuotation ? 'Create Quotation / Estimate' : 'New Rental Bill'}</h2>
         </div>
         
         <div className="p-6 flex-1 overflow-y-auto space-y-6">
@@ -290,7 +289,8 @@ export default function NewBill() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Advance Paid (₹)</Label>
-                    <Input type="number" className="bg-background border-border h-11 rounded-xl" value={advance} onChange={e => setAdvance(e.target.value)} placeholder="0" />
+                    <Input type="number" className="bg-background border-border h-11 rounded-xl" value={advance} onChange={e => setAdvance(e.target.value)} placeholder="0" disabled={isQuotation} />
+                    {isQuotation && <p className="text-[10px] text-muted-foreground mt-1">Quotations do not process advance payments.</p>}
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Discount (₹)</Label>
@@ -421,12 +421,11 @@ export default function NewBill() {
             <p className="text-xl font-bold text-foreground">Total: ₹ {calculateTotal()}</p>
           </div>
           <Button onClick={handleSaveBill} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-8 py-6 text-base shadow-sm border-none w-full sm:w-auto">
-            Create Rental Bill
+            {isQuotation ? 'Create Quotation' : 'Create Rental Bill'}
           </Button>
         </div>
       </div>
 
-      {/* Right Column: Inventory */}
       <div className="w-full md:w-[400px] flex flex-col h-full max-h-[calc(100vh-6rem)] overflow-hidden space-y-4">
         <div className="flex items-center justify-between shrink-0">
           <h2 className="text-2xl font-bold">Inventory</h2>

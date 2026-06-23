@@ -663,6 +663,45 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const totalIssued = bill.items.reduce((acc, item) => acc + item.qtyIssued, 0);
   const createdDateStr = bill.eventDate || format(new Date(parseInt(bill.id.split('-')[1])), 'dd-MM-yyyy');
 
+  const handleConvertToOrder = () => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const isEventArrived = bill.eventDate && bill.eventDate <= todayStr;
+    
+    // Deduct stock for all items since it's now an official order
+    bill.items.forEach(item => {
+      updateInventoryQty(item.inventoryId, -item.qtyIssued);
+    });
+
+    let updatedBillPayload: any = {
+      isQuotation: false,
+      status: isEventArrived ? 'Active' : 'Upcoming',
+      billingStarted: isEventArrived ? true : undefined,
+      auditTrail: [
+        ...(bill.auditTrail || []),
+        {
+          timestamp: Date.now(),
+          action: 'Converted to Order',
+          employeeName: currentUser?.name || 'System',
+          details: `Converted from Quotation. Status set to ${isEventArrived ? 'Active' : 'Upcoming'}.`
+        }
+      ]
+    };
+
+    if (isEventArrived) {
+      updatedBillPayload.items = bill.items.map(i => ({
+        ...i,
+        isDispatched: true,
+        dispatchDate: todayStr,
+        dispatchTime: format(new Date(), 'HH:mm'),
+        issueDate: bill.eventDate || todayStr,
+        issueTime: bill.eventTime || format(new Date(), 'HH:mm')
+      }));
+    }
+
+    updateBill(bill.id, updatedBillPayload);
+    toast.success(`Quotation converted successfully to ${isEventArrived ? 'Active' : 'Upcoming'} Order!`);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0 overflow-hidden flex flex-col bg-background/95 backdrop-blur-sm border-border/50 print:static print:translate-x-0 print:translate-y-0 print:w-full print:h-auto print:max-w-none print:border-none print:bg-white print:overflow-visible print:shadow-none print:p-0 print:m-0">
@@ -691,12 +730,10 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               <p className="text-sm font-medium text-muted-foreground">Mobile</p>
               <a href={`tel:${bill.mobile}`} className="font-semibold text-primary hover:underline block">{bill.mobile}</a>
             </div>
-            {bill.address && (
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Address</p>
-                <p className="font-semibold text-foreground text-sm line-clamp-2" title={bill.address}>{bill.address}</p>
-              </div>
-            )}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Address</p>
+              <p className="font-semibold text-foreground text-sm line-clamp-2" title={bill.address || 'N/A'}>{bill.address || 'N/A'}</p>
+            </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Referral</p>
               <p className="font-semibold text-foreground">{bill.referral || 'N/A'}</p>
@@ -714,6 +751,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
             </div>
             {(() => {
+              if (bill.isQuotation) return null;
+
               const todayStr = format(new Date(), 'yyyy-MM-dd');
               const isPureUpcoming = displayStatus === 'Upcoming';
               const isUpcomingEvent = bill.eventDate && bill.eventDate > todayStr;
@@ -848,10 +887,18 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 <p className="text-sm italic text-muted-foreground mt-2 border-l-2 border-primary/30 pl-3 py-1 bg-muted/20 rounded-r-md">{bill.notes}</p>
               )}
             </div>
+
+            {bill.isQuotation && (
+              <div className="col-span-2 md:col-span-4 mt-4">
+                <Button onClick={handleConvertToOrder} className="w-full h-12 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md transition-all">
+                  Convert to Official Order
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Items To Be Dispatched (Upcoming) */}
-          {bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
+          {!bill.isQuotation && bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               {/* Desktop Header */}
               <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
@@ -955,7 +1002,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           )}
 
           {/* Current Items Status (Active / Partially Active) */}
-          {bill.items.some(isItemConsideredDispatched) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
+          {!bill.isQuotation && bill.items.some(isItemConsideredDispatched) && displayStatus !== 'Upcoming' && displayStatus !== 'Pending' && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               {/* Desktop Header */}
               <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
@@ -1194,33 +1241,99 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             </div>
           </div>
 
+          {/* Quotation Items (Fallback when it's a quotation) */}
+          {bill.isQuotation && (
+            <div className="space-y-4">
+              <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
+                <h3 className="text-xl font-bold font-serif text-foreground">Quotation Items</h3>
+              </div>
+              <div className="hidden lg:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead className="w-[50%]">Item</TableHead>
+                      <TableHead className="text-center">Rate</TableHead>
+                      <TableHead className="text-center">Requested Qty</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bill.items.map(item => (
+                      <TableRow key={item.id} className="group">
+                        <TableCell>
+                          <p className="font-semibold text-foreground">{item.name}</p>
+                        </TableCell>
+                        <TableCell className="text-center">₹{item.price}</TableCell>
+                        <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="block lg:hidden space-y-3">
+                <h3 className="text-xl font-bold font-serif text-foreground border-b border-border pb-2 mt-6">Quotation Items</h3>
+                {bill.items.map(item => (
+                  <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col shadow-sm">
+                    <p className="font-semibold text-foreground text-base">{item.name}</p>
+                    <div className="flex justify-between mt-2">
+                      <span className="text-sm text-muted-foreground">Rate: ₹{item.price}</span>
+                      <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* Sticky Footer */}
-        <div className="bg-card border-t border-border p-4 sm:px-8 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
-          <Button onClick={() => setShowPaymentModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1">
-            <Wallet className="w-4 h-4 shrink-0" /> <span className="truncate">Record Payment</span>
-          </Button>
-          {currentUser?.role !== 'Staff' && (
-            <Button variant="outline" onClick={() => setShowDiscountModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 text-sm sm:text-base transition-all gap-1.5 sm:gap-2 col-span-1">
-              <Tag className="w-4 h-4 shrink-0" /> <span className="truncate">Discount / Waive</span>
+        {!bill.isQuotation && (
+          <div className="bg-card border-t border-border p-4 sm:px-8 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
+            <Button onClick={() => setShowPaymentModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1">
+              <Wallet className="w-4 h-4 shrink-0" /> <span className="truncate">Record Payment</span>
             </Button>
-          )}
+            {currentUser?.role !== 'Staff' && (
+              <Button variant="outline" onClick={() => setShowDiscountModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 text-sm sm:text-base transition-all gap-1.5 sm:gap-2 col-span-1">
+                <Tag className="w-4 h-4 shrink-0" /> <span className="truncate">Discount / Waive</span>
+              </Button>
+            )}
 
-          <Button 
-            className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1 md:ml-auto"
-            onClick={handleShareReceipt}
-          >
-            <MessageCircle className="w-4 h-4 shrink-0" /> <span className="truncate">WhatsApp</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-1.5 sm:gap-2 col-span-1"
-            onClick={() => window.print()}
-          >
-            <Printer className="w-4 h-4 shrink-0" /> <span className="truncate">Print</span>
-          </Button>
-        </div>
+            <Button 
+              className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1 md:ml-auto"
+              onClick={handleShareReceipt}
+            >
+              <MessageCircle className="w-4 h-4 shrink-0" /> <span className="truncate">WhatsApp</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-1.5 sm:gap-2 col-span-1"
+              onClick={() => window.print()}
+            >
+              <Printer className="w-4 h-4 shrink-0" /> <span className="truncate">Print</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Quotation Footer */}
+        {bill.isQuotation && (
+          <div className="bg-card border-t border-border p-4 sm:px-8 flex items-center justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
+            <Button 
+              className="w-full md:w-auto h-12 px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-2 shadow-sm"
+              onClick={handleShareReceipt}
+            >
+              <MessageCircle className="w-4 h-4 shrink-0" /> Share Quotation
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full md:w-auto h-12 px-6 rounded-xl font-bold bg-background hover:bg-muted border-border transition-all gap-2"
+              onClick={() => window.print()}
+            >
+              <Printer className="w-4 h-4 shrink-0" /> Print
+            </Button>
+          </div>
+        )}
 
 
         {/* Discount Modal */}

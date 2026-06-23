@@ -48,7 +48,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         </div>
 
         <div className="border-b border-dashed border-black pb-2 mb-2">
-          <p><strong>Order ID:</strong> {bill.id}</p>
+          <p><strong>{bill.isQuotation ? 'Quotation ID:' : 'Order ID:'}</strong> {bill.id}</p>
           <p><strong>Date:</strong> {format(new Date(), 'dd MMM yyyy HH:mm')}</p>
           <p><strong>Customer:</strong> {bill.customerName}</p>
           {bill.mobile && <p><strong>Phone:</strong> {bill.mobile}</p>}
@@ -108,11 +108,21 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <p>Base Amount: <strong>₹{bill.totalCost - (bill.damageCharges || 0)}</strong></p>
           {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
-          <p>Total Cost: <strong>₹{bill.totalCost}</strong></p>
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
-          <p>Paid: <strong>₹{paid}</strong></p>
-          <p className="text-sm border-t border-dashed border-black pt-1 mt-1">Balance Due: <strong>₹{balance}</strong></p>
+          <p className="border-t border-dashed border-black pt-1 mt-1">Total Cost: <strong>₹{bill.totalCost}</strong></p>
+          {!bill.isQuotation && (
+            <>
+              <p>Paid: <strong>₹{paid}</strong></p>
+              <p className="text-sm border-t border-dashed border-black pt-1 mt-1">Balance Due: <strong>₹{balance}</strong></p>
+            </>
+          )}
         </div>
+
+        {bill.isQuotation && (
+          <div className="mb-4 text-[10px] text-justify whitespace-pre-wrap border p-1 uppercase font-bold text-center">
+            This is a quotation only. Stock is not guaranteed until converted to an order.
+          </div>
+        )}
 
         {biz.terms && (
           <div className="mb-6 text-[10px] text-justify whitespace-pre-wrap">
@@ -122,6 +132,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         )}
 
         <div className="text-center mt-8 pt-4 border-t border-dashed border-black">
+          {!bill.isQuotation && <p>All items must be returned in their original condition.</p>}
           <p>Thank you for your business!</p>
         </div>
       </div>,
@@ -160,7 +171,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           </div>
         </div>
         <div className="text-right">
-          <p className="font-bold text-base">Invoice #: {bill.id}</p>
+          <p className="font-bold text-base">{bill.isQuotation ? 'QUOTATION / ESTIMATE' : `Invoice #: ${bill.id}`}</p>
           <p className="text-xs text-gray-500 mt-1">Generated:</p>
           <p className="text-xs text-gray-500">{format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
         </div>
@@ -177,7 +188,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
       <table className="w-full text-left mb-6 border-collapse text-sm">
         <thead>
           <tr className="border-b-2 border-black">
-            <th className="py-2 px-1 font-bold">Equipment Returned</th>
+            <th className="py-2 px-1 font-bold">{bill.isQuotation ? 'Equipment Requested' : 'Equipment Taken'}</th>
             <th className="py-2 px-1 font-bold text-center">Qty</th>
             <th className="py-2 px-1 font-bold text-center">Time</th>
             <th className="py-2 px-1 font-bold text-center">Rate</th>
@@ -249,7 +260,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               </div>
             )}
             
-            {bill.payments && bill.payments.length > 0 ? (
+            {!bill.isQuotation && (bill.payments && bill.payments.length > 0 ? (
               <div className="pt-2">
                 <span className="block mb-1">Payments Received:</span>
                 {bill.payments.map((p, i) => (
@@ -268,7 +279,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                 <span>Advance Received:</span>
                 <span>- ₹{paid}</span>
               </div>
-            )}
+            ))}
 
             {!!bill.transportationCharges && bill.transportationCharges > 0 && (
               <div className="flex justify-between pt-2">
@@ -278,9 +289,16 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             )}
 
             {!!bill.discount && bill.discount > 0 && (
-              <div className="flex justify-between pt-2">
-                <span>Discount:</span>
+              <div className="flex justify-between pt-1">
+                <span>Discount / Waived:</span>
                 <span>- ₹{bill.discount}</span>
+              </div>
+            )}
+
+            {!bill.isQuotation && (
+              <div className="flex justify-between pt-3 mt-3 border-t-2 border-black text-lg">
+                <span>Balance Due:</span>
+                <span>₹{balance}</span>
               </div>
             )}
           </div>
@@ -290,22 +308,17 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             <span className="font-bold text-lg">Grand Total:</span>
             <span className="font-bold text-xl">₹{bill.totalCost}</span>
           </div>
-
-          {/* Balance */}
-          <div className="flex justify-between items-center pt-2">
-            <span className="font-bold text-sm">{isEstStatus ? 'Est. Balance Due:' : 'Final Balance:'}</span>
-            <span className="font-bold text-sm">₹{balance}</span>
-          </div>
         </div>
       </div>
 
-      {/* Footer Message */}
-      <div className="text-center mt-8 text-sm">
-        {isReturnedStatus ? (
-          <p>All items returned. Thank you for choosing {biz.name || 'Padma Suppliers'}!</p>
-        ) : (
-          <p>Thank you for choosing {biz.name || 'Padma Suppliers'}!</p>
+      {/* Footer Notes */}
+      <div className="mt-12 text-xs text-gray-500 space-y-1 border-t border-gray-200 pt-4">
+        {bill.isQuotation && (
+          <p className="font-bold text-gray-800 uppercase mb-2 text-sm text-center border p-2 bg-gray-50 rounded">This is a quotation only. Stock is not guaranteed until officially confirmed and converted to an order.</p>
         )}
+        {biz.terms && <p className="mb-4"><strong>Terms & Conditions:</strong> {biz.terms}</p>}
+        {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
+        {!bill.isQuotation && <p>Thank you for choosing {biz.name || 'Padma Suppliers'} for your event!</p>}
       </div>
 
     </div>,
