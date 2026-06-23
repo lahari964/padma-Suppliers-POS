@@ -248,8 +248,12 @@ export default function Bills() {
           <Button onClick={() => navigate('/new-bill')} className="gap-2">
             <Plus className="w-4 h-4" /> New Order
           </Button>
-          <Button onClick={() => navigate('/new-bill?type=quotation')} variant="secondary" className="gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200">
-            <FileText className="w-4 h-4" /> New Quotation
+          <Button 
+            onClick={() => navigate('/new-bill?type=quotation')} 
+            variant="outline" 
+            className="gap-2 border-purple-200 text-purple-700 bg-purple-50/50 hover:bg-purple-100 hover:text-purple-800 hover:border-purple-300 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-200 dark:bg-purple-950/30"
+          >
+            <FileText className="w-4 h-4 text-purple-500 dark:text-purple-400" /> New Quotation
           </Button>
         </div>
       </div>
