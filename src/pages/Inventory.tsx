@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
-import { toast } from '@/components/ui/sonner';
+import { Plus, Search, Trash2, Edit, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Inventory() {
   const { inventory, setInventory } = useStore();
@@ -70,13 +70,57 @@ export default function Inventory() {
     }
   };
 
+  const handleAutoCategorize = () => {
+    let updatedCount = 0;
+    const newInventory = inventory.map(item => {
+      if (item.category && item.category !== 'Other' && item.category !== 'Uncategorized') {
+        return item;
+      }
+      
+      const name = item.name.toLowerCase();
+      let newCat = item.category || 'Other';
+
+      if (name.includes('sofa') || name.includes('table') || name.includes('chair') || name.includes('peta') || name.includes('peeta')) {
+        newCat = 'Furniture & Seating';
+      } else if (name.includes('tent') || name.includes('pandal') || name.includes('shamiana')) {
+        newCat = 'Tents & Structures';
+      } else if (name.includes('plate') || name.includes('box') || name.includes('tray') || name.includes('glass') || name.includes('spoon') || name.includes('bowl')) {
+        newCat = 'Catering & Food Service';
+      } else if (name.includes('gangqlam') || name.includes('gangalam') || name.includes('pooja') || name.includes('binde') || name.includes('sthnam')) {
+        newCat = 'Traditional & Ritual Items';
+      } else if (name.includes('water') || name.includes('drum') || name.includes('cooler') || name.includes('fan')) {
+        newCat = 'Utilities & Water';
+      } else if (name.includes('light') || name.includes('sound') || name.includes('dj') || name.includes('mike') || name.includes('mic')) {
+        newCat = 'Lighting & Audio';
+      }
+
+      if (newCat !== item.category) {
+        updatedCount++;
+        return { ...item, category: newCat };
+      }
+      return item;
+    });
+
+    if (updatedCount > 0) {
+      setInventory(newInventory);
+      toast.success(`Auto-categorized ${updatedCount} items successfully!`);
+    } else {
+      toast.info('All items are already categorized or no matching keywords found.');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold font-serif">Inventory Management</h2>
-        <Button onClick={() => handleOpenDialog()}>
-          <Plus className="w-4 h-4 mr-2" /> Add Item
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleAutoCategorize} className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50">
+            <Sparkles className="w-4 h-4" /> Auto-Categorize
+          </Button>
+          <Button onClick={() => handleOpenDialog()}>
+            <Plus className="w-4 h-4 mr-2" /> Add Item
+          </Button>
+        </div>
       </div>
 
       <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
@@ -147,7 +191,15 @@ export default function Inventory() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Category</label>
-              <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Furniture" />
+              <Input list="category-suggestions" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Furniture & Seating" />
+              <datalist id="category-suggestions">
+                <option value="Furniture & Seating" />
+                <option value="Catering & Food Service" />
+                <option value="Tents & Structures" />
+                <option value="Traditional & Ritual Items" />
+                <option value="Utilities & Water" />
+                <option value="Lighting & Audio" />
+              </datalist>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Price / Day (₹)</label>
