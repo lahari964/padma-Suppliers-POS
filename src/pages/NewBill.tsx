@@ -41,6 +41,7 @@ export default function NewBill() {
   const [discount, setDiscount] = useState('');
   const [referral, setReferral] = useState('');
   const [notes, setNotes] = useState('');
+  const [customServices, setCustomServices] = useState<CustomService[]>([]);
   
   const [stagedItems, setStagedItems] = useState<StagedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -132,7 +133,8 @@ export default function NewBill() {
 
   const calculateTotal = () => {
     const subtotal = stagedItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    return subtotal + (Number(transportation) || 0) - (Number(discount) || 0);
+    const servicesTotal = customServices.reduce((acc, service) => acc + service.price, 0);
+    return subtotal + servicesTotal + (Number(transportation) || 0) - (Number(discount) || 0);
   };
 
   const handleSaveBill = () => {
@@ -200,11 +202,12 @@ export default function NewBill() {
         handledBy: currentUser?.name
       }] : [],
       createdBy: currentUser?.name,
+      customServices: customServices,
       auditTrail: [{
         timestamp: Date.now(),
         action: isQuotation ? 'Quotation Created' : 'Bill Created',
         employeeName: currentUser?.name || 'System',
-        details: isQuotation ? 'Initial quotation generated.' : `Status: ${initialStatus}, Items: ${stagedItems.length}, Total: ₹${totalCost}`
+        details: isQuotation ? 'Initial quotation generated.' : `Status: ${initialStatus}, Items: ${stagedItems.length}, Services: ${customServices.length}, Total: ₹${totalCost}`
       }]
     };
 
@@ -413,6 +416,56 @@ export default function NewBill() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Custom Services Section */}
+          <div className="mt-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-500" />
+                Services & Decorations
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => {
+                const name = window.prompt('Enter Service / Decoration Name:');
+                if (!name) return;
+                const price = window.prompt('Enter Price (₹):');
+                if (price === null) return;
+                setCustomServices([...customServices, { id: `SRV-${Date.now()}`, name, price: Number(price) || 0 }]);
+              }} className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50">
+                <Plus className="w-4 h-4" /> Add Custom Service
+              </Button>
+            </div>
+            {customServices.length > 0 && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <Table>
+                  <TableBody>
+                    {customServices.map((service) => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">{service.name}</TableCell>
+                        <TableCell className="w-32 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <span className="text-muted-foreground">₹</span>
+                            <Input 
+                              type="number" 
+                              min="0" 
+                              className={`${compactView ? "h-7 text-xs" : "h-8"} w-20 text-right bg-background`} 
+                              value={service.price} 
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setCustomServices(prev => prev.map(s => s.id === service.id ? { ...s, price: Number(e.target.value) } : s))}
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell className="w-16 text-center">
+                          <Button variant="ghost" size="icon" onClick={() => setCustomServices(prev => prev.filter(s => s.id !== service.id))} className={`${compactView ? "w-7 h-7" : "w-8 h-8"} text-destructive hover:text-destructive hover:bg-destructive/10`} title="Remove Service">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
         </div>
 

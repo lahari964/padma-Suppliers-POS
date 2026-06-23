@@ -20,7 +20,8 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const thermalSize = preferences.receiptTemplate.includes('112') ? '112mm' : preferences.receiptTemplate.includes('58') ? '58mm' : '80mm';
   const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
   const balance = Math.max(0, bill.totalCost - paid - (bill.discount || 0));
-  const itemsSubtotal = bill.totalCost - (bill.transportationCharges || 0) + (bill.discount || 0) - (bill.damageCharges || 0);
+  const servicesTotal = bill.customServices?.reduce((acc, s) => acc + s.price, 0) || 0;
+  const itemsSubtotal = bill.totalCost - (bill.transportationCharges || 0) + (bill.discount || 0) - (bill.damageCharges || 0) - servicesTotal;
 
   let totalOverrideDifference = 0;
   const enrichedItems = bill.items.map(item => {
@@ -101,12 +102,28 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
                   </tr>
                 ))}
               </tbody>
+          </div>
+        )}
+
+        {bill.customServices && bill.customServices.length > 0 && (
+          <div className="mb-4">
+            <h4 className="font-bold border-b-2 border-black mb-1 uppercase text-center text-xs pb-1">Services & Decorations</h4>
+            <table className="w-full text-left text-sm mb-2">
+              <tbody>
+                {bill.customServices.map((service, idx) => (
+                  <tr key={idx}>
+                    <td className="py-1 px-1 font-semibold">{service.name}</td>
+                    <td className="py-1 px-1 text-right font-semibold">₹{service.price}</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}
 
         <div className="border-t border-dashed border-black pt-2 mb-4 space-y-1 text-right">
           <p>Base Amount: <strong>₹{itemsSubtotal}</strong></p>
+          {servicesTotal > 0 ? <p>Services Total: <strong>+₹{servicesTotal}</strong></p> : null}
           {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.transportationCharges ? <p>Transportation: <strong>+₹{bill.transportationCharges}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
@@ -245,6 +262,29 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         </tbody>
       </table>
 
+      {/* Services & Decorations Section */}
+      {bill.customServices && bill.customServices.length > 0 && (
+        <div className="mt-6 mb-4 break-inside-avoid">
+          <h4 className="font-bold border-b-2 border-black mb-2 pb-1 text-lg">Services & Decorations</h4>
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-100/50">
+              <tr className="border-b-2 border-black">
+                <th className="py-2 px-1 font-bold w-3/4">Service Name</th>
+                <th className="py-2 px-1 font-bold text-right w-1/4">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bill.customServices.map((service, idx) => (
+                <tr key={idx} className="border-b border-gray-200">
+                  <td className="py-3 px-1 font-medium">{service.name}</td>
+                  <td className="py-3 px-1 text-right font-bold">₹{service.price.toLocaleString('en-IN')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Totals Section */}
       <div className="flex justify-end">
         <div className="w-72">
@@ -254,6 +294,13 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <span>{isEstStatus ? 'Items Total (Est.):' : 'Items Total:'}</span>
               <span>₹{itemsSubtotal}</span>
             </div>
+            
+            {servicesTotal > 0 && (
+              <div className="flex justify-between pt-1">
+                <span>Services Total:</span>
+                <span>₹{servicesTotal}</span>
+              </div>
+            )}
             
             {totalOverrideDifference > 0 && (
               <div className="flex justify-between text-gray-500 font-normal">

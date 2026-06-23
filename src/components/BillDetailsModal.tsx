@@ -155,6 +155,72 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     window.print();
   };
 
+  const handleAddCustomService = () => {
+    const name = window.prompt('Enter Service / Decoration Name:');
+    if (!name) return;
+    const priceStr = window.prompt('Enter Price (₹):');
+    if (!priceStr) return;
+    const price = Number(priceStr);
+    
+    const newService = { id: `SRV-${Date.now()}`, name, price };
+    const newCustomServices = [...(bill.customServices || []), newService];
+    
+    const newTotalCost = bill.totalCost + price;
+    
+    let newStatus = bill.status;
+    const newRemaining = newTotalCost - totalPaid - (bill.discount || 0);
+    const allReturned = bill.items.every(i => (i.qtyReturned || 0) >= i.qtyIssued);
+    if (newRemaining > 0 && allReturned && bill.status === 'Settled') {
+      newStatus = 'Pending';
+    }
+
+    const newAuditLog = {
+      timestamp: Date.now(),
+      action: 'Added Service',
+      employeeName: currentUser?.name || 'System',
+      details: `${name} (₹${price})`
+    };
+
+    updateBill(bill.id, { 
+      customServices: newCustomServices,
+      totalCost: newTotalCost,
+      status: newStatus,
+      auditTrail: [...(bill.auditTrail || []), newAuditLog]
+    });
+    toast.success('Custom service added');
+  };
+
+  const handleRemoveCustomService = (serviceId: string) => {
+    if (!window.confirm('Are you sure you want to remove this service?')) return;
+    const serviceToRemove = bill.customServices?.find(s => s.id === serviceId);
+    if (!serviceToRemove) return;
+    
+    const newCustomServices = bill.customServices?.filter(s => s.id !== serviceId) || [];
+    const newTotalCost = bill.totalCost - serviceToRemove.price;
+    
+    let newStatus = bill.status;
+    const newRemaining = newTotalCost - totalPaid - (bill.discount || 0);
+    const allReturned = bill.items.every(i => (i.qtyReturned || 0) >= i.qtyIssued);
+    if (newRemaining <= 0 && allReturned && bill.status !== 'Settled') {
+      newStatus = 'Settled';
+    }
+
+    const newAuditLog = {
+      timestamp: Date.now(),
+      action: 'Removed Service',
+      employeeName: currentUser?.name || 'System',
+      details: `${serviceToRemove.name} (₹${serviceToRemove.price})`
+    };
+
+    updateBill(bill.id, { 
+      customServices: newCustomServices,
+      totalCost: newTotalCost,
+      status: newStatus,
+      auditTrail: [...(bill.auditTrail || []), newAuditLog]
+    });
+    toast.success('Custom service removed');
+  };
+
   const handleApplyDiscount = () => {
     if (!discountAmount || Number(discountAmount) <= 0) return;
     const newDiscount = (bill.discount || 0) + Number(discountAmount);
@@ -1284,7 +1350,52 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 ))}
               </div>
             </div>
+            </div>
           )}
+
+          {/* Custom Services & Decorations */}
+          <div className="mt-8 border-t border-border pt-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-500" />
+                Services & Decorations
+              </h3>
+              <Button size="sm" onClick={handleAddCustomService} className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-none font-semibold">
+                <Plus className="w-4 h-4 mr-1" /> Add Service
+              </Button>
+            </div>
+            
+            {(!bill.customServices || bill.customServices.length === 0) ? (
+              <div className="bg-muted/30 border border-dashed border-border rounded-xl p-8 text-center text-muted-foreground">
+                No services or decorations added to this bill.
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead>Service Name</TableHead>
+                      <TableHead className="text-right w-32">Amount (₹)</TableHead>
+                      <TableHead className="w-16 text-center">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bill.customServices.map(service => (
+                      <TableRow key={service.id}>
+                        <TableCell className="font-medium">{service.name}</TableCell>
+                        <TableCell className="text-right font-medium">₹{service.price.toLocaleString('en-IN')}</TableCell>
+                        <TableCell className="text-center">
+                          <Button variant="ghost" size="icon" onClick={() => handleRemoveCustomService(service.id)} className="w-8 h-8 text-destructive hover:bg-destructive/10">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
 
         </div>
 

@@ -2,6 +2,8 @@ export type InventoryItem = { id: string; name: string; price: number; category:
 
 export type StagedItem = { inventoryId: string; name: string; price: number; qty: number };
 
+export type CustomService = { id: string; name: string; price: number; };
+
 export type BillItem = {
   id: string;
   inventoryId: string;
@@ -57,6 +59,7 @@ export type Bill = {
   notes?: string;
   billingStarted?: boolean;
   isQuotation?: boolean;
+  customServices?: CustomService[];
   auditTrail?: AuditLog[];
 };
 
