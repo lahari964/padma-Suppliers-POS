@@ -74,9 +74,19 @@ const Discounts = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-4 md:mb-6 grid w-full grid-cols-2 md:w-auto md:inline-flex h-auto p-1 bg-muted/50 rounded-xl">
-          <TabsTrigger value="total" className="text-xs sm:text-sm md:text-base px-2 sm:px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Total Discount</TabsTrigger>
-          <TabsTrigger value="item" className="text-xs sm:text-sm md:text-base px-2 sm:px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Item-Wise Discount</TabsTrigger>
+        <TabsList className="mb-4 md:mb-6 w-full h-auto p-0 bg-transparent flex flex-wrap gap-2 sm:gap-3 justify-start items-center border-none shadow-none">
+          <TabsTrigger 
+            value="total" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Total Discount
+          </TabsTrigger>
+          <TabsTrigger 
+            value="item" 
+            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+          >
+            Item-Wise Discount
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="total" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">
