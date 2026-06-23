@@ -148,6 +148,7 @@ export const useStore = create<StoreState>((set) => ({
   }),
   setInventory: (inventory) => {
     localStorage.setItem('sadma_inventory', JSON.stringify(inventory));
+    import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     set({ inventory });
   },
   updateInventoryQty: (id, delta) => set((state) => {
