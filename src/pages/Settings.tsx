@@ -244,6 +244,40 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
     }
   };
 
+  const handleExportAllCSV = () => {
+    if (bills.length === 0) {
+      toast.error('No bills found to export');
+      return;
+    }
+    const headers = ['Bill ID', 'Customer Name', 'Mobile', 'Status', 'Event Date', 'Total Cost', 'Settled', 'Balance'];
+    const rows = bills.map(b => {
+      const paid = b.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+      const balance = b.totalCost - paid - (b.discount || 0);
+      return [
+        b.id,
+        `"${b.customerName}"`,
+        b.mobile,
+        getBillDisplayInfo(b).status,
+        b.eventDate || '',
+        b.totalCost,
+        paid,
+        Math.max(0, balance)
+      ];
+    });
+    
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `PadmaPOS_All_Bills.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Complete CSV Exported Successfully');
+  };
+
   const handleExportCSV = () => {
     let dataToExport = bills;
     if (exportStartDate && exportEndDate) {
