@@ -20,6 +20,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const thermalSize = preferences.receiptTemplate.includes('112') ? '112mm' : preferences.receiptTemplate.includes('58') ? '58mm' : '80mm';
   const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
   const balance = Math.max(0, bill.totalCost - paid - (bill.discount || 0));
+  const itemsSubtotal = bill.totalCost - (bill.transportationCharges || 0) + (bill.discount || 0) - (bill.damageCharges || 0);
 
   let totalOverrideDifference = 0;
   const enrichedItems = bill.items.map(item => {
@@ -105,8 +106,9 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         )}
 
         <div className="border-t border-dashed border-black pt-2 mb-4 space-y-1 text-right">
-          <p>Base Amount: <strong>₹{bill.totalCost - (bill.damageCharges || 0)}</strong></p>
+          <p>Base Amount: <strong>₹{itemsSubtotal}</strong></p>
           {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
+          {bill.transportationCharges ? <p>Transportation: <strong>+₹{bill.transportationCharges}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
           <p className="border-t border-dashed border-black pt-1 mt-1">Total Cost: <strong>₹{bill.totalCost}</strong></p>
@@ -250,7 +252,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <div className="space-y-2 mb-2 text-sm font-bold">
             <div className="flex justify-between">
               <span>{isEstStatus ? 'Items Total (Est.):' : 'Items Total:'}</span>
-              <span>₹{bill.totalCost}</span>
+              <span>₹{itemsSubtotal}</span>
             </div>
             
             {totalOverrideDifference > 0 && (
