@@ -79,7 +79,7 @@ const Discounts = () => {
           <TabsTrigger value="item" className="text-xs sm:text-sm md:text-base px-2 sm:px-6 py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Item-Wise Discount</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="total" className="mt-0 outline-none">
+        <TabsContent value="total" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
@@ -118,7 +118,7 @@ const Discounts = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="item" className="mt-0 outline-none">
+        <TabsContent value="item" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2 duration-400 ease-out">
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="p-4 bg-muted/20 border-b border-border">
               <p className="text-xs text-muted-foreground">Click on a bill to view the exact items that were discounted.</p>
