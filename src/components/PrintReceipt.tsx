@@ -57,7 +57,8 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <p><strong>Event Date:</strong> {bill.eventDate ? bill.eventDate.split('-').reverse().join('-') : 'N/A'}</p>
         </div>
 
-        <table className="w-full text-left mb-2">
+        {enrichedItems.length > 0 && (
+          <table className="w-full text-left mb-2">
           <thead>
             <tr className="border-b border-dashed border-black">
               <th className="py-1">Item</th>
@@ -81,6 +82,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             ))}
           </tbody>
         </table>
+        )}
 
         {bill.damageDetails && bill.damageDetails.length > 0 && (
           <div className="mt-2 mb-2 border-t border-dashed border-black pt-2">
@@ -205,6 +207,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
       </div>
 
       {/* Items Table */}
+      {enrichedItems.length > 0 && (
       <table className="w-full text-left mb-6 border-collapse text-sm">
         <thead>
           <tr className="border-b-2 border-black">
@@ -262,6 +265,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           })}
         </tbody>
       </table>
+      )}
 
       {/* Services & Decorations Section */}
       {bill.customServices && bill.customServices.length > 0 && (

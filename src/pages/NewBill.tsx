@@ -142,8 +142,8 @@ export default function NewBill() {
   };
 
   const handleSaveBill = () => {
-    if (stagedItems.length === 0) {
-      window.alert('Please SELECT THE ITEMS to create new Bill');
+    if (stagedItems.length === 0 && customServices.length === 0) {
+      window.alert('Please add at least one Item or Custom Service to create a bill');
       return;
     }
     if (!customerName) {
@@ -325,7 +325,7 @@ export default function NewBill() {
           <div className={`md:hidden ${compactView ? "space-y-1.5" : "space-y-3"}`}>
             {stagedItems.length === 0 ? (
               <div className={`bg-card border border-border rounded-2xl ${compactView ? "p-4" : "p-6"} text-center text-muted-foreground text-sm`}>
-                No items added yet
+                No equipment added
               </div>
             ) : (
               stagedItems.map((item) => (
@@ -381,7 +381,7 @@ export default function NewBill() {
               <TableBody>
                 {stagedItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No items added yet</TableCell>
+                    <TableCell colSpan={4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No equipment added</TableCell>
                   </TableRow>
                 ) : (
                   stagedItems.map((item) => (
