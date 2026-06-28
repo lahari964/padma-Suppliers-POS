@@ -1,60 +1,69 @@
-# Sadma POS - Tenthouse & Event Rentals
+# Padma POS
 
-A comprehensive Point of Sale (POS) and inventory management system designed specifically for tenthouse and event rental businesses. Built with React, TypeScript, Tailwind CSS, and powered by an offline-first architecture with real-time Supabase background syncing.
+Padma POS is a modern, offline-first Point of Sale (POS) and inventory management system designed for suppliers and event decorators. Built with a focus on speed, reliability, and mobile responsiveness, it allows businesses to seamlessly manage orders, quotations, inventory, and staff whether online or completely offline.
 
-## Core Features
+## Features
 
-- **Robust Billing System**: Create and manage rental orders, track item quantities, and automatically calculate costs based on rental duration (days).
-- **Return Management**: Process full, partial, and bulk returns. Support for tracking damages and applying damage charges.
-- **Payment Tracking**: Record advance payments, multiple partial payments, and track outstanding balances.
-- **Offline-First Auto-Sync Architecture**: The app writes all changes locally first, ensuring it functions seamlessly without an internet connection. Every update instantly triggers an automatic background sync to Supabase.
-- **Secure PIN Authentication**: Employees log in securely using their registered mobile number and a 4-digit PIN. Passwords can be managed directly within the app.
-- **Dynamic Calendar View**: Visually track upcoming events, expected returns, and dispatched items on a monthly calendar.
-- **Print Receipts & Invoices**: Generate professional Standard A4 Invoices or Thermal Receipts (58mm, 80mm, 112mm) directly from the browser.
-- **Inventory Management**: Real-time tracking of available vs dispatched inventory.
+- **Offline-First Architecture**: Works entirely offline using robust local state management. All data is saved instantly to your device.
+- **Cloud Synchronization**: Sync your local database to Supabase whenever you have an internet connection to keep your data backed up securely.
+- **Order & Bill Management**: 
+  - Track orders across different states: Upcoming, Active, Pending, Settled, and Quotations.
+  - Automatically calculate cart-level and item-level discounts.
+- **Inventory Tracking**: 
+  - Manage categories like Furniture & Seating, Props & Backdrops, Lighting, and more.
+  - Real-time stock alerts and quantity tracking.
+- **Role-Based Access Control**: Manage employee access and permissions securely.
+- **Premium UI/UX**: Designed with a sleek, responsive interface featuring dynamic animations, a dark mode toggle, and mobile-friendly interactions (using Shadcn/UI & Tailwind CSS).
 
-## Architecture & State Management
+## Tech Stack
 
-- **Frontend Framework**: React 18 powered by Vite.
-- **Styling**: Tailwind CSS and shadcn/ui components.
-- **State Management**: Zustand handles global state, persisting to `localStorage` to guarantee offline availability.
-- **Database Backend**: Supabase (PostgreSQL) stores `bills`, `inventory`, and `employees`. 
-- **Auto-Sync Engine**: Whenever a user modifies data (e.g., adding a payment, processing a return), the `useStore` hooks immediately trigger `syncUpToCloud` via the `@supabase/supabase-js` client, bypassing manual sync requirements.
-
-## Requirements
-
-- Node.js 18+ (LTS recommended)
-- npm
+- **Frontend**: React (Vite), TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI
+- **State Management**: Zustand
+- **Database / Sync**: Supabase (Backend-as-a-Service) for cloud backups
+- **Icons**: Lucide React
+- **Date Handling**: date-fns
 
 ## Getting Started
 
-Install dependencies:
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/lahari964/padma-Suppliers-POS.git
+cd padma-pos
+```
+
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-Run the development server:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-## Available Scripts
+4. Open your browser and navigate to `http://localhost:5173`.
 
-- `npm run dev` - Start Vite in development mode
-- `npm run build` - Create a production build
-- `npm run preview` - Preview the production build locally
-- `npm run lint` - Run ESLint checks
-- `npm run test` - Run Vitest tests
-- `npx tsc --noEmit` - Run strict TypeScript compilation checks
-
-## Environment Configuration
-The application securely connects to Supabase using a `.env.local` configuration or pre-injected service credentials for frictionless zero-config execution.
-
-## Verification Commands
-To verify repository health before deploying:
-```bash
-npm run lint
-npm run test
-npm run build
-npx tsc --noEmit
+### Environment Variables
+To enable cloud synchronization, create a `.env` file in the root directory and add your Supabase credentials:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+*Note: If you do not provide these keys, the app will continue to function perfectly in offline-only mode.*
+
+## Build for Production
+
+To build the application for production, run:
+```bash
+npm run build
+```
+The optimized production build will be output to the `dist` folder.
+
+## License
+Private Property - All rights reserved.
