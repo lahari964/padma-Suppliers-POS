@@ -39,7 +39,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
   // Local Quotation Days State
   const [quotationDays, setQuotationDays] = useState<Record<string, string | number>>({});
-  const getQuotationDays = (itemId: string) => quotationDays[itemId] !== undefined ? quotationDays[itemId] : 1;
+  
+  const getQuotationDays = (itemId: string) => {
+    if (quotationDays[itemId] !== undefined) return quotationDays[itemId];
+    return bill?.items.find(i => i.id === itemId)?.days || 1;
+  };
+
   const updateQuotationDays = (itemId: string, value: string) => {
     if (value === '') {
       setQuotationDays(prev => ({ ...prev, [itemId]: '' }));
@@ -49,6 +54,24 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     if (!isNaN(days) && days >= 0) {
       setQuotationDays(prev => ({ ...prev, [itemId]: days }));
     }
+  };
+
+  const handleQuotationDaysBlur = (itemId: string) => {
+    if (!bill) return;
+    const days = Number(getQuotationDays(itemId)) || 1;
+    const updatedItems = bill.items.map(i => i.id === itemId ? { ...i, days } : i);
+    
+    const itemsTotal = updatedItems.reduce((acc, item) => {
+      const currentDays = item.id === itemId ? days : (Number(getQuotationDays(item.id)) || item.days || 1);
+      return acc + (item.price * item.qtyIssued * currentDays);
+    }, 0);
+    const servicesTotal = bill.customServices?.reduce((acc, service) => acc + service.price, 0) || 0;
+    const newTotalCost = itemsTotal + servicesTotal + (bill.transportationCharges || 0) - (bill.discount || 0);
+
+    updateBill(bill.id, {
+      items: updatedItems,
+      totalCost: newTotalCost
+    });
   };
 
   const dynamicQuotationTotal = useMemo(() => {
@@ -766,8 +789,11 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const totalIssued = bill.items.reduce((acc, item) => acc + item.qtyIssued, 0);
   const createdDateStr = bill.eventDate || format(new Date(parseInt(bill.id.split('-')[1])), 'dd-MM-yyyy');
 
+  const [isConverting, setIsConverting] = useState(false);
   const handleConvertToOrder = () => {
+    setIsConverting(true);
     // Deduct stock for all items since it's now an official order
+    // (User opted to force through stock even if negative)
     bill.items.forEach(item => {
       updateInventoryQty(item.inventoryId, -item.qtyIssued);
     });
@@ -793,6 +819,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
     updateBill(bill.id, updatedBillPayload);
     toast.success('Quotation converted successfully to Upcoming Order!');
+    setIsConverting(false);
   };
 
   return (
@@ -996,8 +1023,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
             {bill.isQuotation && (
               <div className="col-span-2 md:col-span-4 mt-4">
-                <Button onClick={handleConvertToOrder} className="w-full h-12 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md transition-all">
-                  Convert to Official Order
+                <Button onClick={handleConvertToOrder} disabled={isConverting} className="w-full h-12 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md transition-all">
+                  {isConverting ? 'Converting...' : 'Convert to Official Order'}
                 </Button>
               </div>
             )}
@@ -1007,8 +1034,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           {!bill.isQuotation && bill.items.some(isItemPendingDispatch) && displayStatus !== 'Settled' && (
             <div className="space-y-4">
               {/* Desktop Header */}
-              <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-border pb-4 mt-8 gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                   <h3 className="text-xl font-bold font-serif text-foreground">Items To Dispatch</h3>
                   <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
                     + Add New Items to Order
@@ -1380,6 +1407,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                             className="h-8 w-16 text-center mx-auto" 
                             value={getQuotationDays(item.id)} 
                             onChange={(e) => updateQuotationDays(item.id, e.target.value)}
+                            onBlur={() => handleQuotationDaysBlur(item.id)}
                           />
                         </TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
@@ -1410,6 +1438,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           className="h-7 w-14 text-xs text-center" 
                           value={getQuotationDays(item.id)} 
                           onChange={(e) => updateQuotationDays(item.id, e.target.value)}
+                          onBlur={() => handleQuotationDaysBlur(item.id)}
                         />
                       </div>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
