@@ -31,6 +31,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
 const playSound = () => {
   const soundPref = localStorage.getItem('sadma_sound') as any || 'pop';
   playNotificationSound(soundPref);
+  
+  // Provide haptic feedback on supported mobile devices
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    navigator.vibrate(50);
+  }
 };
 
 const toast = Object.assign(

@@ -117,10 +117,6 @@ export default function NewBill() {
         qty: qty
       }];
     });
-    // Vibrate lightly on supported mobile devices
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(50);
-    }
     toast.success(`${qty}x ${item.name} added`, { 
       duration: 1500, 
       position: window.innerWidth < 768 ? 'top-center' : 'bottom-right' 
