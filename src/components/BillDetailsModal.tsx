@@ -37,6 +37,21 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
+  // Local Quotation Days State
+  const [quotationDays, setQuotationDays] = useState<Record<string, number>>({});
+  const getQuotationDays = (itemId: string) => quotationDays[itemId] || 1;
+  const updateQuotationDays = (itemId: string, days: number) => {
+    if (days < 1) return;
+    setQuotationDays(prev => ({ ...prev, [itemId]: days }));
+  };
+
+  const dynamicQuotationTotal = useMemo(() => {
+    if (!bill?.isQuotation) return bill?.totalCost || 0;
+    const itemsTotal = bill.items.reduce((acc, item) => acc + (item.price * item.qtyIssued * getQuotationDays(item.id)), 0);
+    const servicesTotal = bill.customServices?.reduce((acc, service) => acc + service.price, 0) || 0;
+    return itemsTotal + servicesTotal + (bill.transportationCharges || 0) - (bill.discount || 0);
+  }, [bill, quotationDays]);
+
   // Common Modal Inputs
   const formatToDDMMYYYY = (dateStr: string) => {
     if (!dateStr) return '';
@@ -140,7 +155,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   if (!bill) return null;
 
   const totalPaid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
-  const remainingBalance = bill.totalCost - totalPaid - (bill.discount || 0);
+  const remainingBalance = (bill.isQuotation ? dynamicQuotationTotal : bill.totalCost) - totalPaid - (bill.discount || 0);
 
   // Define clear rules for when an item should appear in the "To Dispatch" vs "Active" tables
   const isItemConsideredDispatched = (i: any) => {
@@ -783,7 +798,16 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0 overflow-hidden flex flex-col bg-background/95 backdrop-blur-sm border-border/50 print:static print:translate-x-0 print:translate-y-0 print:w-full print:h-auto print:max-w-none print:border-none print:bg-white print:overflow-visible print:shadow-none print:p-0 print:m-0">
         
-        <PrintReceipt bill={bill} />
+        {/* Print Receipt Hidden */}
+        <div className="hidden print:block">
+          <PrintReceipt 
+            bill={bill.isQuotation ? {
+              ...bill, 
+              totalCost: dynamicQuotationTotal, 
+              items: bill.items.map(i => ({ ...i, price: i.price * getQuotationDays(i.id) }))
+            } : bill} 
+          />
+        </div>
 
         {/* Sticky Header */}
         <div className="flex justify-between items-start lg:items-center px-4 lg:px-6 py-4 border-b border-border bg-card z-10 print:hidden gap-2">
@@ -934,10 +958,11 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               )}
             </div>
 
-            <div className="space-y-1 p-2 -m-2">
-              <p className="text-sm font-medium text-muted-foreground">Total Cost</p>
-              <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{bill.totalCost.toLocaleString('en-IN')}</p>
+            <div className="bg-muted/30 p-3 rounded-lg border border-border/50 col-span-1 min-w-[120px]">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total Amount</p>
+              <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{(bill.isQuotation ? dynamicQuotationTotal : bill.totalCost).toLocaleString('en-IN')}</p>
             </div>
+            
             <div className="space-y-1 p-2 -m-2">
               <p className="text-sm font-medium text-muted-foreground">Balance</p>
               <p className={`font-semibold text-lg tracking-tight mt-1 ${remainingBalance > 0 ? 'text-orange-500' : 'text-emerald-500'}`}>
@@ -1330,7 +1355,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     <TableRow>
                       <TableHead className="w-[40%]">Item</TableHead>
                       <TableHead className="text-center">Rate</TableHead>
-                      <TableHead className="text-center">Days</TableHead>
+                      <TableHead className="text-center w-24">Days</TableHead>
                       <TableHead className="text-center">Requested Qty</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -1341,7 +1366,15 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           <p className="font-semibold text-foreground">{item.name}</p>
                         </TableCell>
                         <TableCell className="text-center">₹{item.price}</TableCell>
-                        <TableCell className="text-center font-medium">{item.days || 1}</TableCell>
+                        <TableCell className="text-center">
+                          <Input 
+                            type="number" 
+                            min="1" 
+                            className="h-8 w-16 text-center mx-auto" 
+                            value={getQuotationDays(item.id)} 
+                            onChange={(e) => updateQuotationDays(item.id, Number(e.target.value))}
+                          />
+                        </TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
                       </TableRow>
                     ))}
@@ -1355,9 +1388,18 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 {bill.items.map(item => (
                   <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col shadow-sm">
                     <p className="font-semibold text-foreground text-base">{item.name}</p>
-                    <div className="flex justify-between mt-2">
+                    <div className="flex justify-between items-center mt-2">
                       <span className="text-sm text-muted-foreground">Rate: ₹{item.price}</span>
-                      <span className="text-sm font-medium">Days: {item.days || 1}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Days:</span>
+                        <Input 
+                          type="number" 
+                          min="1" 
+                          className="h-7 w-14 text-xs text-center" 
+                          value={getQuotationDays(item.id)} 
+                          onChange={(e) => updateQuotationDays(item.id, Number(e.target.value))}
+                        />
+                      </div>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
                     </div>
                   </div>

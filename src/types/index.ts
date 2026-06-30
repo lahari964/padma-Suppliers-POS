@@ -1,6 +1,6 @@
 export type InventoryItem = { id: string; name: string; price: number; category: string; qtyAvailable?: number; updatedAt?: string; hasConflict?: boolean };
 
-export type StagedItem = { inventoryId: string; name: string; price: number; qty: number; days?: number; };
+export type StagedItem = { inventoryId: string; name: string; price: number; qty: number };
 
 export type CustomService = { id: string; name: string; price: number; };
 
