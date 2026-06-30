@@ -516,8 +516,10 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       updatedItems.push(newItem);
       newCost += finalPrice * qty * 1; // base 1 day cost
       
-      // Deduct stock
-      updateInventoryQty(invItem.id, -qty);
+      // Deduct stock only if it's an official order
+      if (!bill.isQuotation) {
+        updateInventoryQty(invItem.id, -qty);
+      }
     });
     
     const newAuditLog = {
@@ -530,7 +532,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     updateBill(bill.id, {
       items: updatedItems,
       totalCost: newCost,
-      status: 'Partially Active',
+      status: bill.isQuotation ? bill.status : 'Partially Active',
       auditTrail: [...(bill.auditTrail || []), newAuditLog]
     });
     
@@ -1350,6 +1352,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             <div className="space-y-4">
               <div className="hidden lg:flex justify-between items-center border-b border-border pb-2 mt-6">
                 <h3 className="text-xl font-bold font-serif text-foreground">Quotation Items</h3>
+                <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
+                  + Add New Items to Quotation
+                </Button>
               </div>
               <div className="hidden lg:block bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <Table>
@@ -1385,8 +1390,13 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               </div>
 
               {/* Mobile View */}
-              <div className="block lg:hidden space-y-3">
-                <h3 className="text-xl font-bold font-serif text-foreground border-b border-border pb-2 mt-6">Quotation Items</h3>
+              <div className="block lg:hidden space-y-3 mt-6">
+                <div className="flex flex-col gap-3 border-b border-border pb-3">
+                  <h3 className="text-xl font-bold font-serif text-foreground">Quotation Items</h3>
+                  <Button size="sm" variant="outline" onClick={() => setShowAddItems(true)} className="w-full h-9 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200">
+                    + Add New Items to Quotation
+                  </Button>
+                </div>
                 {bill.items.map(item => (
                   <div key={item.id} className="bg-card border border-border rounded-xl p-4 flex flex-col shadow-sm">
                     <p className="font-semibold text-foreground text-base">{item.name}</p>
