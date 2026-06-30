@@ -815,7 +815,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
               totalCost: dynamicQuotationTotal, 
               items: bill.items.map(i => {
                 const days = Number(getQuotationDays(i.id)) || 1;
-                return { ...i, price: i.price * days };
+                return { ...i, days };
               })
             } : bill} 
           />
