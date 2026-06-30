@@ -23,22 +23,22 @@ export function PendingBillingAlert({ bills, onViewAll }: Props) {
   const remaining = bills.length - PREVIEW_COUNT;
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3.5">
+    <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3.5 dark:border-blue-900/30 dark:bg-blue-950/20">
       {/* Count block */}
-      <div className="flex-shrink-0 rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-center">
-        <div className="text-xl font-medium leading-none text-blue-700">
+      <div className="flex-shrink-0 rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-center dark:border-blue-800/50 dark:bg-blue-900/30">
+        <div className="text-xl font-medium leading-none text-blue-700 dark:text-blue-300">
           {bills.length}
         </div>
-        <div className="mt-0.5 text-[9px] text-blue-400">orders</div>
+        <div className="mt-0.5 text-[9px] text-blue-400 dark:text-blue-500">orders</div>
       </div>
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <div className="mb-2 text-sm font-medium text-blue-900">
+        <div className="mb-2 text-sm font-medium text-blue-900 dark:text-blue-100">
           Pending billing start
         </div>
 
-        <div className="divide-y divide-blue-100">
+        <div className="divide-y divide-blue-100 dark:divide-blue-900/30">
           {preview.map((bill) => {
             const overdue = isOverdue(bill.eventDate);
             // const today = isToday(bill.eventDate);
@@ -46,15 +46,15 @@ export function PendingBillingAlert({ bills, onViewAll }: Props) {
               <div key={bill.id} className="flex items-center gap-2 py-1.5">
                 <span
                   className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
-                    overdue ? "bg-red-500" : "bg-orange-400"
+                    overdue ? "bg-red-500" : "bg-orange-500 dark:bg-orange-400"
                   }`}
                 />
-                <span className="flex-1 truncate text-xs font-medium text-blue-900">
+                <span className="flex-1 truncate text-xs font-medium text-blue-900 dark:text-blue-100">
                   {bill.customerName}
                 </span>
                 <span
                   className={`flex-shrink-0 text-[11px] ${
-                    overdue ? "text-red-500" : "text-orange-500"
+                    overdue ? "text-red-500 dark:text-red-400" : "text-orange-500 dark:text-orange-400"
                   }`}
                 >
                   {overdue
@@ -70,7 +70,7 @@ export function PendingBillingAlert({ bills, onViewAll }: Props) {
         </div>
 
         {remaining > 0 && (
-          <div className="mt-1.5 text-[11px] text-blue-500">
+          <div className="mt-1.5 text-[11px] text-blue-500 dark:text-blue-400">
             + {remaining} more {remaining === 1 ? "order" : "orders"}
           </div>
         )}
