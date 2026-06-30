@@ -11,6 +11,7 @@ import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft
 import { toast } from '@/components/ui/sonner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
@@ -52,6 +53,8 @@ export default function NewBill() {
   const [inventoryQty, setInventoryQty] = useState<Record<string, number | string>>({});
   const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
   const [draftLoaded, setDraftLoaded] = useState(false);
+  const [animationParent] = useAutoAnimate();
+  const [servicesParent] = useAutoAnimate();
 
   useEffect(() => {
     const draft = localStorage.getItem('sadma_newbill_draft');
@@ -327,7 +330,7 @@ export default function NewBill() {
 
           <p className="text-xs italic text-muted-foreground">* If Event Date is in the future, order will be saved as an "Upcoming Order".</p>
 
-          <div className={`md:hidden ${compactView ? "space-y-1.5" : "space-y-3"}`}>
+          <div ref={animationParent} className={`md:hidden ${compactView ? "space-y-1.5" : "space-y-3"}`}>
             {stagedItems.length === 0 ? (
               <div className={`bg-card border border-border rounded-2xl ${compactView ? "p-4" : "p-6"} text-center text-muted-foreground text-sm`}>
                 No equipment added
@@ -383,7 +386,7 @@ export default function NewBill() {
                   <TableHead className="text-center font-bold w-16"></TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody ref={animationParent}>
                 {stagedItems.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No equipment added</TableCell>
@@ -446,7 +449,7 @@ export default function NewBill() {
             {customServices.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
-                  <TableBody>
+                  <TableBody ref={servicesParent}>
                     {customServices.map((service) => (
                       <TableRow key={service.id}>
                         <TableCell className="font-medium">{service.name}</TableCell>
