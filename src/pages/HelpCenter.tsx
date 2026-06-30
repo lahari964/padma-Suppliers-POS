@@ -171,6 +171,19 @@ const FAQ_DATA = [
       { q: "Can I add new items to a bill after it has been created?", a: "Yes. Open the bill, and under 'Items To Dispatch', click the '+ Add New Items to Order' button to append extra inventory to an existing order." },
       { q: "What is the difference between Event Date and Billing Start Date?", a: "'Event Date' is when the actual function occurs. The 'Billing Start Date' (Dispatch Date) is when the items leave your warehouse and the rental charge clock begins." }
     ]
+  },
+  {
+    category: "13. Latest Features: Quotations & Mobile Updates",
+    icon: <Activity className="w-5 h-5 text-emerald-500" />,
+    items: [
+      { q: "How do custom days work on Quotations?", a: "When you edit the 'Days' column for an item on a Quotation, the total cost updates instantly. Plus, your changes are saved immediately as soon as you tap away, meaning you can close the window and reopen it without losing your custom days!" },
+      { q: "What happens if I try to convert an out-of-stock Quotation?", a: "The system now performs a safety check right before conversion. If any items in the quotation do not have enough 'Available Quantity', the conversion is blocked and a red warning popup will list exactly which items you are missing." },
+      { q: "Can a Quotation expire?", a: "Yes! When creating a new Quotation, you can now set a 'Quotation Valid Until' date (default is 7 days). If a quotation passes its validity date, it will show an 'Expired' flashing red tag in the Bills list, and the Convert button will be disabled to protect your inventory." },
+      { q: "What happens when I add a new item to an existing Quotation?", a: "It will now automatically default to '1 Day' instead of zero, ensuring the math is immediately correct on your printed receipts." },
+      { q: "Why did the 'Convert to Official Order' button turn gray?", a: "To prevent accidental double-bookings if you double-click or have a slow network, the button immediately disables itself and says 'Converting...' while it processes the order securely." },
+      { q: "How do I see my sync status on my mobile phone?", a: "The top navigation bar has been updated for mobile screens! The sync status no longer hides on small screens; it shrinks down perfectly so you can always see your 'Connected' status and exactly what time you last synced." },
+      { q: "How do I navigate between Active/Settled bills on mobile?", a: "The bill status tabs (Upcoming, Active, Settled, etc.) no longer break into messy rows on small screens. You can now smoothly swipe left and right across the single row of tabs to navigate." }
+    ]
   }
 ];
 
