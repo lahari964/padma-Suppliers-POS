@@ -38,16 +38,25 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [newServicePrice, setNewServicePrice] = useState('');
 
   // Local Quotation Days State
-  const [quotationDays, setQuotationDays] = useState<Record<string, number>>({});
-  const getQuotationDays = (itemId: string) => quotationDays[itemId] || 1;
-  const updateQuotationDays = (itemId: string, days: number) => {
-    if (days < 1) return;
-    setQuotationDays(prev => ({ ...prev, [itemId]: days }));
+  const [quotationDays, setQuotationDays] = useState<Record<string, string | number>>({});
+  const getQuotationDays = (itemId: string) => quotationDays[itemId] !== undefined ? quotationDays[itemId] : 1;
+  const updateQuotationDays = (itemId: string, value: string) => {
+    if (value === '') {
+      setQuotationDays(prev => ({ ...prev, [itemId]: '' }));
+      return;
+    }
+    const days = parseInt(value, 10);
+    if (!isNaN(days) && days >= 0) {
+      setQuotationDays(prev => ({ ...prev, [itemId]: days }));
+    }
   };
 
   const dynamicQuotationTotal = useMemo(() => {
     if (!bill?.isQuotation) return bill?.totalCost || 0;
-    const itemsTotal = bill.items.reduce((acc, item) => acc + (item.price * item.qtyIssued * getQuotationDays(item.id)), 0);
+    const itemsTotal = bill.items.reduce((acc, item) => {
+      const days = Number(getQuotationDays(item.id)) || 1;
+      return acc + (item.price * item.qtyIssued * days);
+    }, 0);
     const servicesTotal = bill.customServices?.reduce((acc, service) => acc + service.price, 0) || 0;
     return itemsTotal + servicesTotal + (bill.transportationCharges || 0) - (bill.discount || 0);
   }, [bill, quotationDays]);
@@ -804,7 +813,10 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             bill={bill.isQuotation ? {
               ...bill, 
               totalCost: dynamicQuotationTotal, 
-              items: bill.items.map(i => ({ ...i, price: i.price * getQuotationDays(i.id) }))
+              items: bill.items.map(i => {
+                const days = Number(getQuotationDays(i.id)) || 1;
+                return { ...i, price: i.price * days };
+              })
             } : bill} 
           />
         </div>
@@ -1372,7 +1384,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                             min="1" 
                             className="h-8 w-16 text-center mx-auto" 
                             value={getQuotationDays(item.id)} 
-                            onChange={(e) => updateQuotationDays(item.id, Number(e.target.value))}
+                            onChange={(e) => updateQuotationDays(item.id, e.target.value)}
                           />
                         </TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
@@ -1397,7 +1409,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           min="1" 
                           className="h-7 w-14 text-xs text-center" 
                           value={getQuotationDays(item.id)} 
-                          onChange={(e) => updateQuotationDays(item.id, Number(e.target.value))}
+                          onChange={(e) => updateQuotationDays(item.id, e.target.value)}
                         />
                       </div>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
