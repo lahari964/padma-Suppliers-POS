@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft, FileText } from 'lucide-react';
+import { Plus, Search, Trash2, Armchair, Box, Fan, Lightbulb, Package, ArrowLeft, FileText, Check } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
@@ -50,6 +50,7 @@ export default function NewBill() {
   const [stagedItems, setStagedItems] = useState<StagedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [inventoryQty, setInventoryQty] = useState<Record<string, number | string>>({});
+  const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
   const [draftLoaded, setDraftLoaded] = useState(false);
 
   useEffect(() => {
@@ -115,6 +116,14 @@ export default function NewBill() {
         price: item.price,
         qty: qty
       }];
+    });
+    // Vibrate lightly on supported mobile devices
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    toast.success(`${qty}x ${item.name} added`, { 
+      duration: 1500, 
+      position: window.innerWidth < 768 ? 'top-center' : 'bottom-right' 
     });
   };
 
@@ -531,15 +540,19 @@ export default function NewBill() {
                         />
                         <Button 
                           size="icon" 
-                          className="w-8 h-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-none"
+                          className={`w-8 h-8 rounded-full shadow-sm border-none transition-all duration-300 ${addedItemIds[item.id] ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
                           onClick={() => {
                             const val = inventoryQty[item.id];
                             const qty = val === "" || val === undefined ? 1 : Number(val);
                             handleAddItem(item, qty);
                             setInventoryQty(prev => ({ ...prev, [item.id]: 1 }));
+                            setAddedItemIds(prev => ({ ...prev, [item.id]: true }));
+                            setTimeout(() => {
+                              setAddedItemIds(prev => ({ ...prev, [item.id]: false }));
+                            }, 1000);
                           }}
                         >
-                          <Plus className="w-4 h-4" />
+                          {addedItemIds[item.id] ? <Check className="w-4 h-4 animate-in zoom-in duration-300" /> : <Plus className="w-4 h-4" />}
                         </Button>
                       </div>
                     </div>

@@ -2,6 +2,19 @@ import { create } from 'zustand';
 import { Bill, InventoryItem, Employee, UserSession } from '../types';
 import { DEFAULT_INVENTORY, DEFAULT_EMPLOYEES } from '../lib/constants';
 
+function createDebouncedSaver(key: string, delay: number) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return (data: any) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      localStorage.setItem(key, JSON.stringify(data));
+    }, delay);
+  };
+}
+
+const saveBillsDebounced = createDebouncedSaver('sadma_bills', 500);
+const saveInventoryDebounced = createDebouncedSaver('sadma_inventory', 500);
+
 interface StoreState {
   bills: Bill[];
   inventory: InventoryItem[];
@@ -147,28 +160,33 @@ export const useStore = create<StoreState>((set) => ({
     }) 
   }),
   setInventory: (inventory) => {
-    localStorage.setItem('sadma_inventory', JSON.stringify(inventory));
+    const time = new Date().toISOString();
+    const inv = inventory.map(i => ({ ...i, updatedAt: time }));
+    saveInventoryDebounced(inv);
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
-    set({ inventory });
+    set({ inventory: inv });
   },
   updateInventoryQty: (id, delta) => set((state) => {
+    const time = new Date().toISOString();
     const newInventory = state.inventory.map(item => 
-      item.id === id ? { ...item, qtyAvailable: Math.max(0, (item.qtyAvailable || 0) + delta) } : item
+      item.id === id ? { ...item, qtyAvailable: Math.max(0, (item.qtyAvailable || 0) + delta), updatedAt: time } : item
     );
-    localStorage.setItem('sadma_inventory', JSON.stringify(newInventory));
+    saveInventoryDebounced(newInventory);
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { inventory: newInventory };
   }),
   reduceTotalInventory: (id, delta) => set((state) => {
+    const time = new Date().toISOString();
     const newInventory = state.inventory.map(item => 
       item.id === id ? { 
         ...item, 
         // We only track qtyAvailable right now, but if totalQuantity existed we'd reduce it.
         // Reducing the available quantity is essentially permanently destroying it from circulation.
-        qtyAvailable: Math.max(0, (item.qtyAvailable || 0) - delta)
+        qtyAvailable: Math.max(0, (item.qtyAvailable || 0) - delta),
+        updatedAt: time
       } : item
     );
-    localStorage.setItem('sadma_inventory', JSON.stringify(newInventory));
+    saveInventoryDebounced(newInventory);
     return { inventory: newInventory };
   }),
   setEmployees: (employees) => {
@@ -193,19 +211,21 @@ export const useStore = create<StoreState>((set) => ({
   setColorTheme: (colorTheme) => set({ colorTheme }),
   
   addBill: (bill) => set((state) => {
-    const newBills = [...state.bills, bill];
-    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
+    const newBill = { ...bill, updatedAt: new Date().toISOString() };
+    const newBills = [...state.bills, newBill];
+    saveBillsDebounced(newBills);
     return { bills: newBills };
   }),
   updateBill: (id, updated) => set((state) => {
-    const newBills = state.bills.map(b => b.id === id ? { ...b, ...updated } : b);
-    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
+    const time = new Date().toISOString();
+    const newBills = state.bills.map(b => b.id === id ? { ...b, ...updated, updatedAt: time } : b);
+    saveBillsDebounced(newBills);
     import('../lib/supabase').then(({ syncUpToCloud }) => syncUpToCloud().catch(console.error));
     return { bills: newBills };
   }),
   deleteBill: (id) => set((state) => {
     const newBills = state.bills.filter(b => b.id !== id);
-    localStorage.setItem('sadma_bills', JSON.stringify(newBills));
+    saveBillsDebounced(newBills);
     
     // Immediately tell the API to delete it from Supabase
     const password = import.meta.env.VITE_APP_PASSWORD || 'padma_pos_secure_2024';

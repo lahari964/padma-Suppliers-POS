@@ -50,7 +50,12 @@ const AppSidebar = ({ navItems }: { navItems: any[] }) => {
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser, employees, isDatabaseConnected, setIsDatabaseConnected, lastSyncTime } = useStore();
+  const currentUser = useStore(state => state.currentUser);
+  const setCurrentUser = useStore(state => state.setCurrentUser);
+  const employees = useStore(state => state.employees);
+  const isDatabaseConnected = useStore(state => state.isDatabaseConnected);
+  const setIsDatabaseConnected = useStore(state => state.setIsDatabaseConnected);
+  const lastSyncTime = useStore(state => state.lastSyncTime);
   const activeUser = employees.find(e => e.id === currentUser?.id) || currentUser;
   const { resolvedTheme, setTheme } = useTheme();
   const [logoError, setLogoError] = useState(false);

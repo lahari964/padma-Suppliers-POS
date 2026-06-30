@@ -1,4 +1,4 @@
-export type InventoryItem = { id: string; name: string; price: number; category: string; qtyAvailable?: number };
+export type InventoryItem = { id: string; name: string; price: number; category: string; qtyAvailable?: number; updatedAt?: string; hasConflict?: boolean };
 
 export type StagedItem = { inventoryId: string; name: string; price: number; qty: number };
 
@@ -61,6 +61,9 @@ export type Bill = {
   isQuotation?: boolean;
   customServices?: CustomService[];
   auditTrail?: AuditLog[];
+  updatedAt?: string;
+  hasConflict?: boolean;
+  conflictData?: string; // stores JSON of the conflicting cloud version
 };
 
 export type Employee = {

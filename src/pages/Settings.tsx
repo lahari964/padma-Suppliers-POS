@@ -20,14 +20,27 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function Settings() {
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const { bills, inventory, employees, currentUser, setCurrentUser, preferences, setPreferences, isDatabaseConnected } = useStore();
+  const bills = useStore(state => state.bills);
+  const inventory = useStore(state => state.inventory);
+  const employees = useStore(state => state.employees);
+  const currentUser = useStore(state => state.currentUser);
+  const setCurrentUser = useStore(state => state.setCurrentUser);
+  const preferences = useStore(state => state.preferences);
+  const setPreferences = useStore(state => state.setPreferences);
+  const isDatabaseConnected = useStore(state => state.isDatabaseConnected);
+  
   const [activeTab, setActiveTab] = useState('General');
   const [isMenuOpen, setIsMenuOpen] = useState(window.innerWidth >= 768);
   
   // Database State
   const [wipeConfirmation, setWipeConfirmation] = useState('');
   const [isWipeDialogOpen, setIsWipeDialogOpen] = useState(false);
-  const { setBills, setInventory, setEmployees, setIsDatabaseConnected, updateEmployee, addEmployee } = useStore();
+  const setBills = useStore(state => state.setBills);
+  const setInventory = useStore(state => state.setInventory);
+  const setEmployees = useStore(state => state.setEmployees);
+  const setIsDatabaseConnected = useStore(state => state.setIsDatabaseConnected);
+  const updateEmployee = useStore(state => state.updateEmployee);
+  const addEmployee = useStore(state => state.addEmployee);
 
   const activeUser = employees.find(e => e.id === currentUser?.id) || currentUser;
 

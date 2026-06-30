@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { BillDetailsModal } from '../components/BillDetailsModal';
 import { useStore } from '../store/useStore';
 import { getBillDisplayInfo } from '../hooks/useBillCalculations';
@@ -16,7 +17,12 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
 export default function Bills() {
-  const { bills, employees, deleteBill, isDatabaseConnected, preferences, currentUser } = useStore();
+  const bills = useStore(state => state.bills);
+  const employees = useStore(state => state.employees);
+  const deleteBill = useStore(state => state.deleteBill);
+  const isDatabaseConnected = useStore(state => state.isDatabaseConnected);
+  const preferences = useStore(state => state.preferences);
+  const currentUser = useStore(state => state.currentUser);
   const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,72 +130,91 @@ export default function Bills() {
     }
   };
 
-  const renderTable = (data: any[], type: string) => (
-    <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden mt-4">
-      <Table>
-        <TableHeader className="bg-muted/50">
-          <TableRow>
-            <TableHead className="hidden md:table-cell">Bill ID</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead className="hidden md:table-cell">Status</TableHead>
-            <TableHead className="hidden md:table-cell text-right">Total (₹)</TableHead>
-            <TableHead className="hidden sm:table-cell text-right">Balance (₹)</TableHead>
-            {currentUser?.role === 'Admin' && <TableHead className="w-[80px] text-right">Actions</TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                No {type} bills found.
-              </TableCell>
+  const VirtualizedBillTable = ({ data, type }: { data: any[], type: string }) => {
+    const parentRef = useRef<HTMLDivElement>(null);
+    const virtualizer = useVirtualizer({
+      count: data.length,
+      getScrollElement: () => parentRef.current,
+      estimateSize: () => 65,
+      overscan: 5,
+    });
+
+    const items = virtualizer.getVirtualItems();
+
+    return (
+      <div ref={parentRef} className="bg-card rounded-xl border border-border shadow-sm overflow-auto max-h-[600px]">
+        <Table>
+          <TableHeader className="bg-muted/30 sticky top-0 z-10">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="hidden md:table-cell w-[100px]">Order ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Mobile</TableHead>
+              <TableHead className="hidden md:table-cell">Status</TableHead>
+              <TableHead className="hidden md:table-cell text-right">Total (₹)</TableHead>
+              <TableHead className="hidden sm:table-cell text-right">Balance (₹)</TableHead>
+              {currentUser?.role === 'Admin' && <TableHead className="w-[80px] text-right">Actions</TableHead>}
             </TableRow>
-          ) : (
-            data.map(bill => (
-              <TableRow 
-                key={bill.id} 
-                className="group cursor-pointer hover:bg-muted/50"
-                onClick={() => setSelectedBillId(bill.id)}
-              >
-                <TableCell className="hidden md:table-cell font-medium text-xs text-muted-foreground">{bill.id}</TableCell>
-                <TableCell className="font-medium">{bill.customerName}</TableCell>
-                <TableCell>{bill.mobile}</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Badge variant="outline" className={
-                    getBillDisplayInfo(bill).status === 'Quotation' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' :
-                    bill.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                    bill.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                    bill.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                    'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                  }>
-                    {getBillDisplayInfo(bill).status}
-                  </Badge>
+          </TableHeader>
+          <TableBody>
+            {data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  No {type} bills found.
                 </TableCell>
-                <TableCell className="hidden md:table-cell text-right font-medium">
-                  {Number(bill.totalCost || 0).toLocaleString('en-IN')}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell text-right">
-                  <span className={bill.status === 'Settled' ? 'text-emerald-500 font-semibold' : 'text-orange-500 font-semibold'}>
-                    {Math.max(0, Number(bill.totalCost || 0) - (bill.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0) - (bill.discount || 0)).toLocaleString('en-IN')}
-                  </span>
-                </TableCell>
-                {currentUser?.role === 'Admin' && (
-                  <TableCell className="text-right">
-                    {(getBillDisplayInfo(bill).status === 'Quotation' || getBillDisplayInfo(bill).status === 'Upcoming' || getBillDisplayInfo(bill).status === 'Active' || getBillDisplayInfo(bill).status === 'Partially Active') ? (
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={(e) => handleCancelOrder(e, bill.id)} title="Delete Bill">
-                        <Trash className="w-4 h-4" />
-                      </Button>
-                    ) : null}
-                  </TableCell>
-                )}
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
+            ) : (
+              <>
+                {items.length > 0 && <TableRow style={{ height: `${items[0].start}px` }} />}
+                {items.map((virtualRow) => {
+                  const bill = data[virtualRow.index];
+                  return (
+                    <TableRow 
+                      key={bill.id} 
+                      className="group cursor-pointer hover:bg-muted/50 h-[65px]"
+                      onClick={() => setSelectedBillId(bill.id)}
+                    >
+                      <TableCell className="hidden md:table-cell font-medium text-xs text-muted-foreground">{bill.id}</TableCell>
+                      <TableCell className="font-medium">{bill.customerName}</TableCell>
+                      <TableCell>{bill.mobile}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant="outline" className={
+                          getBillDisplayInfo(bill).status === 'Quotation' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' :
+                          bill.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                          bill.status === 'Pending' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
+                          bill.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                          'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                        }>
+                          {getBillDisplayInfo(bill).status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-right font-medium">
+                        {Number(bill.totalCost || 0).toLocaleString('en-IN')}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-right">
+                        <span className={bill.status === 'Settled' ? 'text-emerald-500 font-semibold' : 'text-orange-500 font-semibold'}>
+                          {Math.max(0, Number(bill.totalCost || 0) - (bill.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0) - (bill.discount || 0)).toLocaleString('en-IN')}
+                        </span>
+                      </TableCell>
+                      {currentUser?.role === 'Admin' && (
+                        <TableCell className="text-right">
+                          {(getBillDisplayInfo(bill).status === 'Quotation' || getBillDisplayInfo(bill).status === 'Upcoming' || getBillDisplayInfo(bill).status === 'Active' || getBillDisplayInfo(bill).status === 'Partially Active') ? (
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={(e) => handleCancelOrder(e, bill.id)} title="Delete Bill">
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          ) : null}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })}
+                {items.length > 0 && <TableRow style={{ height: `${virtualizer.getTotalSize() - items[items.length - 1].end}px` }} />}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -251,34 +276,34 @@ export default function Bills() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full h-auto p-0 bg-transparent flex flex-wrap gap-2 sm:gap-3 justify-start items-center border-none shadow-none">
+        <TabsList className="w-full h-auto p-1 bg-transparent flex flex-nowrap overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-2 sm:gap-3 justify-start items-center border-none shadow-none">
           <TabsTrigger 
             value="upcoming" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="snap-start shrink-0 rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Upcoming ({upcomingBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="active" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="snap-start shrink-0 rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Active ({activeBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="pending" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="snap-start shrink-0 rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Pending ({pendingBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="settled" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="snap-start shrink-0 rounded-full border border-border bg-card hover:bg-muted/60 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Settled ({settledBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="quotations" 
-            className="rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:text-white data-[state=active]:border-purple-600 shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="snap-start shrink-0 rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-5 py-2.5 text-sm font-medium transition-all duration-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:text-white data-[state=active]:border-purple-600 shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Quotations ({quotationBills.length})
           </TabsTrigger>

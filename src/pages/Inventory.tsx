@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStore } from '../store/useStore';
 import { InventoryItem } from '../types';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,8 @@ import { Plus, Search, Trash2, Edit, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Inventory() {
-  const { inventory, setInventory } = useStore();
+  const inventory = useStore(state => state.inventory);
+  const setInventory = useStore(state => state.setInventory);
   const [searchTerm, setSearchTerm] = useState('');
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -17,11 +19,21 @@ export default function Inventory() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
+  
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const filteredInventory = inventory.filter(item => 
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const virtualizer = useVirtualizer({
+    count: filteredInventory.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 65,
+    overscan: 5,
+  });
+  const items = virtualizer.getVirtualItems();
 
   const handleOpenDialog = (item?: InventoryItem) => {
     if (item) {
@@ -140,8 +152,9 @@ export default function Inventory() {
           </div>
         </div>
         
+      <div ref={parentRef} className="bg-card border border-border rounded-xl shadow-sm overflow-auto max-h-[600px]">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader className="bg-muted/50 sticky top-0 z-10">
             <TableRow>
               <TableHead>Item Name</TableHead>
               <TableHead className="hidden sm:table-cell">Category</TableHead>
@@ -157,27 +170,34 @@ export default function Inventory() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredInventory.map(item => (
-                <TableRow key={item.id} className="group">
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                      {item.category}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">{item.price.toLocaleString('en-IN')}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1 sm:gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenDialog(item)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+              <>
+                {items.length > 0 && <TableRow style={{ height: `${items[0].start}px` }} />}
+                {items.map((virtualRow) => {
+                  const item = filteredInventory[virtualRow.index];
+                  return (
+                    <TableRow key={item.id} className="group h-[65px]">
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                          {item.category}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">{item.price.toLocaleString('en-IN')}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1 sm:gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenDialog(item)}>
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {items.length > 0 && <TableRow style={{ height: `${virtualizer.getTotalSize() - items[items.length - 1].end}px` }} />}
+              </>
             )}
           </TableBody>
         </Table>
