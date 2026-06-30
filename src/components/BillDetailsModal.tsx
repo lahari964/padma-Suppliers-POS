@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useStore } from '../store/useStore';
 import { getBillDisplayInfo } from '../hooks/useBillCalculations';
 import { format, differenceInDays, differenceInHours, parseISO } from 'date-fns';
