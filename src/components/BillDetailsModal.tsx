@@ -765,9 +765,6 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const createdDateStr = bill.eventDate || format(new Date(parseInt(bill.id.split('-')[1])), 'dd-MM-yyyy');
 
   const handleConvertToOrder = () => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const isEventArrived = bill.eventDate && bill.eventDate <= todayStr;
-    
     // Deduct stock for all items since it's now an official order
     bill.items.forEach(item => {
       updateInventoryQty(item.inventoryId, -item.qtyIssued);
@@ -775,32 +772,25 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
     let updatedBillPayload: any = {
       isQuotation: false,
-      status: isEventArrived ? 'Active' : 'Upcoming',
-      billingStarted: isEventArrived ? true : undefined,
+      status: 'Upcoming',
+      totalCost: dynamicQuotationTotal,
+      items: bill.items.map(i => {
+        const days = Number(getQuotationDays(i.id)) || 1;
+        return { ...i, days };
+      }),
       auditTrail: [
         ...(bill.auditTrail || []),
         {
           timestamp: Date.now(),
           action: 'Converted to Order',
           employeeName: currentUser?.name || 'System',
-          details: `Converted from Quotation. Status set to ${isEventArrived ? 'Active' : 'Upcoming'}.`
+          details: 'Converted from Quotation to Upcoming Order.'
         }
       ]
     };
 
-    if (isEventArrived) {
-      updatedBillPayload.items = bill.items.map(i => ({
-        ...i,
-        isDispatched: true,
-        dispatchDate: todayStr,
-        dispatchTime: format(new Date(), 'HH:mm'),
-        issueDate: bill.eventDate || todayStr,
-        issueTime: bill.eventTime || format(new Date(), 'HH:mm')
-      }));
-    }
-
     updateBill(bill.id, updatedBillPayload);
-    toast.success(`Quotation converted successfully to ${isEventArrived ? 'Active' : 'Upcoming'} Order!`);
+    toast.success('Quotation converted successfully to Upcoming Order!');
   };
 
   return (
