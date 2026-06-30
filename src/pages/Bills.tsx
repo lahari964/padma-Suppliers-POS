@@ -279,31 +279,31 @@ export default function Bills() {
         <TabsList className="w-full h-auto p-1 bg-transparent flex flex-wrap justify-start items-center gap-1.5 sm:gap-3 border-none shadow-none">
           <TabsTrigger 
             value="upcoming" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-2.5 py-1 sm:px-5 sm:py-2.5 text-[11px] sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="flex-1 min-w-fit rounded-full border border-border bg-card hover:bg-muted/60 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Upcoming ({upcomingBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="active" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-2.5 py-1 sm:px-5 sm:py-2.5 text-[11px] sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="flex-1 min-w-fit rounded-full border border-border bg-card hover:bg-muted/60 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Active ({activeBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="pending" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-2.5 py-1 sm:px-5 sm:py-2.5 text-[11px] sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="flex-1 min-w-fit rounded-full border border-border bg-card hover:bg-muted/60 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Pending ({pendingBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="settled" 
-            className="rounded-full border border-border bg-card hover:bg-muted/60 px-2.5 py-1 sm:px-5 sm:py-2.5 text-[11px] sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="flex-1 min-w-fit rounded-full border border-border bg-card hover:bg-muted/60 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Settled ({settledBills.length})
           </TabsTrigger>
           <TabsTrigger 
             value="quotations" 
-            className="rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-2.5 py-1 sm:px-5 sm:py-2.5 text-[11px] sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:text-white data-[state=active]:border-purple-600 shadow-sm hover:shadow data-[state=active]:shadow-md"
+            className="flex-1 min-w-fit rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:text-white data-[state=active]:border-purple-600 shadow-sm hover:shadow data-[state=active]:shadow-md"
           >
             Quotations ({quotationBills.length})
           </TabsTrigger>
