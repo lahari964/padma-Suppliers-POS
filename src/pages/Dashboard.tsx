@@ -8,6 +8,7 @@ import { useBillCalculations, getBillDisplayInfo } from '../hooks/useBillCalcula
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { PendingBillingAlert } from '../components/PendingBillingAlert';
 
 export default function Dashboard() {
   const bills = useStore(state => state.bills);
@@ -165,32 +166,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {pendingBillingBills.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 font-bold text-lg shrink-0">
-                      {pendingBillingBills.length}
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-blue-900 dark:text-blue-300">Pending Billing Start</h4>
-                        <div className="text-xs text-blue-700/80 dark:text-blue-400/80 mt-1 leading-relaxed">
-                          {pendingBillingBills.map(b => (
-                            <span key={b.id} className="block">
-                              • <span className="font-semibold">{b.customerName}</span> 
-                              <span className="opacity-80"> ({b.eventDate === format(new Date(), 'yyyy-MM-dd') ? 'Event starts today' : `Event started on ${formatToDDMMYYYY(b.eventDate)}`})</span>
-                            </span>
-                          ))}
-                        </div>
-                    </div>
-                  </div>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm whitespace-nowrap shrink-0" 
-                    onClick={() => navigate('/bills?action=pending-billing')}
-                  >
-                    Start Billing
-                  </Button>
-                </div>
-              )}
+              <PendingBillingAlert bills={pendingBillingBills} onViewAll={() => navigate('/bills?action=pending-billing')} />
 
               {overduePayments.length === 0 && overdueReturns.length === 0 && pendingBillingBills.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-10 text-muted-foreground border border-dashed rounded-xl bg-muted/20 h-full">
