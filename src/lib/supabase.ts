@@ -29,11 +29,59 @@ export const syncDownFromCloud = async (): Promise<{success: boolean, error?: st
     }
 
     const { bills, inventory, employees } = result.data;
+    
+    const state = useStore.getState();
+    const lastSyncStr = state.lastSyncTime;
+    const lastSyncDate = lastSyncStr ? new Date(lastSyncStr).getTime() : 0;
 
-    // Update Zustand Store (which automatically updates localStorage via the actions/setters)
-    if (bills) useStore.getState().setBills(bills as Bill[]);
-    if (inventory) useStore.getState().setInventory(inventory as InventoryItem[]);
-    if (employees) useStore.getState().setEmployees(employees as Employee[]);
+    if (bills) {
+      const cloudBills = bills as Bill[];
+      const mergedBills = cloudBills.map(cloudBill => {
+        const localBill = state.bills.find(b => b.id === cloudBill.id);
+        if (!localBill) return cloudBill; // New from cloud
+        
+        const localUpdated = localBill.updatedAt ? new Date(localBill.updatedAt).getTime() : 0;
+        
+        // If locally modified AFTER last sync, AND cloud is different -> CONFLICT
+        if (localUpdated > lastSyncDate && localBill.updatedAt !== cloudBill.updatedAt) {
+          return {
+            ...localBill,
+            hasConflict: true,
+            conflictData: JSON.stringify(cloudBill)
+          };
+        }
+        
+        return cloudBill; // Cloud wins if no local changes
+      });
+      
+      // Add local bills that haven't been pushed yet (not in cloud)
+      const localOnly = state.bills.filter(b => !cloudBills.some(cb => cb.id === b.id));
+      state.setBills([...mergedBills, ...localOnly]);
+    }
+
+    if (inventory) {
+      const cloudInv = inventory as InventoryItem[];
+      const mergedInv = cloudInv.map(cloudItem => {
+        const localItem = state.inventory.find(i => i.id === cloudItem.id);
+        if (!localItem) return cloudItem;
+
+        const localUpdated = localItem.updatedAt ? new Date(localItem.updatedAt).getTime() : 0;
+        
+        if (localUpdated > lastSyncDate && localItem.updatedAt !== cloudItem.updatedAt) {
+          return {
+            ...localItem,
+            hasConflict: true,
+            qtyAvailable: cloudItem.qtyAvailable! < 0 ? 0 : localItem.qtyAvailable // negative stock fix
+          };
+        }
+        return cloudItem;
+      });
+      
+      const localOnlyInv = state.inventory.filter(i => !cloudInv.some(ci => ci.id === i.id));
+      state.setInventory([...mergedInv, ...localOnlyInv]);
+    }
+
+    if (employees) state.setEmployees(employees as Employee[]);
 
     useStore.getState().setIsDatabaseConnected(true);
     useStore.getState().setLastSyncTime(new Date().toISOString());

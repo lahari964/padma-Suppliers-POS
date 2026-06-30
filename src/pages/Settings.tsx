@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
-import { Trash2, Plus, UserCircle, Bell, Download, FileText, Settings as SettingsIcon, Package, Database, Sun, Moon, Activity, Wrench, Code, AlertTriangle, Key, Menu } from 'lucide-react';
+import { Trash2, Plus, UserCircle, Bell, Download, FileText, Settings as SettingsIcon, Package, Database, Sun, Moon, Activity, Wrench, Code, AlertTriangle, Key, Menu, Save, CheckCircle2, CloudUpload, RefreshCw, Smartphone, ArrowRight, Table, Server, Cpu, DatabaseBackup, Lock } from 'lucide-react';
 import { syncUpToCloud } from '../lib/supabase';
 import { getBillDisplayInfo } from '../hooks/useBillCalculations';
 import { format } from 'date-fns';
@@ -229,7 +229,10 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
 
+  const hasConflicts = bills.some(b => b.hasConflict) || inventory.some(i => i.hasConflict);
+
   const tabs = [
+    ...(hasConflicts ? [{ name: 'Conflicts', icon: AlertTriangle }] : []),
     { name: 'Password', icon: KeyRound },
     ...(currentUser?.role !== 'Staff' ? [{ name: 'General', icon: SettingsIcon }] : []),
     ...(currentUser?.role === 'Admin' ? [{ name: 'Staff', icon: UserCircle }] : []),
@@ -394,8 +397,113 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
           </Button>
           <h2 className="text-xl font-bold">{activeTab} Settings</h2>
         </div>
-        
-                {/* --- GENERAL TAB --- */}
+        {/* --- CONFLICTS TAB --- */}
+        {activeTab === 'Conflicts' && (
+          <div className="w-full space-y-8 animate-in fade-in duration-300">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-6 h-6 text-amber-500" />
+                <h3 className="text-xl font-bold tracking-tight text-amber-500">Sync Conflicts Detected</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">The following records were modified offline on this device AND modified on another device simultaneously. Please choose which version to keep.</p>
+            </div>
+
+            {hasConflicts ? (
+              <div className="space-y-6">
+                {bills.filter(b => b.hasConflict).map(bill => {
+                  let cloudBill: any = null;
+                  try { if(bill.conflictData) cloudBill = JSON.parse(bill.conflictData); } catch(e){}
+                  
+                  return (
+                    <div key={bill.id} className="bg-card border border-amber-500/30 rounded-2xl p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-lg">Bill: {bill.customerName} (₹{bill.totalAmount})</h4>
+                        <span className="text-xs bg-amber-500/10 text-amber-500 px-2 py-1 rounded-md">Bill Conflict</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="border border-border rounded-xl p-4 space-y-2 bg-muted/20">
+                          <h5 className="font-bold text-sm text-primary">Local Version (This Device)</h5>
+                          <p className="text-xs text-muted-foreground">Last Edited: {bill.updatedAt ? new Date(bill.updatedAt).toLocaleString() : 'N/A'}</p>
+                          <ul className="text-xs space-y-1">
+                            <li>Status: {bill.status}</li>
+                            <li>Total: ₹{bill.totalAmount}</li>
+                            <li>Items: {bill.items?.length || 0}</li>
+                          </ul>
+                          <Button 
+                            className="w-full mt-2" 
+                            variant="default"
+                            onClick={() => {
+                              const updated = { ...bill };
+                              delete updated.hasConflict;
+                              delete updated.conflictData;
+                              useStore.getState().updateBill(updated.id, updated);
+                              toast.success('Local version kept');
+                            }}
+                          >
+                            Keep Local Version
+                          </Button>
+                        </div>
+                        
+                        <div className="border border-border rounded-xl p-4 space-y-2 bg-muted/20">
+                          <h5 className="font-bold text-sm text-blue-500">Cloud Version (Remote)</h5>
+                          <p className="text-xs text-muted-foreground">Last Edited: {cloudBill?.updatedAt ? new Date(cloudBill.updatedAt).toLocaleString() : 'N/A'}</p>
+                          <ul className="text-xs space-y-1">
+                            <li>Status: {cloudBill?.status || 'N/A'}</li>
+                            <li>Total: ₹{cloudBill?.totalAmount || 0}</li>
+                            <li>Items: {cloudBill?.items?.length || 0}</li>
+                          </ul>
+                          <Button 
+                            className="w-full mt-2" 
+                            variant="outline"
+                            onClick={() => {
+                              if(cloudBill) {
+                                const updated = { ...cloudBill };
+                                delete updated.hasConflict;
+                                delete updated.conflictData;
+                                useStore.getState().updateBill(updated.id, updated);
+                                toast.success('Cloud version kept');
+                              }
+                            }}
+                          >
+                            Keep Cloud Version
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {inventory.filter(i => i.hasConflict).map(item => (
+                  <div key={item.id} className="bg-card border border-red-500/30 rounded-2xl p-6 space-y-4">
+                     <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-lg">Inventory: {item.name}</h4>
+                        <span className="text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded-md">Negative Stock Check</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">The cloud sync attempted to push negative stock for this item due to conflicting rentals. The local stock was protected.</p>
+                      <Button 
+                        onClick={() => {
+                          const updated = { ...item };
+                          delete updated.hasConflict;
+                          useStore.getState().updateInventoryItem(updated.id, updated);
+                          toast.success('Inventory conflict dismissed');
+                        }}
+                      >
+                        Acknowledge & Dismiss
+                      </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                <p>All conflicts resolved! Your data is in sync.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --- GENERAL TAB --- */}
         {activeTab === 'General' && (
           <div className="w-full space-y-8 animate-in fade-in duration-300">
             <div className="space-y-1">

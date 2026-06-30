@@ -2,7 +2,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import { ReactNode, useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { Home, ListTodo, Package, Settings, LogOut, Sun, Moon, BookOpen, Calendar, CloudUpload, RefreshCw, Clock, CheckCircle2, Percent } from 'lucide-react';
+import { Home, ListTodo, Package, Settings, LogOut, Sun, Moon, BookOpen, Calendar, CloudUpload, RefreshCw, Clock, CheckCircle2, Percent, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { syncUpToCloud, syncDownFromCloud } from '../lib/supabase';
 import { toast } from '@/components/ui/sonner';
@@ -53,6 +53,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const currentUser = useStore(state => state.currentUser);
   const setCurrentUser = useStore(state => state.setCurrentUser);
   const employees = useStore(state => state.employees);
+  const bills = useStore(state => state.bills);
+  const inventory = useStore(state => state.inventory);
+  const hasConflicts = bills.some(b => b.hasConflict) || inventory.some(i => i.hasConflict);
+  
   const isDatabaseConnected = useStore(state => state.isDatabaseConnected);
   const setIsDatabaseConnected = useStore(state => state.setIsDatabaseConnected);
   const lastSyncTime = useStore(state => state.lastSyncTime);
@@ -267,6 +271,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
               <Button size="sm" variant="outline" className="h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 whitespace-nowrap" onClick={() => navigate('/settings')}>
                 Go to Settings
+              </Button>
+            </div>
+          )}
+
+          {hasConflicts && (
+            <div className="bg-amber-500/10 border-b border-amber-500/20 p-2.5 px-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400 text-center sm:text-left">
+                  Sync Conflicts Detected! Some records were modified offline and on another device simultaneously.
+                </p>
+              </div>
+              <Button size="sm" variant="outline" className="h-7 text-xs border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 whitespace-nowrap" onClick={() => navigate('/settings')}>
+                Resolve Conflicts
               </Button>
             </div>
           )}
