@@ -241,10 +241,10 @@ export default function HelpCenter() {
                 value={`category-${idx}`} 
                 className="bg-card border border-border rounded-xl shadow-sm px-2 overflow-hidden"
               >
-                <AccordionTrigger className="hover:no-underline px-4 py-5">
-                  <div className="flex items-center gap-3">
-                    {category.icon}
-                    <h2 className="text-xl font-semibold text-foreground">{category.category}</h2>
+                <AccordionTrigger className="hover:no-underline px-4 py-5 text-left">
+                  <div className="flex items-center gap-3 text-left w-full justify-start">
+                    <div className="shrink-0">{category.icon}</div>
+                    <h2 className="text-xl font-semibold text-foreground text-left">{category.category}</h2>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="p-0 border-t border-border">
