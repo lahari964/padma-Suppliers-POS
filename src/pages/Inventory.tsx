@@ -202,6 +202,7 @@ export default function Inventory() {
           </TableBody>
         </Table>
       </div>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
