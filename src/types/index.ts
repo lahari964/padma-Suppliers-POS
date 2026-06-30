@@ -62,6 +62,7 @@ export type Bill = {
   customServices?: CustomService[];
   auditTrail?: AuditLog[];
   updatedAt?: string;
+  validUntil?: string;
   hasConflict?: boolean;
   conflictData?: string; // stores JSON of the conflicting cloud version
 };

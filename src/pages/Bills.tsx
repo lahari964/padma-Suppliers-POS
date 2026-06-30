@@ -174,7 +174,16 @@ export default function Bills() {
                       onClick={() => setSelectedBillId(bill.id)}
                     >
                       <TableCell className="hidden md:table-cell font-medium text-xs text-muted-foreground">{bill.id}</TableCell>
-                      <TableCell className="font-medium">{bill.customerName}</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex flex-col">
+                          <span>{bill.customerName}</span>
+                          {bill.isQuotation && bill.validUntil && bill.validUntil < new Date().toISOString().split('T')[0] && (
+                            <span className="text-[10px] text-destructive font-semibold flex items-center gap-1 mt-0.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse"></span> Expired
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{bill.mobile}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Badge variant="outline" className={
@@ -276,7 +285,7 @@ export default function Bills() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full h-auto p-1 bg-transparent flex flex-wrap justify-start items-center gap-1.5 sm:gap-3 border-none shadow-none">
+        <TabsList className="w-full h-auto p-1 bg-transparent flex overflow-x-auto flex-nowrap justify-start items-center gap-2 border-none shadow-none pb-2 hide-scrollbar">
           <TabsTrigger 
             value="upcoming" 
             className="flex-1 min-w-fit rounded-full border border-border bg-card hover:bg-muted/60 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary shadow-sm hover:shadow data-[state=active]:shadow-md"

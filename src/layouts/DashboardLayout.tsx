@@ -199,30 +199,32 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-background border border-border">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-background border border-border">
                 {isCheckingConnection ? (
                   <>
                     <div className="w-3 h-3 rounded-full border-2 border-muted-foreground border-t-transparent animate-spin"></div>
-                    <span className="text-xs font-medium text-muted-foreground">Checking...</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground hidden sm:inline-block">Checking...</span>
                   </>
                 ) : isDatabaseConnected ? (
                   <>
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Connected</span>
-                    <span className="text-[10px] text-muted-foreground ml-2 border-l pl-2 mr-2">Sync: {lastSyncTime}</span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={handleDownload} title="Download/Refresh from Cloud">
-                      <RefreshCw className="w-3.5 h-3.5" />
+                    <span className="text-[10px] sm:text-xs font-medium text-emerald-700 dark:text-emerald-400 hidden sm:inline-block">Connected</span>
+                    <span className="text-[9px] sm:text-[10px] text-muted-foreground sm:ml-2 sm:border-l sm:pl-2 sm:mr-2">
+                      {lastSyncTime ? new Date(lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No Sync'}
+                    </span>
+                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={handleDownload} title="Download/Refresh from Cloud">
+                      <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50" onClick={handleUpload} title="Upload Local Data to Cloud">
-                      <CloudUpload className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 hidden sm:flex" onClick={handleUpload} title="Upload Local Data to Cloud">
+                      <CloudUpload className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
                   </>
                 ) : (
                   <>
                     <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                    <span className="text-xs font-medium text-red-600 dark:text-red-400">Offline</span>
-                    <Button variant="ghost" size="sm" className="h-5 px-2 ml-1 text-[10px]" onClick={() => navigate('/settings')}>
-                      Configure
+                    <span className="text-[10px] sm:text-xs font-medium text-red-600 dark:text-red-400 hidden sm:inline-block">Offline</span>
+                    <Button variant="ghost" size="sm" className="h-5 px-2 ml-1 text-[9px] sm:text-[10px]" onClick={() => navigate('/settings')}>
+                      Config
                     </Button>
                   </>
                 )}

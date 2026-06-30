@@ -788,12 +788,23 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   // Timeline Data Compilation
   const totalIssued = bill.items.reduce((acc, item) => acc + item.qtyIssued, 0);
   const createdDateStr = bill.eventDate || format(new Date(parseInt(bill.id.split('-')[1])), 'dd-MM-yyyy');
+  const isQuotationExpired = bill.isQuotation && bill.validUntil && bill.validUntil < format(new Date(), 'yyyy-MM-dd');
 
   const [isConverting, setIsConverting] = useState(false);
   const handleConvertToOrder = () => {
+    // 1. Pre-conversion stock check (A3)
+    const unavailableItems = bill.items.filter(item => {
+      const invItem = inventory.find(i => i.id === item.inventoryId);
+      return !invItem || (invItem.qtyAvailable || 0) < item.qtyIssued;
+    });
+
+    if (unavailableItems.length > 0) {
+      toast.error(`Cannot convert! Insufficient stock for: ${unavailableItems.map(i => i.name).join(', ')}`);
+      return;
+    }
+
     setIsConverting(true);
     // Deduct stock for all items since it's now an official order
-    // (User opted to force through stock even if negative)
     bill.items.forEach(item => {
       updateInventoryQty(item.inventoryId, -item.qtyIssued);
     });
@@ -1022,8 +1033,17 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             </div>
 
             {bill.isQuotation && (
-              <div className="col-span-2 md:col-span-4 mt-4">
-                <Button onClick={handleConvertToOrder} disabled={isConverting} className="w-full h-12 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md transition-all">
+              <div className="col-span-2 md:col-span-4 mt-4 space-y-3">
+                {isQuotationExpired && (
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg flex items-start gap-3">
+                    <TriangleAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-sm">Quotation Expired</p>
+                      <p className="text-xs mt-1">This quotation was valid until {bill.validUntil}. You cannot convert it to an official order without generating a new quotation.</p>
+                    </div>
+                  </div>
+                )}
+                <Button onClick={handleConvertToOrder} disabled={isConverting || isQuotationExpired} className="w-full h-12 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md transition-all">
                   {isConverting ? 'Converting...' : 'Convert to Official Order'}
                 </Button>
               </div>

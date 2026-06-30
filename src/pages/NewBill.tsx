@@ -36,6 +36,7 @@ export default function NewBill() {
   const [mobile, setMobile] = useState('');
   const [address, setAddress] = useState('');
   const [eventDate, setEventDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [validUntil, setValidUntil] = useState(format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
   const [eventTime, setEventTime] = useState(format(new Date(), 'HH:mm'));
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [transportation, setTransportation] = useState('');
@@ -187,6 +188,7 @@ export default function NewBill() {
       eventDate,
       eventTime,
       expectedReturnDate,
+      validUntil: isQuotation ? validUntil : undefined,
       transportationCharges: Number(transportation) || 0,
       notes,
       isQuotation,
@@ -285,6 +287,12 @@ export default function NewBill() {
               <Label className="text-sm font-semibold text-foreground">Event / Outward Date</Label>
               <DatePicker className="h-11 rounded-xl" value={eventDate} onChange={(date) => setEventDate(date)} />
             </div>
+            {isQuotation && (
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-foreground">Quotation Valid Until</Label>
+                <DatePicker className="h-11 rounded-xl" value={validUntil} onChange={(date) => setValidUntil(date)} />
+              </div>
+            )}
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-foreground">Event Time</Label>
               <TimePicker className="bg-background border-border h-11 rounded-xl w-32" value={eventTime} onChange={setEventTime} />
