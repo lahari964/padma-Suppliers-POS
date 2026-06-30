@@ -225,11 +225,9 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
   };
 
 
-  // Export State
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
-
-  const hasConflicts = bills.some(b => b.hasConflict) || inventory.some(i => i.hasConflict);
+  const hasConflicts = bills.some(b => b.hasConflict);
 
   const tabs = [
     ...(hasConflicts ? [{ name: 'Conflicts', icon: AlertTriangle }] : []),
@@ -474,25 +472,6 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                   );
                 })}
 
-                {inventory.filter(i => i.hasConflict).map(item => (
-                  <div key={item.id} className="bg-card border border-red-500/30 rounded-2xl p-6 space-y-4">
-                     <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-lg">Inventory: {item.name}</h4>
-                        <span className="text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded-md">Negative Stock Check</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">The cloud sync attempted to push negative stock for this item due to conflicting rentals. The local stock was protected.</p>
-                      <Button 
-                        onClick={() => {
-                          const updated = { ...item };
-                          delete updated.hasConflict;
-                          useStore.getState().updateInventoryItem(updated.id, updated);
-                          toast.success('Inventory conflict dismissed');
-                        }}
-                      >
-                        Acknowledge & Dismiss
-                      </Button>
-                  </div>
-                ))}
               </div>
             ) : (
               <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground">

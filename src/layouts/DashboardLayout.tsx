@@ -54,8 +54,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const setCurrentUser = useStore(state => state.setCurrentUser);
   const employees = useStore(state => state.employees);
   const bills = useStore(state => state.bills);
-  const inventory = useStore(state => state.inventory);
-  const hasConflicts = bills.some(b => b.hasConflict) || inventory.some(i => i.hasConflict);
+  const hasConflicts = bills.some(b => b.hasConflict);
   
   const isDatabaseConnected = useStore(state => state.isDatabaseConnected);
   const setIsDatabaseConnected = useStore(state => state.setIsDatabaseConnected);

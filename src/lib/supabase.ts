@@ -61,24 +61,10 @@ export const syncDownFromCloud = async (): Promise<{success: boolean, error?: st
 
     if (inventory) {
       const cloudInv = inventory as InventoryItem[];
-      const mergedInv = cloudInv.map(cloudItem => {
-        const localItem = state.inventory.find(i => i.id === cloudItem.id);
-        if (!localItem) return cloudItem;
-
-        const localUpdated = localItem.updatedAt ? new Date(localItem.updatedAt).getTime() : 0;
-        
-        if (localUpdated > lastSyncDate && localItem.updatedAt !== cloudItem.updatedAt) {
-          return {
-            ...localItem,
-            hasConflict: true,
-            qtyAvailable: cloudItem.qtyAvailable! < 0 ? 0 : localItem.qtyAvailable // negative stock fix
-          };
-        }
-        return cloudItem;
-      });
       
+      // Add local items that haven't been pushed yet (not in cloud)
       const localOnlyInv = state.inventory.filter(i => !cloudInv.some(ci => ci.id === i.id));
-      state.setInventory([...mergedInv, ...localOnlyInv]);
+      state.setInventory([...cloudInv, ...localOnlyInv]);
     }
 
     if (employees) state.setEmployees(employees as Employee[]);
