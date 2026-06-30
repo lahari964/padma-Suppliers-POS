@@ -117,7 +117,8 @@ export default function NewBill() {
         inventoryId: item.id,
         name: item.name,
         price: item.price,
-        qty: qty
+        qty: qty,
+        days: 1
       }];
     });
     toast.success(`${qty}x ${item.name} added`, { 
@@ -134,6 +135,11 @@ export default function NewBill() {
     setStagedItems(prev => prev.map(i => i.inventoryId === inventoryId ? { ...i, qty: newQty } : i));
   };
 
+  const updateItemDays = (inventoryId: string, newDays: number) => {
+    if (newDays <= 0) return;
+    setStagedItems(prev => prev.map(i => i.inventoryId === inventoryId ? { ...i, days: newDays } : i));
+  };
+
   const updateItemPrice = (inventoryId: string, newPrice: number) => {
     if (newPrice < 0) return;
     setStagedItems(prev => prev.map(i => i.inventoryId === inventoryId ? { ...i, price: newPrice } : i));
@@ -144,7 +150,7 @@ export default function NewBill() {
   };
 
   const calculateTotal = () => {
-    const subtotal = stagedItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const subtotal = stagedItems.reduce((acc, item) => acc + (item.price * item.qty * (item.days || 1)), 0);
     const servicesTotal = customServices.reduce((acc, service) => acc + service.price, 0);
     return subtotal + servicesTotal + (Number(transportation) || 0) - (Number(discount) || 0);
   };
@@ -201,7 +207,7 @@ export default function NewBill() {
         issueTimestamp: Date.now(),
         qtyIssued: item.qty,
         qtyReturned: 0,
-        days: 1,
+        days: item.days || 1,
         isDispatched: initialStatus === 'Active',
         dispatchDate: initialStatus === 'Active' ? format(new Date(), 'yyyy-MM-dd') : undefined,
         dispatchTime: initialStatus === 'Active' ? format(new Date(), 'HH:mm') : undefined,
@@ -383,13 +389,14 @@ export default function NewBill() {
                   <TableHead className="font-bold">Item</TableHead>
                   <TableHead className="text-center font-bold w-32">Daily Rate</TableHead>
                   <TableHead className="text-center font-bold w-32">Qty</TableHead>
+                  {isQuotation && <TableHead className="text-center font-bold w-24">Days</TableHead>}
                   <TableHead className="text-center font-bold w-16"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody ref={animationParent}>
                 {stagedItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No equipment added</TableCell>
+                    <TableCell colSpan={isQuotation ? 5 : 4} className={`text-center text-muted-foreground ${compactView ? "h-16" : "h-24"}`}>No equipment added</TableCell>
                   </TableRow>
                 ) : (
                   stagedItems.map((item) => (
@@ -418,6 +425,18 @@ export default function NewBill() {
                           onChange={(e) => updateItemQty(item.inventoryId, Number(e.target.value))}
                         />
                       </TableCell>
+                      {isQuotation && (
+                        <TableCell>
+                          <Input 
+                            type="number" 
+                            min="1" 
+                            className={`${compactView ? "h-7 text-xs" : "h-8"} w-16 text-center mx-auto bg-background`} 
+                            value={item.days || 1} 
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => updateItemDays(item.inventoryId, Number(e.target.value))}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="text-center">
                         <Button variant="ghost" size="icon" onClick={() => removeStagedItem(item.inventoryId)} className={`${compactView ? "w-7 h-7" : "w-8 h-8"} text-destructive hover:text-destructive hover:bg-destructive/10`} title="Remove Item">
                           <Trash2 className="w-4 h-4" />

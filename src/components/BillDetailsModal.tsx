@@ -1328,8 +1328,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="w-[50%]">Item</TableHead>
+                      <TableHead className="w-[40%]">Item</TableHead>
                       <TableHead className="text-center">Rate</TableHead>
+                      <TableHead className="text-center">Days</TableHead>
                       <TableHead className="text-center">Requested Qty</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -1340,6 +1341,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           <p className="font-semibold text-foreground">{item.name}</p>
                         </TableCell>
                         <TableCell className="text-center">₹{item.price}</TableCell>
+                        <TableCell className="text-center font-medium">{item.days || 1}</TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
                       </TableRow>
                     ))}
@@ -1355,6 +1357,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                     <p className="font-semibold text-foreground text-base">{item.name}</p>
                     <div className="flex justify-between mt-2">
                       <span className="text-sm text-muted-foreground">Rate: ₹{item.price}</span>
+                      <span className="text-sm font-medium">Days: {item.days || 1}</span>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
                     </div>
                   </div>
