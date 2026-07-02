@@ -183,6 +183,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [hasDamages, setHasDamages] = useState(false);
   const [modalDamageQty, setModalDamageQty] = useState<number | ''>('');
   const [modalDamageCost, setModalDamageCost] = useState<number | ''>('');
+  const [isConverting, setIsConverting] = useState(false);
   
   if (!bill) return null;
 
@@ -790,7 +791,6 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const createdDateStr = bill.eventDate || format(new Date(parseInt(bill.id.split('-')[1])), 'dd-MM-yyyy');
   const isQuotationExpired = bill.isQuotation && bill.validUntil && bill.validUntil < format(new Date(), 'yyyy-MM-dd');
 
-  const [isConverting, setIsConverting] = useState(false);
   const handleConvertToOrder = () => {
     // 1. Pre-conversion stock check (A3)
     const unavailableItems = bill.items.filter(item => {
