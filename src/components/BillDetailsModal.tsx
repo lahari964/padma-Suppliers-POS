@@ -1124,7 +1124,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Button size="sm" onClick={() => openSendModal(item)} className="h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4">Send</Button>
-                            <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="h-9 px-3 text-destructive border-destructive/30 hover:bg-destructive/10">Edit / Delete</Button>
+                            <Button variant="outline" size="icon" onClick={() => openDeleteModal(item)} className="h-8 w-8 text-destructive border-destructive/30 hover:bg-destructive/10"><Trash2 className="w-4 h-4" /></Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1155,7 +1155,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                       </div>
                       <div className="flex items-center gap-3 mt-1">
                         <Button size="sm" onClick={() => openSendModal(item)} className="flex-1 h-11 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-base">Send</Button>
-                        <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="flex-1 h-11 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium">Edit / Delete</Button>
+                        <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="flex-1 h-11 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium"><Trash2 className="w-4 h-4 mx-auto" /></Button>
                       </div>
                     </div>
                   );
@@ -1443,7 +1443,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                         </TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="h-8 px-3 text-destructive border-destructive/30 hover:bg-destructive/10">Edit / Delete</Button>
+                          <Button variant="outline" size="icon" onClick={() => openDeleteModal(item)} className="h-8 w-8 text-destructive border-destructive/30 hover:bg-destructive/10"><Trash2 className="w-4 h-4" /></Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1477,7 +1477,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                       </div>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="w-full mt-3 h-10 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium">Edit / Delete</Button>
+                    <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="w-full mt-3 h-10 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium"><Trash2 className="w-4 h-4 mx-auto" /></Button>
                   </div>
                 ))}
               </div>
