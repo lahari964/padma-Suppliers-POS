@@ -203,7 +203,17 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const displayStatus = getBillDisplayInfo(bill).status;
 
   const handleDownloadPDF = () => {
-    window.print();
+    const originalTitle = document.title;
+    // Create a clean filename from the customer name
+    const safeCustomerName = (bill.customerName || 'Customer').replace(/[^a-zA-Z0-9 \-_]/g, '').trim();
+    document.title = bill.isQuotation ? `Quotation - ${safeCustomerName}` : `Bill - ${safeCustomerName}`;
+    
+    // Slight delay to ensure browser registers the title change before opening print dialog
+    setTimeout(() => {
+      window.print();
+      // Revert title back to normal after print dialog closes
+      document.title = originalTitle;
+    }, 50);
   };
 
   const handleAddCustomService = () => {
@@ -1536,7 +1546,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             <Button 
               variant="outline" 
               className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-1.5 sm:gap-2 col-span-1"
-              onClick={() => window.print()}
+              onClick={handleDownloadPDF}
             >
               <Printer className="w-4 h-4 shrink-0" /> <span className="truncate">Print</span>
             </Button>
@@ -1555,7 +1565,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
             <Button 
               variant="outline" 
               className="w-full md:w-auto h-12 px-6 rounded-xl font-bold bg-background hover:bg-muted border-border transition-all gap-2"
-              onClick={() => window.print()}
+              onClick={handleDownloadPDF}
             >
               <Printer className="w-4 h-4 shrink-0" /> Print
             </Button>
