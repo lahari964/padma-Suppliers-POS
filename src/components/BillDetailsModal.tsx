@@ -1421,6 +1421,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                       <TableHead className="text-center">Rate</TableHead>
                       <TableHead className="text-center w-24">Days</TableHead>
                       <TableHead className="text-center">Requested Qty</TableHead>
+                      <TableHead className="text-right w-32">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1441,6 +1442,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                           />
                         </TableCell>
                         <TableCell className="text-center font-medium">{item.qtyIssued}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="h-8 px-3 text-destructive border-destructive/30 hover:bg-destructive/10">Edit / Delete</Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -1473,6 +1477,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                       </div>
                       <span className="text-sm font-medium">Qty: {item.qtyIssued}</span>
                     </div>
+                    <Button variant="outline" size="sm" onClick={() => openDeleteModal(item)} className="w-full mt-3 h-10 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10 font-medium">Edit / Delete</Button>
                   </div>
                 ))}
               </div>
@@ -1555,19 +1560,24 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
 
         {/* Quotation Footer */}
         {bill.isQuotation && (
-          <div className="bg-card border-t border-border p-4 sm:px-8 flex items-center justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
+          <div className="bg-card border-t border-border p-4 sm:px-8 grid grid-cols-2 md:flex md:flex-row items-center justify-between md:justify-end gap-3 z-10 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] print:hidden">
+            {currentUser?.role !== 'Staff' && (
+              <Button variant="outline" onClick={() => setShowDiscountModal(true)} className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 text-sm sm:text-base transition-all gap-1.5 sm:gap-2 col-span-2 md:mr-auto">
+                <Tag className="w-4 h-4 shrink-0" /> <span className="truncate">Discount / Waive</span>
+              </Button>
+            )}
             <Button 
-              className="w-full md:w-auto h-12 px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-2 shadow-sm"
+              className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition-all gap-1.5 sm:gap-2 shadow-sm col-span-1"
               onClick={handleShareReceipt}
             >
-              <MessageCircle className="w-4 h-4 shrink-0" /> Share Quotation
+              <MessageCircle className="w-4 h-4 shrink-0" /> <span className="truncate">Share Quotation</span>
             </Button>
             <Button 
               variant="outline" 
-              className="w-full md:w-auto h-12 px-6 rounded-xl font-bold bg-background hover:bg-muted border-border transition-all gap-2"
+              className="w-full md:w-auto h-12 px-2 sm:px-6 rounded-xl font-bold bg-background hover:bg-muted border-border hover:border-primary/50 transition-all gap-1.5 sm:gap-2 col-span-1"
               onClick={handleDownloadPDF}
             >
-              <Printer className="w-4 h-4 shrink-0" /> Print
+              <Printer className="w-4 h-4 shrink-0" /> <span className="truncate">Print</span>
             </Button>
           </div>
         )}
