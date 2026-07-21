@@ -179,13 +179,13 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   return createPortal(
     <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex gap-4">
-          <div className="w-12 h-12 shrink-0">
+      <div className="flex justify-between items-start mb-5">
+        <div className="flex gap-3">
+          <div className="w-10 h-10 shrink-0 mt-1">
             <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-4xl font-serif font-bold uppercase tracking-tight leading-none mb-2">{biz.name || 'PADMA\nSUPPLIERS'}</h1>
+            <h1 className="text-2xl font-serif font-bold uppercase tracking-tight leading-tight mb-1">{biz.name || 'PADMA\nSUPPLIERS'}</h1>
             <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
             <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
             {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
@@ -200,7 +200,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
       </div>
 
       {/* Customer Info */}
-      <div className="border-t-2 border-b-2 border-black py-3 mb-6 space-y-1 text-sm">
+      <div className="border-t-2 border-b-2 border-black py-2 mb-4 space-y-0.5 text-sm">
         <p><span className="font-bold">Customer Name:</span> {bill.customerName}</p>
         <p><span className="font-bold">Mobile:</span> {bill.mobile}</p>
         {bill.address && <p><span className="font-bold">Address:</span> {bill.address}</p>}
