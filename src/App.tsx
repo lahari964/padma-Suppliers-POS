@@ -56,16 +56,16 @@ const App = () => {
     // Clear dynamic import reload flag on successful load
     sessionStorage.removeItem('chunk_failed_reload');
 
-    if (!preferences.businessDetails?.address?.includes('ganugapalem')) {
+    if (!preferences.businessDetails?.address?.includes('ganugapalem') || preferences.businessDetails?.name === 'Padma Suppliers') {
       setPreferences({
         businessDetails: {
           ...preferences.businessDetails,
-          name: 'Padma Suppliers',
+          name: 'Padma Suppliers, Events & Decorations',
           tagline: 'Premium Quality (since 1977)',
           address: 'ganugapalem, ongole, Andhra Pradesh -523001',
           phone: '+91 9000000000, +91 8000000000, +91 7000000000, 08592-200000',
           terms: '1. Transportation and delivery charges are extra.\n2. Customers are fully liable for any damage or loss of rented items and must cover repair/replacement costs.\n3. All payments must be settled strictly according to the prior agreed terms.\n4. Late returns will incur additional daily rental fees.',
-          signatureLabel: 'For Padma Suppliers'
+          signatureLabel: 'For Padma Suppliers, Events & Decorations'
         }
       });
     }
