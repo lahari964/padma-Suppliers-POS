@@ -185,7 +185,13 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
             <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-serif font-bold uppercase tracking-tight leading-tight mb-1">{biz.name || 'PADMA\nSUPPLIERS'}</h1>
+            <h1 className="text-2xl font-serif font-bold uppercase tracking-tight leading-tight mb-1">
+              {biz.name === 'Padma Suppliers, Events & Decorations' ? (
+                <>PADMA SUPPLIERS<br />EVENTS & DECORATIONS</>
+              ) : (
+                biz.name || 'PADMA\nSUPPLIERS'
+              )}
+            </h1>
             <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
             <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
             {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
