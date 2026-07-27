@@ -102,9 +102,27 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [setIsDatabaseConnected]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: NodeJS.Timeout | null = null;
     let consecutiveFailures = 0; // Tracks consecutive sync failures
     
+    const runSync = async () => {
+      timeout = null; // Clear pending state
+      const { success } = await syncUpToCloud();
+      if (success) {
+        consecutiveFailures = 0; // Reset on success
+        setIsDatabaseConnected(true);
+        const now = new Date();
+        useStore.setState({ lastSyncTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+      } else {
+        consecutiveFailures += 1;
+        setIsDatabaseConnected(false);
+        toast.error('Upload failed! Your changes are saved locally but not in the cloud. Please check internet and click Upload.', { 
+          id: 'db-fail',
+          duration: 10000
+        });
+      }
+    };
+
     const unsubscribe = useStore.subscribe((state, prevState) => {
       // Only trigger sync if actual data changed (ignore UI state changes)
       if (
@@ -112,29 +130,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         state.inventory !== prevState.inventory ||
         state.employees !== prevState.employees
       ) {
-        clearTimeout(timeout);
-        timeout = setTimeout(async () => {
-          const { success } = await syncUpToCloud();
-          if (success) {
-            consecutiveFailures = 0; // Reset on success
-            setIsDatabaseConnected(true);
-            const now = new Date();
-            useStore.setState({ lastSyncTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-          } else {
-            consecutiveFailures += 1;
-            setIsDatabaseConnected(false);
-            toast.error('Upload failed! Your changes are saved locally but not in the cloud. Please check internet and click Upload.', { 
-              id: 'db-fail',
-              duration: 10000
-            });
-          }
-        }, 2000); // Wait 2 seconds after the last change before pushing to cloud
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(runSync, 2000); // Wait 2 seconds after the last change before pushing to cloud
       }
     });
 
+    // If the user locks the phone or switches apps while a sync is pending, fire it immediately!
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && timeout) {
+        clearTimeout(timeout);
+        runSync();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       unsubscribe();
-      clearTimeout(timeout);
+      if (timeout) clearTimeout(timeout);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [setIsDatabaseConnected]);
 

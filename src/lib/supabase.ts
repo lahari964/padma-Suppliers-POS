@@ -94,6 +94,7 @@ export const syncUpToCloud = async (): Promise<{success: boolean, error?: string
   try {
     const response = await fetch('/api/sync', {
       method: 'POST',
+      keepalive: true, // Guarantees request finishes even if user closes the tab!
       headers: {
         'Authorization': password,
         'Content-Type': 'application/json'
