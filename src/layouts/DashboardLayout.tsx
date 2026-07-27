@@ -122,13 +122,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             useStore.setState({ lastSyncTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
           } else {
             consecutiveFailures += 1;
-            if (consecutiveFailures >= 3) {
-              // It failed 3 times in a row. This is a real outage.
-              setIsDatabaseConnected(false);
-              toast.error('Warning: Cloud database unreachable. Your changes are saved safely to your device.', { id: 'db-fail' });
-            } else {
-              console.warn(`Background auto-sync failed ${consecutiveFailures} time(s). Hiccup ignored.`);
-            }
+            setIsDatabaseConnected(false);
+            toast.error('Upload failed! Your changes are saved locally but not in the cloud. Please check internet and click Upload.', { 
+              id: 'db-fail',
+              duration: 10000
+            });
           }
         }, 2000); // Wait 2 seconds after the last change before pushing to cloud
       }
@@ -215,7 +213,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={handleDownload} title="Download/Refresh from Cloud">
                       <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 hidden sm:flex" onClick={handleUpload} title="Upload Local Data to Cloud">
+                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 flex" onClick={handleUpload} title="Upload Local Data to Cloud">
                       <CloudUpload className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
                   </>
