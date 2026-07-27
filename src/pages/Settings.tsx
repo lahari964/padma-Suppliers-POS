@@ -50,6 +50,21 @@ export default function Settings() {
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
 
+  const handleDownloadData = async () => {
+    toast.loading('Downloading data from database...', { id: 'sync-down' });
+    try {
+      const { syncDownFromCloud } = await import('../lib/supabase');
+      const { success, error } = await syncDownFromCloud();
+      if (success) {
+        toast.success('Download complete!', { id: 'sync-down' });
+      } else {
+        toast.error('Download failed: ' + error, { id: 'sync-down' });
+      }
+    } catch (e: any) {
+      toast.error('Error downloading: ' + e.message, { id: 'sync-down' });
+    }
+  };
+
   const handleHealthCheck = async () => {
     toast.loading('Pinging database cluster...', { id: 'db-ping' });
     try {
@@ -491,6 +506,19 @@ ALTER TABLE bills DISABLE ROW LEVEL SECURITY;
                 <h3 className="text-xl font-bold tracking-tight">General & Receipt Settings</h3>
               </div>
               <p className="text-sm text-muted-foreground">Manage global application preferences and customize printed receipts.</p>
+            </div>
+
+            <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-lg">Data Synchronization</h4>
+                  <p className="text-sm text-muted-foreground mt-1">Manually pull the latest data from the cloud database.</p>
+                </div>
+                <Button onClick={handleDownloadData} className="gap-2" variant="outline">
+                  <Download className="w-4 h-4" />
+                  Download the data from database
+                </Button>
+              </div>
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6 space-y-6">

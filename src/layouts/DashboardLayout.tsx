@@ -224,7 +224,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <span className="text-[9px] sm:text-[10px] text-muted-foreground sm:ml-2 sm:border-l sm:pl-2 sm:mr-2">
                       {lastSyncTime ? new Date(lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No Sync'}
                     </span>
-                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={handleDownload} title="Download/Refresh from Cloud">
+                    <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 hover:text-blue-600 hover:bg-blue-50 hidden sm:flex" onClick={handleDownload} title="Download/Refresh from Cloud">
                       <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </Button>
                     <Button variant="ghost" size="icon" className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 flex" onClick={handleUpload} title="Upload Local Data to Cloud">
