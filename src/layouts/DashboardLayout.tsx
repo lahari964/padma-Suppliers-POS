@@ -278,8 +278,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
                 </span>
-                <p className="text-sm font-medium text-destructive text-center sm:text-left">
-                  Website is offline now. Once connected, click the health check in Settings → Database.
+                <p className="text-sm font-bold text-destructive text-center sm:text-left">
+                  ⚠️ UNSYNCED DATA: Your latest changes are stored on this device but have NOT been uploaded to the cloud. Please check your internet and click Upload.
                 </p>
               </div>
               <Button size="sm" variant="outline" className="h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 whitespace-nowrap" onClick={() => navigate('/settings')}>
