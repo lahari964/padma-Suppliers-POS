@@ -58,7 +58,9 @@ export default async function handler(req, res) {
       const promises = [];
 
       if (bills.length > 0) {
-        promises.push(supabase.from('bills').upsert(bills, { onConflict: 'id' }));
+        // Strip local-only UI properties before sending to Supabase
+        const safeBills = bills.map(({ hasConflict, conflictData, ...bill }) => bill);
+        promises.push(supabase.from('bills').upsert(safeBills, { onConflict: 'id' }));
       }
 
       if (inventory.length > 0) {
