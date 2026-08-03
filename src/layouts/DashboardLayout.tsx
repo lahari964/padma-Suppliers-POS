@@ -282,9 +282,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   ⚠️ UNSYNCED DATA: Your latest changes are stored on this device but have NOT been uploaded to the cloud. Please check your internet and click Upload.
                 </p>
               </div>
-              <Button size="sm" variant="outline" className="h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 whitespace-nowrap" onClick={() => navigate('/settings')}>
-                Go to Settings
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="default" className="h-7 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90 whitespace-nowrap" onClick={handleUpload}>
+                  <CloudUpload className="w-3.5 h-3.5 mr-1.5" />
+                  Upload Now
+                </Button>
+                <Button size="sm" variant="outline" className="h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 whitespace-nowrap" onClick={() => navigate('/settings')}>
+                  Settings
+                </Button>
+              </div>
             </div>
           )}
 
