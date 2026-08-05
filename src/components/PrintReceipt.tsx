@@ -191,19 +191,20 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <tr>
             <td>
               {/* Header */}
-              <div className="flex justify-between items-center border-b-2 border-black pb-2 mb-4">
+              <div className="flex justify-between items-start border-b-2 border-black pb-2 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 shrink-0">
+                  <div className="w-8 h-8 shrink-0 mt-1">
                     <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h1 className="text-xl font-serif font-bold uppercase tracking-tight leading-none">
+                    <h1 className="text-xl font-serif font-bold uppercase tracking-tight leading-none mt-1">
                       {biz.name === 'Padma Suppliers, Events & Decorations' ? 'PADMA SUPPLIERS EVENTS & DECORATIONS' : (biz.name || 'PADMA SUPPLIERS')}
                     </h1>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-sm">{bill.isQuotation ? 'QUOTATION' : `Invoice #: ${bill.id}`}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
                 </div>
               </div>
             </td>
@@ -215,17 +216,15 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               {/* Shop Info */}
               <div className="mb-4">
                 <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
-                {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
+                {biz.phone && <p className="text-xs text-gray-500 mt-0.5">Ph: {biz.phone}</p>}
                 {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
-                <p className="text-xs text-gray-500 mt-1">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
               </div>
 
               {/* Customer Info */}
-              <div className="border-t-2 border-b-2 border-black py-2 mb-4 space-y-0.5 text-sm">
-                <p><span className="font-bold">Customer Name:</span> {bill.customerName}</p>
-                <p><span className="font-bold">Mobile:</span> {bill.mobile}</p>
-                {bill.address && <p><span className="font-bold">Address:</span> {bill.address}</p>}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-1 text-sm border border-gray-100">
+                <p><span className="font-bold text-gray-700">Customer Name:</span> {bill.customerName}</p>
+                <p><span className="font-bold text-gray-700">Mobile:</span> {bill.mobile}</p>
+                {bill.address && <p><span className="font-bold text-gray-700">Address:</span> {bill.address}</p>}
               </div>
 
       {/* Items Table */}
@@ -400,6 +399,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <p className="font-bold text-gray-800 uppercase mb-2 text-sm text-center border p-2 bg-gray-50 rounded">This is a quotation only. Stock is not guaranteed until officially confirmed and converted to an order.</p>
             )}
             {biz.terms && <p className="mb-4"><strong>Terms & Conditions:</strong> {biz.terms}</p>}
+            <p className="text-xs text-gray-500 pt-2">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
           </div>
             </td>
           </tr>
