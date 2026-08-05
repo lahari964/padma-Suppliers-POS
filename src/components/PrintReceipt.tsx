@@ -399,7 +399,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <p className="font-bold text-gray-800 uppercase mb-2 text-sm text-center border p-2 bg-gray-50 rounded">This is a quotation only. Stock is not guaranteed until officially confirmed and converted to an order.</p>
             )}
             {biz.terms && <p className="mb-4"><strong>Terms & Conditions:</strong> {biz.terms}</p>}
-            <p className="text-xs text-gray-500 pt-2">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
+            <p className="text-xs text-gray-500 pt-2">Generated: {format(new Date(parseInt(bill.id.split('-')[1]) || Date.now()), 'dd MMM yyyy, hh:mm a')}</p>
           </div>
             </td>
           </tr>
