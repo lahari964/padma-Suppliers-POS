@@ -212,22 +212,20 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         <tbody>
           <tr>
             <td>
-              {/* Customer Info & Store Info */}
-              <div className="flex justify-between items-start mb-6 text-sm">
-                <div>
-                  <p className="font-bold text-base mb-1">Bill To:</p>
-                  <p><span className="font-semibold">Name:</span> {bill.customerName}</p>
-                  <p><span className="font-semibold">Mobile:</span> {bill.mobile}</p>
-                  {bill.address && <p><span className="font-semibold">Address:</span> {bill.address}</p>}
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-base mb-1">From:</p>
-                  <p>{biz.address || 'Ganugapalem, Ongole-523001'}</p>
-                  <p className="text-xs text-gray-500">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
-                  {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
-                  {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
-                  <p className="text-xs text-gray-500 mt-2">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
-                </div>
+              {/* Shop Info */}
+              <div className="mb-4">
+                <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
+                {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
+                {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
+                <p className="text-xs text-gray-500 mt-1">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
+              </div>
+
+              {/* Customer Info */}
+              <div className="border-t-2 border-b-2 border-black py-2 mb-4 space-y-0.5 text-sm">
+                <p><span className="font-bold">Customer Name:</span> {bill.customerName}</p>
+                <p><span className="font-bold">Mobile:</span> {bill.mobile}</p>
+                {bill.address && <p><span className="font-bold">Address:</span> {bill.address}</p>}
               </div>
 
       {/* Items Table */}
