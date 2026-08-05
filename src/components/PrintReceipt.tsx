@@ -37,6 +37,19 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
     return { ...item, actualPrice, isCustom, itemDays };
   });
 
+  const renderClickablePhones = (phoneStr?: string) => {
+    if (!phoneStr) return null;
+    return phoneStr.split(',').map((num, i, arr) => {
+      const cleanNum = num.trim();
+      return (
+        <span key={i}>
+          <a href={`tel:${cleanNum.replace(/[^0-9+]/g, '')}`} className="text-inherit hover:underline cursor-pointer">{cleanNum}</a>
+          {i < arr.length - 1 && ', '}
+        </span>
+      );
+    });
+  };
+
   if (isThermal) {
     return createPortal(
       <div id="print-section" className="hidden print:block font-mono text-black mx-auto text-[12px] leading-tight p-2" style={{ width: thermalSize, maxWidth: thermalSize }}>
@@ -45,15 +58,15 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <h1 className="text-lg font-bold uppercase">{biz.name}</h1>
           {biz.tagline && <p className="text-xs">{biz.tagline}</p>}
           {biz.address && <p className="text-xs mt-1">{biz.address}</p>}
-          {biz.phone && <p className="text-xs">Ph: {biz.phone}</p>}
-          {biz.landline && <p className="text-xs">Landline: {biz.landline}</p>}
+          {biz.phone && <p className="text-xs">Ph: {renderClickablePhones(biz.phone)}</p>}
+          {biz.landline && <p className="text-xs">Landline: {renderClickablePhones(biz.landline)}</p>}
         </div>
 
         <div className="border-b border-dashed border-black pb-2 mb-2">
           <p><strong>{bill.isQuotation ? 'Quotation ID:' : 'Order ID:'}</strong> {bill.id}</p>
           <p><strong>Date:</strong> {format(new Date(), 'dd MMM yyyy HH:mm')}</p>
           <p><strong>Customer:</strong> {bill.customerName}</p>
-          {bill.mobile && <p><strong>Phone:</strong> {bill.mobile}</p>}
+          {bill.mobile && <p><strong>Phone:</strong> {renderClickablePhones(bill.mobile)}</p>}
           <p><strong>Event Date:</strong> {bill.eventDate ? bill.eventDate.split('-').reverse().join('-') : 'N/A'}</p>
         </div>
 
@@ -223,7 +236,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               {/* Customer Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-1 text-sm border border-gray-100">
                 <p><span className="font-bold text-gray-700">Customer Name:</span> {bill.customerName}</p>
-                <p><span className="font-bold text-gray-700">Mobile:</span> {bill.mobile}</p>
+                <p><span className="font-bold text-gray-700">Mobile:</span> {renderClickablePhones(bill.mobile)}</p>
                 {bill.address && <p><span className="font-bold text-gray-700">Address:</span> {bill.address}</p>}
               </div>
 
@@ -424,9 +437,9 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           <p>{biz.address || 'Ganugapalem, Ongole-523001'}</p>
           {(biz.phone || biz.landline) && (
             <p>
-              {biz.phone && <span>Ph: {biz.phone}</span>}
+              {biz.phone && <span>Ph: {renderClickablePhones(biz.phone)}</span>}
               {biz.phone && biz.landline && <span> | </span>}
-              {biz.landline && <span>Landline: {biz.landline}</span>}
+              {biz.landline && <span>Landline: {renderClickablePhones(biz.landline)}</span>}
             </p>
           )}
         </div>
