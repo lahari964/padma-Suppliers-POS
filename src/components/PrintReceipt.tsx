@@ -179,39 +179,56 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   // A4 Layout - Exactly matching screenshots
   return createPortal(
     <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-5">
-        <div className="flex gap-3">
-          <div className="w-10 h-10 shrink-0 mt-1">
-            <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-serif font-bold uppercase tracking-tight leading-tight mb-1">
-              {biz.name === 'Padma Suppliers, Events & Decorations' ? (
-                <>PADMA SUPPLIERS<br />EVENTS & DECORATIONS</>
-              ) : (
-                biz.name || 'PADMA\nSUPPLIERS'
-              )}
-            </h1>
-            <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
-            {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
-            {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="font-bold text-base">{bill.isQuotation ? 'QUOTATION / ESTIMATE' : `Invoice #: ${bill.id}`}</p>
-          <p className="text-xs text-gray-500 mt-1">Generated:</p>
-          <p className="text-xs text-gray-500">{format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
-        </div>
-      </div>
-
-      {/* Customer Info */}
-      <div className="border-t-2 border-b-2 border-black py-2 mb-4 space-y-0.5 text-sm">
-        <p><span className="font-bold">Customer Name:</span> {bill.customerName}</p>
-        <p><span className="font-bold">Mobile:</span> {bill.mobile}</p>
-        {bill.address && <p><span className="font-bold">Address:</span> {bill.address}</p>}
-      </div>
+      <style>
+        {`
+          @media print {
+            @page { margin: ${isThermal ? '0mm' : '15mm'}; }
+          }
+        `}
+      </style>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <td>
+              {/* Header */}
+              <div className="flex justify-between items-center border-b-2 border-black pb-2 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 shrink-0">
+                    <img src="/logo.png" alt="Padma Suppliers Logo" className="w-full h-full object-contain" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-serif font-bold uppercase tracking-tight leading-none">
+                      {biz.name === 'Padma Suppliers, Events & Decorations' ? 'PADMA SUPPLIERS EVENTS & DECORATIONS' : (biz.name || 'PADMA SUPPLIERS')}
+                    </h1>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-sm">{bill.isQuotation ? 'QUOTATION' : `Invoice #: ${bill.id}`}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {/* Customer Info & Store Info */}
+              <div className="flex justify-between items-start mb-6 text-sm">
+                <div>
+                  <p className="font-bold text-base mb-1">Bill To:</p>
+                  <p><span className="font-semibold">Name:</span> {bill.customerName}</p>
+                  <p><span className="font-semibold">Mobile:</span> {bill.mobile}</p>
+                  {bill.address && <p><span className="font-semibold">Address:</span> {bill.address}</p>}
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-base mb-1">From:</p>
+                  <p>{biz.address || 'Ganugapalem, Ongole-523001'}</p>
+                  <p className="text-xs text-gray-500">{biz.tagline || 'Premium Tenthouse & Event Rentals'}</p>
+                  {biz.phone && <p className="text-xs text-gray-500">Ph: {biz.phone}</p>}
+                  {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
+                  <p className="text-xs text-gray-500 mt-2">Generated: {format(new Date(), 'dd MMM yyyy, hh:mm a')}</p>
+                </div>
+              </div>
 
       {/* Items Table */}
       {enrichedItems.length > 0 && (
@@ -379,16 +396,29 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         </div>
       </div>
 
-      {/* Footer Notes */}
-      <div className="mt-12 text-xs text-gray-500 space-y-1 border-t border-gray-200 pt-4">
-        {bill.isQuotation && (
-          <p className="font-bold text-gray-800 uppercase mb-2 text-sm text-center border p-2 bg-gray-50 rounded">This is a quotation only. Stock is not guaranteed until officially confirmed and converted to an order.</p>
-        )}
-        {biz.terms && <p className="mb-4"><strong>Terms & Conditions:</strong> {biz.terms}</p>}
-        {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
-        {!bill.isQuotation && <p>Thank you for choosing {biz.name || 'Padma Suppliers'} for your event!</p>}
-      </div>
-
+          {/* Footer Notes in Body */}
+          <div className="mt-8 text-xs text-gray-500 space-y-1">
+            {bill.isQuotation && (
+              <p className="font-bold text-gray-800 uppercase mb-2 text-sm text-center border p-2 bg-gray-50 rounded">This is a quotation only. Stock is not guaranteed until officially confirmed and converted to an order.</p>
+            )}
+            {biz.terms && <p className="mb-4"><strong>Terms & Conditions:</strong> {biz.terms}</p>}
+          </div>
+            </td>
+          </tr>
+        </tbody>
+        
+        {/* Repeating Footer */}
+        <tfoot>
+          <tr>
+            <td>
+              <div className="mt-6 pt-4 border-t border-gray-300 text-xs text-gray-500 text-center space-y-1">
+                {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
+                {!bill.isQuotation && <p>Thank you for choosing Padma Suppliers, Events & Decorations for your event!</p>}
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>,
     document.body
   );
