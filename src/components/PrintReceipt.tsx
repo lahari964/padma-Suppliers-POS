@@ -129,7 +129,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           {servicesTotal > 0 ? <p>Services Total: <strong>+₹{servicesTotal}</strong></p> : null}
           {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.transportationCharges ? <p>Transportation: <strong>+₹{bill.transportationCharges}</strong></p> : null}
-          {bill.coolieCharges ? <p>Coolie: <strong>+₹{bill.coolieCharges}</strong></p> : null}
+          {bill.coolieCharges ? <p>Labor Charges: <strong>+₹{bill.coolieCharges}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
           <p className="border-t border-dashed border-black pt-1 mt-1">Total Cost: <strong>₹{bill.totalCost}</strong></p>
@@ -351,7 +351,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
             {!!bill.coolieCharges && bill.coolieCharges > 0 && (
               <div className="flex justify-between pt-1">
-                <span>Coolie:</span>
+                <span>Labor Charges:</span>
                 <span>₹{bill.coolieCharges}</span>
               </div>
             )}
