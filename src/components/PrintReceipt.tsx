@@ -178,18 +178,18 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
 
   // A4 Layout - Exactly matching screenshots
   return createPortal(
-    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8">
+    <div id="print-section" className="hidden print:block font-sans text-black bg-white w-full max-w-[210mm] mx-auto p-4 sm:p-8 print:p-0">
       <style>
         {`
           @media print {
-            @page { margin: ${isThermal ? '0mm' : '15mm'}; }
+            @page { margin: 0mm; }
           }
         `}
       </style>
       <table className="w-full">
         <thead>
           <tr>
-            <td>
+            <td className="print:pt-8 print:px-8">
               {/* Header */}
               <div className="flex justify-between items-start border-b-2 border-black pb-2 mb-4">
                 <div className="flex items-center gap-3">
@@ -212,7 +212,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         </thead>
         <tbody>
           <tr>
-            <td>
+            <td className="print:px-8">
               {/* Shop Info */}
               <div className="mb-4">
                 <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
@@ -408,7 +408,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         {/* Repeating Footer */}
         <tfoot>
           <tr>
-            <td>
+            <td className="print:pb-8 print:px-8">
               <div className="mt-6 pt-4 border-t border-gray-300 text-xs text-gray-500 text-center space-y-1">
                 {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
                 {!bill.isQuotation && <p>Thank you for choosing Padma Suppliers, Events & Decorations for your event!</p>}
