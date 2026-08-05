@@ -82,11 +82,15 @@ export default function Bills() {
     });
   }, [bills, searchTerm, employeeFilter, dateFilter, employees, searchParams]);
 
-  const upcomingBills = filteredBills.filter(b => ['Upcoming', 'Partially Active'].includes(getBillDisplayInfo(b).status));
-  const activeBills = filteredBills.filter(b => ['Active', 'Partially Active'].includes(getBillDisplayInfo(b).status));
-  const pendingBills = filteredBills.filter(b => b.status === 'Pending');
-  const settledBills = filteredBills.filter(b => b.status === 'Settled');
-  const quotationBills = filteredBills.filter(b => getBillDisplayInfo(b).status === 'Quotation');
+  const { upcomingBills, activeBills, pendingBills, settledBills, quotationBills } = useMemo(() => {
+    return {
+      upcomingBills: filteredBills.filter(b => ['Upcoming', 'Partially Active'].includes(getBillDisplayInfo(b).status)),
+      activeBills: filteredBills.filter(b => ['Active', 'Partially Active'].includes(getBillDisplayInfo(b).status)),
+      pendingBills: filteredBills.filter(b => b.status === 'Pending'),
+      settledBills: filteredBills.filter(b => b.status === 'Settled'),
+      quotationBills: filteredBills.filter(b => getBillDisplayInfo(b).status === 'Quotation')
+    };
+  }, [filteredBills]);
 
   const getActiveData = () => {
     switch (activeTab) {

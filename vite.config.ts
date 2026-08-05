@@ -49,6 +49,22 @@ export default defineConfig(({ mode }) => {
         overlay: false,
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('recharts') || id.includes('d3')) return 'vendor-charts';
+              if (id.includes('lucide-react')) return 'vendor-icons';
+              if (id.includes('@radix-ui')) return 'vendor-ui';
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) return 'vendor-react';
+              if (id.includes('date-fns')) return 'vendor-date';
+              return 'vendor-core';
+            }
+          }
+        }
+      }
+    },
     plugins: [
       react(),
       apiPlugin()

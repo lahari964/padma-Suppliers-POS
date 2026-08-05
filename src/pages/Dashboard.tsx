@@ -33,56 +33,63 @@ export default function Dashboard() {
   const next7DaysStr = format(next7Days, 'yyyy-MM-dd');
 
   // Daily Metrics
-  const todaysDispatches = bills.filter(b => b.eventDate === todayStr).length;
-  
-  let todaysReturns = 0;
-  bills.forEach(b => {
-    b.returnHistory?.forEach(r => {
-      if (r.date === todayStr) {
-        r.items.forEach(i => todaysReturns += i.qty);
+  const { todaysDispatches, todaysReturns, trueTotalPending } = useMemo(() => {
+    let dispatches = 0;
+    let returns = 0;
+    let pending = 0;
+
+    bills.forEach(b => {
+      if (b.eventDate === todayStr) dispatches++;
+      
+      b.returnHistory?.forEach(r => {
+        if (r.date === todayStr) {
+          r.items.forEach(i => returns += i.qty);
+        }
+      });
+
+      if (getBillDisplayInfo(b).status === 'Pending') {
+        const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
+        pending += Math.max(0, b.totalCost - paid - (b.discount || 0));
       }
     });
-  });
-
-  // Calculate exact total due across only 'Pending' bills (returned but unpaid)
-  let trueTotalPending = 0;
-  bills.forEach(b => {
-    if (getBillDisplayInfo(b).status === 'Pending') {
-      const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
-      trueTotalPending += Math.max(0, b.totalCost - paid - (b.discount || 0));
-    }
-  });
+    
+    return { todaysDispatches: dispatches, todaysReturns: returns, trueTotalPending: pending };
+  }, [bills, todayStr]);
 
   // Next 7 Days Data
-  const upcoming7DaysBills = bills.filter(b => {
-    const status = getBillDisplayInfo(b).status;
-    return (status === 'Upcoming' || status === 'Partially Active') && b.eventDate && b.eventDate >= todayStr && b.eventDate <= next7DaysStr;
-  }).sort((a, b) => a.eventDate!.localeCompare(b.eventDate!));
+  const { upcoming7DaysBills, returns7DaysBills, payments7DaysBills, overduePayments, overdueReturns, pendingBillingBills } = useMemo(() => {
+    return {
+      upcoming7DaysBills: bills.filter(b => {
+        const status = getBillDisplayInfo(b).status;
+        return (status === 'Upcoming' || status === 'Partially Active') && b.eventDate && b.eventDate >= todayStr && b.eventDate <= next7DaysStr;
+      }).sort((a, b) => a.eventDate!.localeCompare(b.eventDate!)),
 
-  const returns7DaysBills = bills.filter(b => {
-    const status = getBillDisplayInfo(b).status;
-    return (status === 'Active' || status === 'Partially Active') && b.expectedReturnDate && b.expectedReturnDate >= todayStr && b.expectedReturnDate <= next7DaysStr;
-  }).sort((a, b) => a.expectedReturnDate!.localeCompare(b.expectedReturnDate!));
+      returns7DaysBills: bills.filter(b => {
+        const status = getBillDisplayInfo(b).status;
+        return (status === 'Active' || status === 'Partially Active') && b.expectedReturnDate && b.expectedReturnDate >= todayStr && b.expectedReturnDate <= next7DaysStr;
+      }).sort((a, b) => a.expectedReturnDate!.localeCompare(b.expectedReturnDate!)),
 
-  const payments7DaysBills = bills.filter(b => 
-    b.status === 'Pending' && b.paymentPromiseDate && b.paymentPromiseDate >= todayStr && b.paymentPromiseDate <= next7DaysStr
-  ).sort((a, b) => a.paymentPromiseDate!.localeCompare(b.paymentPromiseDate!));
+      payments7DaysBills: bills.filter(b => 
+        b.status === 'Pending' && b.paymentPromiseDate && b.paymentPromiseDate >= todayStr && b.paymentPromiseDate <= next7DaysStr
+      ).sort((a, b) => a.paymentPromiseDate!.localeCompare(b.paymentPromiseDate!)),
 
-  const overduePayments = bills.filter(b => {
-    const status = getBillDisplayInfo(b).status;
-    const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
-    const balance = b.totalCost - paid - (b.discount || 0);
-    return balance > 0 && status === 'Pending' && b.paymentPromiseDate && b.paymentPromiseDate <= todayStr;
-  });
+      overduePayments: bills.filter(b => {
+        const status = getBillDisplayInfo(b).status;
+        const paid = b.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
+        const balance = b.totalCost - paid - (b.discount || 0);
+        return balance > 0 && status === 'Pending' && b.paymentPromiseDate && b.paymentPromiseDate <= todayStr;
+      }),
 
-  const overdueReturns = bills.filter(b => {
-    const status = getBillDisplayInfo(b).status;
-    return (status === 'Active' || status === 'Partially Active') && b.expectedReturnDate && b.expectedReturnDate < todayStr;
-  });
+      overdueReturns: bills.filter(b => {
+        const status = getBillDisplayInfo(b).status;
+        return (status === 'Active' || status === 'Partially Active') && b.expectedReturnDate && b.expectedReturnDate < todayStr;
+      }),
 
-  const pendingBillingBills = bills.filter(b => {
-    return !b.billingStarted && getBillDisplayInfo(b).status === 'Upcoming' && b.eventDate && b.eventDate <= todayStr;
-  });
+      pendingBillingBills: bills.filter(b => {
+        return !b.billingStarted && getBillDisplayInfo(b).status === 'Upcoming' && b.eventDate && b.eventDate <= todayStr;
+      })
+    };
+  }, [bills, todayStr, next7DaysStr]);
 
   // 6-Month Revenue Aggregation
   const revenueData = useMemo(() => {
