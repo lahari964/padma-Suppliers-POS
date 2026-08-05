@@ -66,7 +66,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       return acc + (item.price * item.qtyIssued * currentDays);
     }, 0);
     const servicesTotal = bill.customServices?.reduce((acc, service) => acc + service.price, 0) || 0;
-    const newTotalCost = itemsTotal + servicesTotal + (bill.transportationCharges || 0) - (bill.discount || 0);
+    const newTotalCost = itemsTotal + servicesTotal + (bill.transportationCharges || 0) + (bill.coolieCharges || 0) - (bill.discount || 0);
 
     updateBill(bill.id, {
       items: updatedItems,
@@ -81,7 +81,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       return acc + (item.price * item.qtyIssued * days);
     }, 0);
     const servicesTotal = bill.customServices?.reduce((acc, service) => acc + service.price, 0) || 0;
-    return itemsTotal + servicesTotal + (bill.transportationCharges || 0) - (bill.discount || 0);
+    return itemsTotal + servicesTotal + (bill.transportationCharges || 0) + (bill.coolieCharges || 0) - (bill.discount || 0);
   }, [bill, quotationDays]);
 
   // Common Modal Inputs
@@ -103,6 +103,9 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   
   const [isEditingTransport, setIsEditingTransport] = useState(false);
   const [transportTemp, setTransportTemp] = useState('');
+
+  const [isEditingCoolie, setIsEditingCoolie] = useState(false);
+  const [coolieTemp, setCoolieTemp] = useState('');
 
   const [isEditingPromiseDate, setIsEditingPromiseDate] = useState(false);
   const [promiseDateTemp, setPromiseDateTemp] = useState('');
@@ -146,6 +149,41 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       toast.success('Transportation charges updated');
     }
     setIsEditingTransport(false);
+  };
+
+  const handleSaveCoolie = () => {
+    const newCoolie = Number(coolieTemp) || 0;
+    const oldCoolie = bill.coolieCharges || 0;
+    const diff = newCoolie - oldCoolie;
+    
+    if (diff !== 0) {
+      const newTotalCost = bill.totalCost + diff;
+      
+      let newStatus = bill.status;
+      const newRemaining = newTotalCost - totalPaid - (bill.discount || 0);
+      const allReturned = bill.items.every(i => (i.qtyReturned || 0) >= i.qtyIssued);
+      if (newRemaining <= 0 && allReturned) {
+         newStatus = 'Settled';
+      } else if (newRemaining > 0 && allReturned && bill.status === 'Settled') {
+         newStatus = 'Pending';
+      }
+
+      const newAuditLog = {
+        timestamp: Date.now(),
+        action: 'Updated Coolie Charges',
+        employeeName: currentUser?.name || 'System',
+        details: `Changed from ₹${oldCoolie} to ₹${newCoolie}`
+      };
+
+      updateBill(bill.id, { 
+        coolieCharges: newCoolie,
+        totalCost: newTotalCost,
+        status: newStatus,
+        auditTrail: [...(bill.auditTrail || []), newAuditLog]
+      });
+      toast.success('Coolie charges updated');
+    }
+    setIsEditingCoolie(false);
   };
   
   const [modalIssueDate, setModalIssueDate] = useState('');
@@ -1007,6 +1045,44 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                 </div>
               ) : (
                 <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{(bill.transportationCharges || 0).toLocaleString('en-IN')}</p>
+              )}
+            </div>
+
+            {/* Coolie with inline edit */}
+            <div className="space-y-1 group relative rounded-xl p-2 -m-2 hover:bg-muted/30 transition-all">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                  <div className="w-4 h-4 rounded-full bg-purple-500/10 flex items-center justify-center">
+                    <UserCircle className="w-2.5 h-2.5 text-purple-500" />
+                  </div>
+                  Coolie
+                </p>
+                {!isEditingCoolie && (
+                  <button onClick={() => { setCoolieTemp(String(bill.coolieCharges || 0)); setIsEditingCoolie(true); }} className="bg-background border border-border/60 shadow-sm p-1.5 text-muted-foreground hover:text-primary hover:border-primary/30 rounded-md absolute right-2 top-2">
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              
+              {isEditingCoolie ? (
+                <div className="flex items-center gap-1.5 mt-2 animate-in fade-in slide-in-from-top-1">
+                  <div className="relative w-full">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">₹</span>
+                    <Input 
+                      type="number" 
+                      value={coolieTemp} 
+                      onChange={e => setCoolieTemp(e.target.value)} 
+                      onFocus={e => e.target.select()}
+                      className="h-8 pl-6 pr-2 text-sm font-medium border-primary/40 focus-visible:ring-primary/20 bg-background" 
+                      autoFocus
+                      onKeyDown={e => e.key === 'Enter' && handleSaveCoolie()}
+                    />
+                  </div>
+                  <Button size="sm" onClick={handleSaveCoolie} className="h-8 w-8 p-0 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm shrink-0"><CheckCircle2 className="w-4 h-4" /></Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingCoolie(false)} className="h-8 w-8 p-0 rounded-md text-muted-foreground hover:text-destructive shrink-0"><X className="w-4 h-4" /></Button>
+                </div>
+              ) : (
+                <p className="font-semibold text-foreground text-lg tracking-tight mt-1">₹{(bill.coolieCharges || 0).toLocaleString('en-IN')}</p>
               )}
             </div>
 

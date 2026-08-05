@@ -21,7 +21,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
   const paid = bill.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
   const balance = Math.max(0, bill.totalCost - paid - (bill.discount || 0));
   const servicesTotal = bill.customServices?.reduce((acc, s) => acc + s.price, 0) || 0;
-  const itemsSubtotal = bill.totalCost - (bill.transportationCharges || 0) + (bill.discount || 0) - (bill.damageCharges || 0) - servicesTotal;
+  const itemsSubtotal = bill.totalCost - (bill.transportationCharges || 0) - (bill.coolieCharges || 0) + (bill.discount || 0) - (bill.damageCharges || 0) - servicesTotal;
 
   let totalOverrideDifference = 0;
   const enrichedItems = bill.items.map(item => {
@@ -129,6 +129,7 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           {servicesTotal > 0 ? <p>Services Total: <strong>+₹{servicesTotal}</strong></p> : null}
           {totalOverrideDifference > 0 ? <p className="text-gray-600">Rate Savings: <strong>₹{totalOverrideDifference}</strong></p> : null}
           {bill.transportationCharges ? <p>Transportation: <strong>+₹{bill.transportationCharges}</strong></p> : null}
+          {bill.coolieCharges ? <p>Coolie: <strong>+₹{bill.coolieCharges}</strong></p> : null}
           {bill.damageCharges ? <p>Damage Charges: <strong>+₹{bill.damageCharges}</strong></p> : null}
           {bill.discount ? <p>Discount: <strong>-₹{bill.discount}</strong></p> : null}
           <p className="border-t border-dashed border-black pt-1 mt-1">Total Cost: <strong>₹{bill.totalCost}</strong></p>
@@ -345,6 +346,13 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
               <div className="flex justify-between pt-2">
                 <span>Transportation:</span>
                 <span>₹{bill.transportationCharges}</span>
+              </div>
+            )}
+
+            {!!bill.coolieCharges && bill.coolieCharges > 0 && (
+              <div className="flex justify-between pt-1">
+                <span>Coolie:</span>
+                <span>₹{bill.coolieCharges}</span>
               </div>
             )}
 

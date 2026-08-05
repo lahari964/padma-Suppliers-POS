@@ -48,6 +48,7 @@ export type Bill = {
   damageCharges?: number;
   damageDetails?: DamageDetail[];
   transportationCharges?: number;
+  coolieCharges?: number;
   eventDate?: string;
   eventTime?: string;
   expectedReturnDate?: string;

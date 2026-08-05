@@ -40,6 +40,7 @@ export default function NewBill() {
   const [eventTime, setEventTime] = useState(format(new Date(), 'HH:mm'));
   const [expectedReturnDate, setExpectedReturnDate] = useState('');
   const [transportation, setTransportation] = useState('');
+  const [coolie, setCoolie] = useState('');
   const [advance, setAdvance] = useState('');
   const [discount, setDiscount] = useState('');
   const [referral, setReferral] = useState('');
@@ -69,6 +70,7 @@ export default function NewBill() {
         if (parsed.eventTime) setEventTime(parsed.eventTime);
         if (parsed.expectedReturnDate) setExpectedReturnDate(parsed.expectedReturnDate);
         if (parsed.transportation) setTransportation(parsed.transportation);
+        if (parsed.coolie) setCoolie(parsed.coolie);
         if (parsed.advance) setAdvance(parsed.advance);
         if (parsed.discount) setDiscount(parsed.discount);
         if (parsed.referral) setReferral(parsed.referral);
@@ -86,13 +88,13 @@ export default function NewBill() {
 
   useEffect(() => {
     if (!draftLoaded) return;
-    const draft = { customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, advance, discount, referral, notes, stagedItems };
+    const draft = { customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, coolie, advance, discount, referral, notes, stagedItems };
     if (customerName || mobile || stagedItems.length > 0) {
       localStorage.setItem('sadma_newbill_draft', JSON.stringify(draft));
     } else {
       localStorage.removeItem('sadma_newbill_draft');
     }
-  }, [customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, advance, discount, referral, notes, stagedItems, draftLoaded]);
+  }, [customerName, mobile, address, eventDate, eventTime, expectedReturnDate, transportation, coolie, advance, discount, referral, notes, stagedItems, draftLoaded]);
 
   const groupedInventory = useMemo(() => {
     const filtered = inventory.filter(item => 
@@ -147,7 +149,7 @@ export default function NewBill() {
   const calculateTotal = () => {
     const subtotal = stagedItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const servicesTotal = customServices.reduce((acc, service) => acc + service.price, 0);
-    return subtotal + servicesTotal + (Number(transportation) || 0) - (Number(discount) || 0);
+    return subtotal + servicesTotal + (Number(transportation) || 0) + (Number(coolie) || 0) - (Number(discount) || 0);
   };
 
   const handleSaveBill = () => {
@@ -190,6 +192,7 @@ export default function NewBill() {
       expectedReturnDate,
       validUntil: isQuotation ? validUntil : undefined,
       transportationCharges: Number(transportation) || 0,
+      coolieCharges: Number(coolie) || 0,
       notes,
       isQuotation,
       items: stagedItems.map(item => ({
@@ -300,6 +303,10 @@ export default function NewBill() {
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-foreground">Transportation (₹)</Label>
               <Input type="number" className="bg-background border-border h-11 rounded-xl" value={transportation} onChange={e => setTransportation(e.target.value)} placeholder="0" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-foreground">Coolie / Workers (₹)</Label>
+              <Input type="number" className="bg-background border-border h-11 rounded-xl" value={coolie} onChange={e => setCoolie(e.target.value)} placeholder="0" />
             </div>
           </div>
 
