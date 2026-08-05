@@ -405,18 +405,21 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
           </tr>
         </tbody>
         
-        {/* Repeating Footer */}
+        {/* Spacer for Fixed Footer */}
         <tfoot>
           <tr>
-            <td className="print:pb-8 print:px-8">
-              <div className="mt-6 pt-4 border-t border-gray-300 text-xs text-gray-500 text-center space-y-1">
-                {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
-                {!bill.isQuotation && <p>Thank you for choosing Padma Suppliers, Events & Decorations for your event!</p>}
-              </div>
-            </td>
+            <td className="h-24 print:px-8"></td>
           </tr>
         </tfoot>
       </table>
+
+      {/* Fixed Footer at Absolute Bottom of Page */}
+      <div className="fixed bottom-0 left-0 right-0 w-full max-w-[210mm] mx-auto bg-white print:px-8 print:pb-8">
+        <div className="pt-4 border-t border-gray-300 text-xs text-gray-500 text-center space-y-1">
+          {!bill.isQuotation && <p>All items must be returned in their original condition. Damages or losses will be charged accordingly.</p>}
+          {!bill.isQuotation && <p>Thank you for choosing Padma Suppliers, Events & Decorations for your event!</p>}
+        </div>
+      </div>
     </div>,
     document.body
   );
