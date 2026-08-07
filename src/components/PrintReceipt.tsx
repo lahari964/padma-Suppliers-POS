@@ -226,12 +226,6 @@ export const PrintReceipt = ({ bill }: { bill: Bill }) => {
         <tbody>
           <tr>
             <td className="print:px-8">
-              {/* Shop Info */}
-              <div className="mb-4">
-                <p className="text-sm font-medium">{biz.address || 'Ganugapalem, Ongole-523001'}</p>
-                {biz.phone && <p className="text-xs text-gray-500 mt-0.5">Ph: {biz.phone}</p>}
-                {biz.landline && <p className="text-xs text-gray-500">Landline: {biz.landline}</p>}
-              </div>
 
               {/* Customer Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-1 text-sm border border-gray-100">
