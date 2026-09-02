@@ -847,8 +847,8 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     });
 
     if (unavailableItems.length > 0) {
-      toast.error(`Cannot convert! Insufficient stock for: ${unavailableItems.map(i => i.name).join(', ')}`);
-      return;
+      toast.warning(`Note: Some items exceeded recorded stock limits. Overbooking allowed.`);
+      // We no longer block conversion. The inventory logic handles negative stock safely.
     }
 
     setIsConverting(true);
