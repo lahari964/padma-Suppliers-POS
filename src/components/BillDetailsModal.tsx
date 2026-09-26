@@ -723,7 +723,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
           const issueDateTime = new Date(`${i.issueDate}T${i.issueTime || '10:00'}:00`);
           const returnDateTime = new Date(`${rDate}T${rTime}:00`);
           const hours = Math.max(0, differenceInHours(returnDateTime, issueDateTime));
-          days = Math.max(1, Math.floor(hours / 24)); 
+          days = Math.max(1, Math.ceil(hours / 24)); 
         }
       }
       
