@@ -717,7 +717,11 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         const ceilDays = Math.max(1, Math.ceil(exactDays));
 
         if (floorDays !== ceilDays && exactDays > 1) {
-          const isCeil = window.confirm(`The rental duration was ${exactDays.toFixed(1)} days.\n\nPress 'OK' to round UP to ${ceilDays} days.\nPress 'Cancel' to round DOWN to ${floorDays} days.`);
+          const fullDays = Math.floor(hours / 24);
+          const extraHours = hours % 24;
+          const timeString = fullDays > 0 ? `${fullDays} days and ${extraHours} hours` : `${extraHours} hours`;
+          
+          const isCeil = window.confirm(`The customer kept the items for ${timeString}.\n\nDo you want to charge them for ${ceilDays} days or ${floorDays} days?\n\n- Press 'OK' to charge for ${ceilDays} days.\n- Press 'Cancel' to charge for ${floorDays} days.`);
           finalDays = isCeil ? ceilDays : floorDays;
         } else {
           finalDays = ceilDays;
