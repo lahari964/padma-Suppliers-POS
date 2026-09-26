@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 export default function Bills() {
   const bills = useStore(state => state.bills);
   const employees = useStore(state => state.employees);
@@ -30,6 +31,7 @@ export default function Bills() {
   const [dateFilter, setDateFilter] = useState('');
   const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
+  const [billToDelete, setBillToDelete] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -128,9 +130,14 @@ export default function Bills() {
 
   const handleCancelOrder = (e: React.MouseEvent, billId: string) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to cancel and delete this order?')) {
-      deleteBill(billId);
-      toast.success('Order cancelled successfully');
+    setBillToDelete(billId);
+  };
+
+  const confirmDelete = () => {
+    if (billToDelete) {
+      deleteBill(billToDelete);
+      toast.success('Order deleted successfully');
+      setBillToDelete(null);
     }
   };
 
@@ -333,6 +340,25 @@ export default function Bills() {
         onClose={() => setSelectedBillId(null)} 
         billId={selectedBillId} 
       />
+
+      <Dialog open={!!billToDelete} onOpenChange={(open) => !open && setBillToDelete(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete Order</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete this order? This action cannot be undone and will remove it from the database.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button variant="outline" onClick={() => setBillToDelete(null)} className="mt-2 sm:mt-0">
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete Order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
