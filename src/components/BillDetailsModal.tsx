@@ -36,6 +36,12 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
+  const [selectedDaysOption, setSelectedDaysOption] = useState<'floor' | 'ceil'>('ceil');
+  
+  // Reset selection when modal closes or opens
+  useEffect(() => {
+    setSelectedDaysOption('ceil');
+  }, [returnModalItem, showReturnAll]);
 
   // Local Quotation Days State
   const [quotationDays, setQuotationDays] = useState<Record<string, string | number>>({});
@@ -896,12 +902,6 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     setIsConverting(false);
   };
 
-  const [selectedDaysOption, setSelectedDaysOption] = useState<'floor' | 'ceil'>('ceil');
-  
-  // Reset selection when modal closes or opens
-  useEffect(() => {
-    setSelectedDaysOption('ceil');
-  }, [returnModalItem, showReturnAll]);
 
   const renderDaysSelector = () => {
     const rDate = modalDate || format(new Date(), 'yyyy-MM-dd');
