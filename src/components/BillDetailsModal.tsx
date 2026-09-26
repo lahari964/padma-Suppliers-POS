@@ -711,10 +711,17 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         const issueDateTime = new Date(`${firstItem.issueDate}T${firstItem.issueTime || '10:00'}:00`);
         const returnDateTime = new Date(`${rDate}T${rTime}:00`);
         const hours = Math.max(0, differenceInHours(returnDateTime, issueDateTime));
-        const calcDays = Math.max(1, Math.ceil(hours / 24)); 
-        const userInput = window.prompt(`The system calculated ${calcDays} days of rent for this return. You can override this number if you want:`, calcDays.toString());
-        if (userInput === null) return; // User clicked Cancel
-        finalDays = Math.max(1, parseInt(userInput) || calcDays);
+        
+        const exactDays = hours / 24;
+        const floorDays = Math.max(1, Math.floor(exactDays));
+        const ceilDays = Math.max(1, Math.ceil(exactDays));
+
+        if (floorDays !== ceilDays && exactDays > 1) {
+          const isCeil = window.confirm(`The rental duration was ${exactDays.toFixed(1)} days.\n\nPress 'OK' to round UP to ${ceilDays} days.\nPress 'Cancel' to round DOWN to ${floorDays} days.`);
+          finalDays = isCeil ? ceilDays : floorDays;
+        } else {
+          finalDays = ceilDays;
+        }
       } else {
         toast.error(`Cannot return items before billing start date (${firstItem.issueDate})`);
         return;
