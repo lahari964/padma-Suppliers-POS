@@ -701,6 +701,26 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       return;
     }
 
+    const rDate = modalDate || todayStr;
+    const rTime = modalTime || format(new Date(), 'HH:mm');
+
+    let finalDays = 0;
+    if (!forceZeroDays) {
+      const firstItem = itemsToReturn[0];
+      if (rDate >= firstItem.issueDate) {
+        const issueDateTime = new Date(`${firstItem.issueDate}T${firstItem.issueTime || '10:00'}:00`);
+        const returnDateTime = new Date(`${rDate}T${rTime}:00`);
+        const hours = Math.max(0, differenceInHours(returnDateTime, issueDateTime));
+        const calcDays = Math.max(1, Math.ceil(hours / 24)); 
+        const userInput = window.prompt(`The system calculated ${calcDays} days of rent for this return. You can override this number if you want:`, calcDays.toString());
+        if (userInput === null) return; // User clicked Cancel
+        finalDays = Math.max(1, parseInt(userInput) || calcDays);
+      } else {
+        toast.error(`Cannot return items before billing start date (${firstItem.issueDate})`);
+        return;
+      }
+    }
+
     const itemsReturnedList: any[] = [];
 
     const updatedItems = bill.items.map(i => {
@@ -714,18 +734,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
       const dQty = (!bulkReturn && hasDamages) ? Number(modalDamageQty || 0) : 0;
       const dCostPerUnit = (!bulkReturn && hasDamages) ? Number(modalDamageCost || 0) : 0;
       
-      const rDate = modalDate || todayStr;
-      const rTime = modalTime || format(new Date(), 'HH:mm');
-      
-      let days = 0;
-      if (!forceZeroDays) {
-        if (rDate >= i.issueDate) {
-          const issueDateTime = new Date(`${i.issueDate}T${i.issueTime || '10:00'}:00`);
-          const returnDateTime = new Date(`${rDate}T${rTime}:00`);
-          const hours = Math.max(0, differenceInHours(returnDateTime, issueDateTime));
-          days = Math.max(1, Math.ceil(hours / 24)); 
-        }
-      }
+      const days = forceZeroDays ? 0 : finalDays;
       
       extraCost += (qtyToReturn * i.price * days) - (qtyToReturn * i.price * 1);
       itemsReturnedList.push({ name: i.name, qty: qtyToReturn, days, cost: qtyToReturn * i.price * days, time: rTime });
