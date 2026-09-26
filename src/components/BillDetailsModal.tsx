@@ -717,12 +717,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
         const ceilDays = Math.max(1, Math.ceil(exactDays));
 
         if (floorDays !== ceilDays && exactDays > 1) {
-          const fullDays = Math.floor(hours / 24);
-          const extraHours = hours % 24;
-          const timeString = fullDays > 0 ? `${fullDays} days and ${extraHours} hours` : `${extraHours} hours`;
-          
-          const isCeil = window.confirm(`The customer kept the items for ${timeString}.\n\nDo you want to charge them for ${ceilDays} days or ${floorDays} days?\n\n- Press 'OK' to charge for ${ceilDays} days.\n- Press 'Cancel' to charge for ${floorDays} days.`);
-          finalDays = isCeil ? ceilDays : floorDays;
+          finalDays = selectedDaysOption === 'floor' ? floorDays : ceilDays;
         } else {
           finalDays = ceilDays;
         }
@@ -899,6 +894,60 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
     updateBill(bill.id, updatedBillPayload);
     toast.success('Quotation converted successfully to Upcoming Order!');
     setIsConverting(false);
+  };
+
+  const [selectedDaysOption, setSelectedDaysOption] = useState<'floor' | 'ceil'>('ceil');
+  
+  // Reset selection when modal closes or opens
+  useEffect(() => {
+    setSelectedDaysOption('ceil');
+  }, [returnModalItem, showReturnAll]);
+
+  const renderDaysSelector = () => {
+    const rDate = modalDate || format(new Date(), 'yyyy-MM-dd');
+    const rTime = modalTime || format(new Date(), 'HH:mm');
+    const issueItem = returnModalItem || (bill.items.find(i => (i.qtyIssued - (i.qtyReturned || 0)) > 0));
+    
+    if (!issueItem || rDate < issueItem.issueDate) return null;
+
+    const issueDateTime = new Date(`${issueItem.issueDate}T${issueItem.issueTime || '10:00'}:00`);
+    const returnDateTime = new Date(`${rDate}T${rTime}:00`);
+    const hours = Math.max(0, differenceInHours(returnDateTime, issueDateTime));
+    
+    const exactDays = hours / 24;
+    const floorDays = Math.max(1, Math.floor(exactDays));
+    const ceilDays = Math.max(1, Math.ceil(exactDays));
+
+    if (floorDays !== ceilDays && exactDays > 1) {
+      const fullDays = Math.floor(hours / 24);
+      const extraHours = hours % 24;
+      const timeString = fullDays > 0 ? `${fullDays} days & ${extraHours} hrs` : `${extraHours} hrs`;
+      
+      return (
+        <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl space-y-3 mt-4">
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+            Rental time: <strong>{timeString}</strong>. How many days should we bill?
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              variant={selectedDaysOption === 'floor' ? 'default' : 'outline'} 
+              className={selectedDaysOption === 'floor' ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'border-amber-500/30 text-amber-600 hover:bg-amber-500/10'}
+              onClick={() => setSelectedDaysOption('floor')}
+            >
+              {floorDays} Days
+            </Button>
+            <Button 
+              variant={selectedDaysOption === 'ceil' ? 'default' : 'outline'}
+              className={selectedDaysOption === 'ceil' ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'border-amber-500/30 text-amber-600 hover:bg-amber-500/10'}
+              onClick={() => setSelectedDaysOption('ceil')}
+            >
+              {ceilDays} Days
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -1855,6 +1904,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                   </div>
                 </div>
               )}
+              {renderDaysSelector()}
               <Button onClick={() => handleReturnAction(false)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold mt-4">Confirm Return</Button>
             </div>
           </DialogContent>
@@ -1881,6 +1931,7 @@ export function BillDetailsModal({ isOpen, onClose, billId }: { isOpen: boolean,
                    <p className="text-xs text-red-500 font-medium">To report damages for specific items, please return them individually instead of using Return All.</p>
                 </div>
               )}
+              {renderDaysSelector()}
               <Button onClick={() => handleReturnAction(true)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold mt-4">Confirm Return All</Button>
             </div>
           </DialogContent>
