@@ -210,11 +210,9 @@ export default function Bills() {
                       </TableCell>
                       {currentUser?.role === 'Admin' && (
                         <TableCell className="text-right">
-                          {(getBillDisplayInfo(bill).status === 'Quotation' || getBillDisplayInfo(bill).status === 'Upcoming' || getBillDisplayInfo(bill).status === 'Active' || getBillDisplayInfo(bill).status === 'Partially Active') ? (
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10" onClick={(e) => handleCancelOrder(e, bill.id)} title="Delete Bill">
                               <Trash className="w-4 h-4" />
                             </Button>
-                          ) : null}
                         </TableCell>
                       )}
                     </TableRow>
